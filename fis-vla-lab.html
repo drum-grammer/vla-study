@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+    html { color-scheme: light; }
+    body { margin: 0; font: 14px system-ui, -apple-system, sans-serif; background: #fafaf9; }
+    img { max-width: 100%; }
+    [hidden] { display: none !important; }
+</style>
+<title>FiS-VLA 실습 세션</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gothic+A1:wght@500;700;800;900&family=Noto+Serif+KR:wght@400;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --ground: #F2F4F3; --plate: #FFFFFF; --ink: #14202B; --ink-2: #47535E; --muted: #6F7B86; --rule: #D6DCE0;
+    --slow: #2F3E9E; --slow-soft: #E8EBFA; --fast: #D9531E; --fast-soft: #FCEAE2;
+    --term: #0F1A14; --term-ink: #CFE7D6; --term-hi: #F0895F;
+    --shadow: 0 1px 2px rgba(20,32,43,.05), 0 10px 30px rgba(20,32,43,.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #0E1318; --plate: #161C23; --ink: #E7EBEE; --ink-2: #B9C2CA; --muted: #8A96A1; --rule: #2A333C;
+      --slow: #97A4F5; --slow-soft: #1E2440; --fast: #F0895F; --fast-soft: #3A2218;
+      --term: #0A0F0C; --term-ink: #CFE7D6; --term-hi: #F0895F;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 10px 30px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #0E1318; --plate: #161C23; --ink: #E7EBEE; --ink-2: #B9C2CA; --muted: #8A96A1; --rule: #2A333C;
+    --slow: #97A4F5; --slow-soft: #1E2440; --fast: #F0895F; --fast-soft: #3A2218;
+    --term: #0A0F0C; --term-ink: #CFE7D6; --term-hi: #F0895F;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 10px 30px rgba(0,0,0,.35);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--ground); color: var(--ink); font-family: "Noto Serif KR", "Apple SD Gothic Neo", "Noto Sans KR", serif; font-size: 16px; line-height: 1.8; -webkit-font-smoothing: antialiased; word-break: keep-all; }
+  h1, h2, h3, h4, .sans { font-family: "Gothic A1", "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif; }
+  code, pre, .mono { font-family: "JetBrains Mono", ui-monospace, Menlo, monospace; }
+  code { font-size: .86em; }
+  a { color: var(--slow); text-decoration: none; border-bottom: 1px solid color-mix(in srgb, var(--slow) 35%, transparent); }
+  a:hover { border-bottom-color: var(--slow); }
+  a:focus-visible, summary:focus-visible { outline: 2px solid var(--fast); outline-offset: 2px; }
+  .page { max-width: 920px; margin: 0 auto; padding: 40px 20px 100px; }
+
+  header.head { background: var(--plate); border: 1px solid var(--rule); box-shadow: var(--shadow); padding: 32px 38px 28px; }
+  header .eyebrow { font-family: "Gothic A1", sans-serif; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: 0 0 10px; }
+  header h1 { margin: 0; font-size: clamp(26px, 4vw, 40px); line-height: 1.15; letter-spacing: -.03em; font-weight: 900; text-wrap: balance; }
+  header h1 .fast { color: var(--fast); } header h1 .slow { color: var(--slow); }
+  header .sub { margin: 14px 0 0; color: var(--ink-2); max-width: 66ch; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0 0; }
+  .chip { font-family: "Gothic A1", sans-serif; font-size: 12.5px; font-weight: 700; padding: 5px 11px; border: 1px solid var(--rule); border-radius: 4px; color: var(--ink-2); background: var(--ground); }
+  .chip.fast { color: var(--fast); background: var(--fast-soft); border-color: transparent; }
+  .chip.slow { color: var(--slow); background: var(--slow-soft); border-color: transparent; }
+
+  section { margin: 44px 0 0; }
+  h2 { font-size: 24px; letter-spacing: -.025em; font-weight: 800; margin: 0 0 16px; border-bottom: 2px solid var(--ink); padding-bottom: 8px; }
+  p { margin: 0 0 12px; max-width: 72ch; }
+  ul, ol { margin: 0 0 12px; padding-left: 22px; max-width: 72ch; } li { margin: 0 0 5px; } li::marker { color: var(--muted); }
+  strong { font-weight: 600; }
+
+  pre.sh { margin: 12px 0; padding: 12px 16px; background: var(--term); color: var(--term-ink); font-size: 13.5px; line-height: 1.6; overflow-x: auto; border-radius: 4px; }
+  pre.sh .c { color: var(--muted); }
+  pre.out { margin: 12px 0; padding: 12px 16px; background: var(--plate); border: 1px solid var(--rule); font-size: 12.5px; line-height: 1.55; overflow-x: auto; color: var(--ink-2); border-left: 3px solid var(--fast); }
+  pre.out b { color: var(--fast); font-weight: 600; }
+
+  .lab { background: var(--plate); border: 1px solid var(--rule); box-shadow: var(--shadow); padding: 26px 30px 22px; margin: 0 0 22px; }
+  .lab .head { display: grid; grid-template-columns: 56px 1fr; gap: 16px; align-items: start; margin-bottom: 10px; }
+  .lab .num { font-family: "Gothic A1", sans-serif; font-weight: 900; font-size: 34px; line-height: 1; color: var(--fast); letter-spacing: -.04em; }
+  .lab h3 { margin: 0; font-size: 19px; font-weight: 800; letter-spacing: -.015em; text-wrap: balance; }
+  .lab .ref { font-family: "Gothic A1", sans-serif; font-size: 12.5px; color: var(--muted); margin-top: 4px; }
+  .lab .ref b { color: var(--slow); font-weight: 800; }
+  .lab h4 { font-family: "Gothic A1", sans-serif; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 18px 0 6px; }
+  .repo { background: var(--slow-soft); border-left: 3px solid var(--slow); padding: 10px 14px; margin: 12px 0 0; font-size: 14.5px; }
+  .repo code { color: var(--slow); }
+  .try { background: var(--fast-soft); border-left: 3px solid var(--fast); padding: 10px 14px; margin: 12px 0 0; font-size: 14.5px; }
+
+  .tbl { overflow-x: auto; margin: 12px 0; border: 1px solid var(--rule); }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; font-variant-numeric: tabular-nums; }
+  th, td { padding: 8px 12px; border-bottom: 1px solid var(--rule); text-align: left; vertical-align: top; }
+  th { font-family: "Gothic A1", sans-serif; font-weight: 800; font-size: 12.5px; color: var(--muted); background: var(--ground); white-space: nowrap; }
+  tr:last-child td { border-bottom: 0; }
+  td.n { text-align: right; white-space: nowrap; }
+  tr.hi td { background: color-mix(in srgb, var(--fast-soft) 55%, var(--plate)); font-weight: 600; }
+
+  figure { margin: 14px 0 0; padding: 12px; background: var(--ground); border: 1px solid var(--rule); }
+  figure svg { width: 100%; height: auto; display: block; max-width: 560px; margin: 0 auto; }
+  figcaption { font-family: "Gothic A1", sans-serif; font-size: 12.5px; color: var(--muted); margin-top: 8px; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 720px) { .two { grid-template-columns: 1fr; } .lab { padding: 20px 18px; } header.head { padding: 24px 20px; } }
+  footer { margin-top: 48px; border-top: 1px solid var(--rule); padding-top: 16px; font-family: "Gothic A1", sans-serif; font-size: 13px; color: var(--muted); line-height: 1.7; }
+</style>
+
+</head>
+<body>
+<div class="page">
+  <header class="head">
+    <p class="eyebrow">사내 VLA 논문 스터디 · FiS-VLA · 실습 세션 · 작성 2026-09-11</p>
+    <h1>numpy 여섯 개로 <span class="slow">느린 머리</span>와 <span class="fast">빠른 손</span>을 만져 보기</h1>
+    <p class="sub">GPU 없이, PyTorch 없이. 논문의 핵심 장치 다섯 개를 1분 안에 돌려 보고, 원 저장소의 정확히 그 줄로 건너간다. 각 실습은 <a href="fis-vla-guide.html">정독 가이드</a>의 절과 연결된다.</p>
+    <div class="chips">
+      <span class="chip">Python 3.9+ · numpy</span>
+      <span class="chip fast">총 90분 · 스크립트 6개</span>
+      <span class="chip slow">저장소 CHEN-H01/Fast-in-Slow 대응</span>
+      <span class="chip">결과 그림 SVG 3장</span>
+    </div>
+  </header>
+
+  <section>
+    <h2>0. 준비</h2>
+<pre class="sh"><span class="c"># 터미널로 스크립트를 돌리는 쪽</span>
+cd 30_ecosystem/ai2-robotics/fis-vla-lab/labs
+python3 -c "import numpy"      <span class="c"># 없으면 pip install numpy</span>
+python3 lab1_tokens_blocks.py  <span class="c"># 1초. 아래 순서대로 여섯 개</span>
+
+<span class="c"># 주피터로 셀을 하나씩 실행하는 쪽 (권장 — 결과 그림이 노트북 안에 뜬다)</span>
+cd labs/notebooks &amp;&amp; jupyter lab</pre>
+    <p><strong>노트북판이 있다.</strong> <code>labs/notebooks/lab*.ipynb</code> 여섯 개는 스크립트와 내용이 같고 셀로 쪼개져 있다. 첫 셀이 작업 폴더를 <code>labs/</code> 로 옮겨 <code>tinynn.py</code> 를 불러오고 결과 그림을 <code>labs/out/</code> 에 저장한다. <code>.py</code> 가 정본이고 노트북은 <code>make_notebooks.py</code> 가 만든 산출물이다.</p>
+    <p><strong>왜 numpy인가.</strong> 참여자 PC에 GPU가 없고, 저장소 원본은 LIFT3D 포함 약 700MB에 CoppeliaSim·Flash-Attention까지 필요하다. 논문의 아이디어는 작은 모형으로 충분히 재현된다. 공용 도구 <code>tinynn.py</code>에 수동 역전파 MLP, Adam, 트랜스포머 블록(순전파), 저장소와 같은 squaredcos_cap_v2 확산 스케줄, SVG 그리기가 들어 있다.</p>
+    <p><strong>권장 순서.</strong> 가이드 1.2~1.3 → 실습 1 → 1.4·1.7 → 실습 2 → 1.8 → 실습 3 → 2.5·2.7 → 실습 4 → 2.6 → 실습 5 → 2.4·3.4 → 실습 6.</p>
+  </section>
+
+  <section>
+    <h2>1. 실습 여섯 개</h2>
+
+    <article class="lab" id="lab1">
+      <div class="head"><div class="num">1</div><div><h3>토큰 열, 어텐션, 블록 쌓기</h3><div class="ref">가이드 <b>1.2 · 1.3 · 2.4</b> · <code>lab1_tokens_blocks.py</code> · 1초</div></div></div>
+      <h4>보는 것</h4>
+      <ol>
+        <li>언어 5 · 이미지 패치 9 · 로봇 상태 1 · 노이즈 행동 1 토큰이 전부 <code>(토큰 수, 16)</code> 행렬. 세로로 이으면 <code>(14, 16)</code> 하나. 논문 그림 2 범례.</li>
+        <li>Q=K=V=x 어텐션에서 "wine" 토큰이 병 패치(4번)에 가장 큰 가중치를 준다. 도서관 비유 그대로.</li>
+        <li>블록 6개 중 0~3만 통과(System 2) → 모양 그대로인 중간 표현 → 고주파 토큰 11개를 붙여 <code>(25, 16)</code> → 4~5 통과(System 1).</li>
+        <li>같은 중간 표현을 4번 재사용하며 상태 토큰만 바꿔 System 1을 돌린다 = 1:4 비동기.</li>
+      </ol>
+<pre class="out">  패치 4: 0.188 ###########  ← 병 패치
+  가장 많이 본 패치 = 4 (기대: 4)
+  블록 0~3 통과 (System 2)   : (14, 16) → (14, 16)   ※ 모양이 같다
+  고주파 토큰 11개를 뒤에 붙임  : (14, 16) + (11, 16) → (25, 16)
+  블록 4~5 통과 (System 1)     : (25, 16) → (25, 16)</pre>
+      <div class="repo"><strong>저장소</strong>: <code>models/vlms/prismatic.py</code>가 LLM을 <code>llm_layer_end=self.llm_middle_layer</code>로 한 번, <code>llm_layer_start=self.llm_middle_layer</code>로 한 번 호출한다. <code>tinynn.run_blocks(blocks, x, start, end)</code>가 그 축소판.</div>
+      <div class="try"><strong>해 볼 것</strong>: <code>MIDDLE</code>을 1이나 5로 바꿔 System 1 크기를 바꾼다(논문 표 6: 1블록 0.49, 2블록 0.69, 8블록 0.64). <code>img[4]</code>를 "wine"과 무관하게 만들면 어텐션이 어디로 가는가.</div>
+    </article>
+
+    <article class="lab" id="lab2">
+      <div class="head"><div class="num">2</div><div><h3>자기회귀는 왜 느리고, 이산화는 왜 끊기는가</h3><div class="ref">가이드 <b>1.3 · 1.4 · 1.7</b> · <code>lab2_autoregressive_vs_chunk.py</code> · 1초 · <code>out/lab2_quantize.svg</code></div></div></div>
+      <h4>보는 것 (M1 Mac 예시)</h4>
+      <div class="tbl"><table>
+        <thead><tr><th>실험</th><th>결과</th></tr></thead>
+        <tbody>
+          <tr><td>토큰 수 64 → 128 → 256 → 512</td><td>1.5 → 2.8 → 5.9 → 14.4 ms. 512에서 ×9.8 (제곱 항이 보인다)</td></tr>
+          <tr><td>7-DoF를 토큰 7개 순차(자기회귀) vs 연속값 7개 한 번에</td><td>50 ms (20 Hz) vs 7 ms (141 Hz), ×7</td></tr>
+          <tr><td>부드러운 Δx 궤적을 256 / 16 구간으로 자르기</td><td>최대 오차 0.004 / 0.06 · 서로 다른 값 91 / 7개</td></tr>
+        </tbody>
+      </table></div>
+      <figure><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 360" font-family="system-ui, sans-serif" font-size="12">
+<rect width="520" height="360" fill="var(--plate)"/>
+<rect x="40" y="40" width="440" height="280" fill="none" stroke="var(--rule)"/>
+<text x="40" y="26" font-size="14" font-weight="700" fill="var(--ink)">연속 행동 vs 256/16 구간 이산화</text>
+<path d="M40.0,180.0 L42.2,176.2 L44.4,172.5 L46.6,168.8 L48.8,165.2 L51.1,161.6 L53.3,158.1 L55.5,154.6 L57.7,151.2 L59.9,147.8 L62.1,144.6 L64.3,141.4 L66.5,138.2 L68.7,135.1 L71.0,132.2 L73.2,129.2 L75.4,126.4 L77.6,123.7 L79.8,121.0 L82.0,118.4 L84.2,115.9 L86.4,113.5 L88.6,111.2 L90.9,109.0 L93.1,106.9 L95.3,104.9 L97.5,102.9 L99.7,101.1 L101.9,99.4 L104.1,97.7 L106.3,96.2 L108.5,94.8 L110.8,93.5 L113.0,92.2 L115.2,91.1 L117.4,90.1 L119.6,89.1 L121.8,88.3 L124.0,87.6 L126.2,87.0 L128.4,86.5 L130.7,86.0 L132.9,85.7 L135.1,85.5 L137.3,85.4 L139.5,85.4 L141.7,85.4 L143.9,85.6 L146.1,85.9 L148.3,86.2 L150.6,86.7 L152.8,87.2 L155.0,87.8 L157.2,88.5 L159.4,89.3 L161.6,90.2 L163.8,91.2 L166.0,92.2 L168.2,93.4 L170.5,94.6 L172.7,95.8 L174.9,97.2 L177.1,98.6 L179.3,100.1 L181.5,101.7 L183.7,103.3 L185.9,105.0 L188.1,106.7 L190.4,108.5 L192.6,110.4 L194.8,112.3 L197.0,114.2 L199.2,116.2 L201.4,118.3 L203.6,120.4 L205.8,122.5 L208.0,124.7 L210.3,126.9 L212.5,129.1 L214.7,131.3 L216.9,133.6 L219.1,136.0 L221.3,138.3 L223.5,140.6 L225.7,143.0 L227.9,145.4 L230.2,147.8 L232.4,150.2 L234.6,152.6 L236.8,155.0 L239.0,157.4 L241.2,159.9 L243.4,162.3 L245.6,164.7 L247.8,167.1 L250.1,169.5 L252.3,171.8 L254.5,174.2 L256.7,176.5 L258.9,178.8 L261.1,181.1 L263.3,183.4 L265.5,185.7 L267.7,187.9 L269.9,190.1 L272.2,192.2 L274.4,194.4 L276.6,196.4 L278.8,198.5 L281.0,200.5 L283.2,202.5 L285.4,204.4 L287.6,206.3 L289.8,208.1 L292.1,209.9 L294.3,211.7 L296.5,213.3 L298.7,215.0 L300.9,216.6 L303.1,218.1 L305.3,219.6 L307.5,221.0 L309.7,222.4 L312.0,223.7 L314.2,225.0 L316.4,226.2 L318.6,227.3 L320.8,228.4 L323.0,229.4 L325.2,230.4 L327.4,231.3 L329.6,232.1 L331.9,232.9 L334.1,233.6 L336.3,234.2 L338.5,234.8 L340.7,235.4 L342.9,235.8 L345.1,236.2 L347.3,236.6 L349.5,236.9 L351.8,237.1 L354.0,237.3 L356.2,237.4 L358.4,237.4 L360.6,237.4 L362.8,237.3 L365.0,237.2 L367.2,237.0 L369.4,236.8 L371.7,236.5 L373.9,236.1 L376.1,235.7 L378.3,235.2 L380.5,234.7 L382.7,234.2 L384.9,233.6 L387.1,232.9 L389.3,232.2 L391.6,231.4 L393.8,230.6 L396.0,229.8 L398.2,228.9 L400.4,228.0 L402.6,227.0 L404.8,226.0 L407.0,225.0 L409.2,223.9 L411.5,222.8 L413.7,221.7 L415.9,220.5 L418.1,219.3 L420.3,218.1 L422.5,216.8 L424.7,215.5 L426.9,214.2 L429.1,212.9 L431.4,211.6 L433.6,210.2 L435.8,208.8 L438.0,207.4 L440.2,206.0 L442.4,204.6 L444.6,203.2 L446.8,201.7 L449.0,200.3 L451.3,198.8 L453.5,197.3 L455.7,195.9 L457.9,194.4 L460.1,192.9 L462.3,191.5 L464.5,190.0 L466.7,188.6 L468.9,187.1 L471.2,185.7 L473.4,184.2 L475.6,182.8 L477.8,181.4 L480.0,180.0" fill="none" stroke="#2F3E9E" stroke-width="2"/>
+<path d="M40.0,167.5 L42.2,167.5 L44.4,167.5 L46.6,167.5 L48.8,167.5 L51.1,167.5 L53.3,167.5 L55.5,142.5 L57.7,142.5 L59.9,142.5 L62.1,142.5 L64.3,142.5 L66.5,142.5 L68.7,142.5 L71.0,142.5 L73.2,117.5 L75.4,117.5 L77.6,117.5 L79.8,117.5 L82.0,117.5 L84.2,117.5 L86.4,117.5 L88.6,117.5 L90.9,117.5 L93.1,117.5 L95.3,92.5 L97.5,92.5 L99.7,92.5 L101.9,92.5 L104.1,92.5 L106.3,92.5 L108.5,92.5 L110.8,92.5 L113.0,92.5 L115.2,92.5 L117.4,92.5 L119.6,92.5 L121.8,92.5 L124.0,92.5 L126.2,92.5 L128.4,92.5 L130.7,92.5 L132.9,92.5 L135.1,92.5 L137.3,92.5 L139.5,92.5 L141.7,92.5 L143.9,92.5 L146.1,92.5 L148.3,92.5 L150.6,92.5 L152.8,92.5 L155.0,92.5 L157.2,92.5 L159.4,92.5 L161.6,92.5 L163.8,92.5 L166.0,92.5 L168.2,92.5 L170.5,92.5 L172.7,92.5 L174.9,92.5 L177.1,92.5 L179.3,92.5 L181.5,92.5 L183.7,92.5 L185.9,92.5 L188.1,117.5 L190.4,117.5 L192.6,117.5 L194.8,117.5 L197.0,117.5 L199.2,117.5 L201.4,117.5 L203.6,117.5 L205.8,117.5 L208.0,117.5 L210.3,117.5 L212.5,117.5 L214.7,142.5 L216.9,142.5 L219.1,142.5 L221.3,142.5 L223.5,142.5 L225.7,142.5 L227.9,142.5 L230.2,142.5 L232.4,142.5 L234.6,142.5 L236.8,167.5 L239.0,167.5 L241.2,167.5 L243.4,167.5 L245.6,167.5 L247.8,167.5 L250.1,167.5 L252.3,167.5 L254.5,167.5 L256.7,167.5 L258.9,167.5 L261.1,192.5 L263.3,192.5 L265.5,192.5 L267.7,192.5 L269.9,192.5 L272.2,192.5 L274.4,192.5 L276.6,192.5 L278.8,192.5 L281.0,192.5 L283.2,192.5 L285.4,192.5 L287.6,217.5 L289.8,217.5 L292.1,217.5 L294.3,217.5 L296.5,217.5 L298.7,217.5 L300.9,217.5 L303.1,217.5 L305.3,217.5 L307.5,217.5 L309.7,217.5 L312.0,217.5 L314.2,217.5 L316.4,217.5 L318.6,217.5 L320.8,217.5 L323.0,217.5 L325.2,242.5 L327.4,242.5 L329.6,242.5 L331.9,242.5 L334.1,242.5 L336.3,242.5 L338.5,242.5 L340.7,242.5 L342.9,242.5 L345.1,242.5 L347.3,242.5 L349.5,242.5 L351.8,242.5 L354.0,242.5 L356.2,242.5 L358.4,242.5 L360.6,242.5 L362.8,242.5 L365.0,242.5 L367.2,242.5 L369.4,242.5 L371.7,242.5 L373.9,242.5 L376.1,242.5 L378.3,242.5 L380.5,242.5 L382.7,242.5 L384.9,242.5 L387.1,242.5 L389.3,242.5 L391.6,242.5 L393.8,242.5 L396.0,217.5 L398.2,217.5 L400.4,217.5 L402.6,217.5 L404.8,217.5 L407.0,217.5 L409.2,217.5 L411.5,217.5 L413.7,217.5 L415.9,217.5 L418.1,217.5 L420.3,217.5 L422.5,217.5 L424.7,217.5 L426.9,217.5 L429.1,217.5 L431.4,217.5 L433.6,217.5 L435.8,217.5 L438.0,217.5 L440.2,217.5 L442.4,192.5 L444.6,192.5 L446.8,192.5 L449.0,192.5 L451.3,192.5 L453.5,192.5 L455.7,192.5 L457.9,192.5 L460.1,192.5 L462.3,192.5 L464.5,192.5 L466.7,192.5 L468.9,192.5 L471.2,192.5 L473.4,192.5 L475.6,192.5 L477.8,192.5 L480.0,192.5" fill="none" stroke="#D9531E" stroke-width="1.5"/>
+<path d="M40.0,179.2 L42.2,176.1 L44.4,173.0 L46.6,168.3 L48.8,165.2 L51.1,162.0 L53.3,157.3 L55.5,154.2 L57.7,151.1 L59.9,148.0 L62.1,144.8 L64.3,141.7 L66.5,138.6 L68.7,135.5 L71.0,132.3 L73.2,129.2 L75.4,126.1 L77.6,123.0 L79.8,121.4 L82.0,118.3 L84.2,115.2 L86.4,113.6 L88.6,110.5 L90.9,108.9 L93.1,107.3 L95.3,104.2 L97.5,102.7 L99.7,101.1 L101.9,99.5 L104.1,98.0 L106.3,96.4 L108.5,94.8 L110.8,93.3 L113.0,91.7 L115.2,91.7 L117.4,90.2 L119.6,88.6 L121.8,88.6 L124.0,87.0 L126.2,87.0 L128.4,87.0 L130.7,85.5 L132.9,85.5 L135.1,85.5 L137.3,85.5 L139.5,85.5 L141.7,85.5 L143.9,85.5 L146.1,85.5 L148.3,85.5 L150.6,87.0 L152.8,87.0 L155.0,88.6 L157.2,88.6 L159.4,88.6 L161.6,90.2 L163.8,91.7 L166.0,91.7 L168.2,93.3 L170.5,94.8 L172.7,96.4 L174.9,98.0 L177.1,98.0 L179.3,99.5 L181.5,101.1 L183.7,102.7 L185.9,104.2 L188.1,107.3 L190.4,108.9 L192.6,110.5 L194.8,112.0 L197.0,113.6 L199.2,116.7 L201.4,118.3 L203.6,119.8 L205.8,123.0 L208.0,124.5 L210.3,126.1 L212.5,129.2 L214.7,130.8 L216.9,133.9 L219.1,135.5 L221.3,138.6 L223.5,140.2 L225.7,143.3 L227.9,144.8 L230.2,148.0 L232.4,149.5 L234.6,152.7 L236.8,155.8 L239.0,157.3 L241.2,160.5 L243.4,162.0 L245.6,165.2 L247.8,166.7 L250.1,169.8 L252.3,171.4 L254.5,174.5 L256.7,176.1 L258.9,179.2 L261.1,180.8 L263.3,183.9 L265.5,185.5 L267.7,188.6 L269.9,190.2 L272.2,191.7 L274.4,194.8 L276.6,196.4 L278.8,198.0 L281.0,201.1 L283.2,202.7 L285.4,204.2 L287.6,205.8 L289.8,207.3 L292.1,210.5 L294.3,212.0 L296.5,213.6 L298.7,215.2 L300.9,216.7 L303.1,218.3 L305.3,219.8 L307.5,221.4 L309.7,223.0 L312.0,223.0 L314.2,224.5 L316.4,226.1 L318.6,227.7 L320.8,227.7 L323.0,229.2 L325.2,230.8 L327.4,230.8 L329.6,232.3 L331.9,232.3 L334.1,233.9 L336.3,233.9 L338.5,235.5 L340.7,235.5 L342.9,235.5 L345.1,235.5 L347.3,237.0 L349.5,237.0 L351.8,237.0 L354.0,237.0 L356.2,237.0 L358.4,237.0 L360.6,237.0 L362.8,237.0 L365.0,237.0 L367.2,237.0 L369.4,237.0 L371.7,237.0 L373.9,235.5 L376.1,235.5 L378.3,235.5 L380.5,235.5 L382.7,233.9 L384.9,233.9 L387.1,232.3 L389.3,232.3 L391.6,230.8 L393.8,230.8 L396.0,229.2 L398.2,229.2 L400.4,227.7 L402.6,227.7 L404.8,226.1 L407.0,224.5 L409.2,224.5 L411.5,223.0 L413.7,221.4 L415.9,219.8 L418.1,219.8 L420.3,218.3 L422.5,216.7 L424.7,215.2 L426.9,213.6 L429.1,213.6 L431.4,212.0 L433.6,210.5 L435.8,208.9 L438.0,207.3 L440.2,205.8 L442.4,204.2 L444.6,202.7 L446.8,201.1 L449.0,199.5 L451.3,199.5 L453.5,198.0 L455.7,196.4 L457.9,194.8 L460.1,193.3 L462.3,191.7 L464.5,190.2 L466.7,188.6 L468.9,187.0 L471.2,185.5 L473.4,183.9 L475.6,182.3 L477.8,180.8 L480.0,180.8" fill="none" stroke="#7a7a7a" stroke-width="1" stroke-dasharray="3 3"/>
+<rect x="48" y="47" width="10" height="10" fill="#2F3E9E"/>
+<text x="64" y="56" fill="var(--ink)">연속 (확산 헤드가 내는 것)</text>
+<rect x="48" y="63" width="10" height="10" fill="#D9531E"/>
+<text x="64" y="72" fill="var(--ink)">16 구간 (계단이 보인다)</text>
+<rect x="48" y="79" width="10" height="10" fill="#7a7a7a"/>
+<text x="64" y="88" fill="var(--ink)">256 구간 (OpenVLA 방식, 확대하면 계단)</text>
+</svg><figcaption>연속(파랑) vs 16 구간(주황) vs 256 구간(점선). 논문 2절 "action discontinuities".</figcaption></figure>
+      <div class="repo"><strong>논문</strong>: 표 1의 OpenVLA 6.3 Hz(토큰 자기회귀) vs FiS-VLA 21.9 Hz가 두 번째 줄의 차이. <strong>주의</strong>: 실제 확산은 디노이징을 여러 번 반복한다(<code>test_rlbench.sh</code>의 <code>--ddim-steps 4</code>). 토큰 순차 생성과는 다른 축의 비용이다.</div>
+    </article>
+
+    <article class="lab" id="lab3">
+      <div class="head"><div class="num">3</div><div><h3>확산으로 행동 만들기, 식 (1) 직접 학습</h3><div class="ref">가이드 <b>1.8 · 2.6</b> · <code>lab3_diffusion_action.py</code> · 6초 · <code>out/lab3_diffusion.svg</code></div></div></div>
+      <h4>보는 것</h4>
+      <ul>
+        <li>시연 데이터: 장애물을 왼쪽(x=−0.65) 또는 오른쪽(+0.65)으로 돌아가는 <strong>두 갈래</strong>. 조건 c로 위/아래가 바뀐다.</li>
+        <li>행동을 직접 MSE로 맞히는 <strong>회귀</strong>는 <code>(+0.00, +0.55)</code> — 두 갈래의 가운데, 장애물 위. 실제 로봇이면 충돌.</li>
+        <li>노이즈를 맞히는 <strong>확산</strong>은 샘플 300개가 왼쪽 52% / 오른쪽 48%, |x| 평균 0.64 (정답 0.65). 갈래를 지킨다.</li>
+      </ul>
+      <figure><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 360" font-family="system-ui, sans-serif" font-size="12">
+<rect width="520" height="360" fill="var(--plate)"/>
+<rect x="40" y="40" width="440" height="280" fill="none" stroke="var(--rule)"/>
+<text x="40" y="26" font-size="14" font-weight="700" fill="var(--ink)">시연(회색) · 회귀 예측(빨강 ×) · 확산 샘플(주황)  — 조건 c=0</text>
+<circle cx="384.7" cy="116.6" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="146.7" cy="113.2" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="376.4" cy="107.2" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="140.7" cy="119.1" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="144.3" cy="121.0" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="395.1" cy="115.6" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="134.9" cy="116.6" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="383.8" cy="117.3" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="132.5" cy="118.3" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="131.3" cy="117.5" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="397.4" cy="119.4" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="157.5" cy="110.1" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="381.7" cy="115.2" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="387.2" cy="117.7" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="385.9" cy="118.2" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="138.9" cy="110.6" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="384.6" cy="115.1" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="381.1" cy="114.6" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="384.7" cy="116.1" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="381.3" cy="110.9" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="137.2" cy="120.8" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="149.9" cy="114.6" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="132.2" cy="113.6" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="148.8" cy="115.0" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="370.1" cy="117.2" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="377.0" cy="122.9" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="146.0" cy="119.6" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="147.7" cy="120.0" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="131.9" cy="112.2" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="143.3" cy="120.2" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="150.7" cy="113.0" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="380.0" cy="120.3" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="383.5" cy="107.9" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="142.3" cy="119.1" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="166.5" cy="122.6" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="379.2" cy="128.7" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="121.1" cy="123.0" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="143.0" cy="107.3" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="375.6" cy="118.6" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="128.1" cy="108.9" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="367.5" cy="111.0" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="384.5" cy="110.6" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="382.0" cy="117.9" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="127.5" cy="117.1" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="376.5" cy="125.5" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="378.7" cy="116.7" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="154.4" cy="113.2" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="150.3" cy="107.2" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="172.8" cy="119.7" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="367.2" cy="113.8" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="383.2" cy="114.8" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="125.4" cy="117.2" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="135.3" cy="111.6" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="375.7" cy="116.4" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="370.4" cy="111.8" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="129.8" cy="116.7" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="386.4" cy="115.4" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="386.0" cy="110.5" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="382.7" cy="110.2" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="143.5" cy="123.7" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="376.6" cy="122.5" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="143.3" cy="121.2" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="371.9" cy="112.0" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="156.4" cy="110.1" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="379.3" cy="115.0" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="384.0" cy="126.4" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="136.2" cy="114.6" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="384.9" cy="104.2" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="145.5" cy="121.1" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="156.2" cy="110.7" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="376.4" cy="123.3" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="376.3" cy="121.7" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="145.9" cy="123.9" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="135.3" cy="113.3" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="142.1" cy="111.1" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="378.1" cy="123.8" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="369.7" cy="120.0" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="362.5" cy="120.3" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="375.6" cy="120.8" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="365.0" cy="121.3" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="381.4" cy="117.1" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="384.3" cy="112.2" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="378.7" cy="104.0" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="368.8" cy="117.1" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="386.4" cy="112.6" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="379.0" cy="106.5" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="155.2" cy="115.2" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="377.6" cy="124.0" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="126.2" cy="130.8" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="147.7" cy="120.8" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="128.9" cy="119.1" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="146.5" cy="115.7" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="153.7" cy="112.2" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="373.8" cy="106.6" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="122.3" cy="124.9" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="132.5" cy="117.4" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="376.4" cy="115.4" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="365.3" cy="118.2" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="379.2" cy="118.1" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="126.7" cy="102.5" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="379.2" cy="115.4" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="380.1" cy="123.7" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="385.5" cy="114.9" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="367.4" cy="117.7" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="148.1" cy="127.4" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="384.1" cy="113.6" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="139.4" cy="120.0" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="381.1" cy="115.5" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="374.4" cy="125.6" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="376.1" cy="112.8" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="133.0" cy="124.4" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="376.0" cy="127.8" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="382.0" cy="119.1" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="382.6" cy="118.8" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="132.7" cy="117.3" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="141.5" cy="110.7" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="145.6" cy="115.9" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="127.5" cy="120.3" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="136.2" cy="110.2" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="156.4" cy="118.0" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="374.7" cy="109.7" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="381.4" cy="121.2" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="358.0" cy="110.2" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="119.6" cy="114.0" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="391.5" cy="112.4" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="140.2" cy="120.0" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="140.4" cy="124.9" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="133.8" cy="122.3" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="377.9" cy="125.8" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="144.6" cy="115.8" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="135.8" cy="117.4" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="142.4" cy="113.8" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="363.6" cy="117.8" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="133.5" cy="108.2" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="128.2" cy="118.5" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="152.2" cy="116.2" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="383.8" cy="121.1" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="372.2" cy="117.5" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="145.8" cy="122.9" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="378.3" cy="115.2" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="138.3" cy="101.2" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="369.7" cy="117.7" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="148.4" cy="114.4" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="146.9" cy="125.7" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="139.0" cy="113.9" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="379.2" cy="111.4" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="148.1" cy="106.9" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="386.1" cy="112.1" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="379.0" cy="118.8" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="142.6" cy="116.4" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="143.5" cy="114.9" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="135.6" cy="111.0" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="151.6" cy="120.9" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="122.6" cy="122.2" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="407.8" cy="112.3" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="157.7" cy="120.9" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="151.6" cy="106.1" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="383.1" cy="107.4" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="149.8" cy="110.8" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="381.0" cy="105.1" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="383.5" cy="105.3" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="383.1" cy="122.1" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="377.3" cy="116.8" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="133.9" cy="114.3" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="360.9" cy="127.1" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="135.0" cy="110.5" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="159.8" cy="118.0" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="155.4" cy="117.0" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="138.9" cy="116.5" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="131.1" cy="119.2" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="134.4" cy="110.9" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="130.2" cy="120.8" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="370.4" cy="112.3" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="128.7" cy="115.4" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="141.1" cy="112.7" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="391.2" cy="118.8" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="381.6" cy="123.5" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="400.3" cy="113.2" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="387.1" cy="119.8" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="138.9" cy="112.8" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="397.4" cy="120.5" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="127.6" cy="115.7" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="357.0" cy="114.7" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="140.9" cy="115.0" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="158.4" cy="113.3" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="391.3" cy="108.8" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="403.5" cy="113.5" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="154.4" cy="107.8" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="146.7" cy="112.0" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="371.3" cy="113.4" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="134.3" cy="114.1" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="137.5" cy="115.6" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="141.9" cy="110.5" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="153.1" cy="111.5" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="387.0" cy="115.9" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="367.4" cy="120.1" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="377.7" cy="118.0" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="382.6" cy="104.0" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="400.1" cy="103.4" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="129.5" cy="118.3" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="365.7" cy="107.9" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="156.0" cy="111.5" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="357.4" cy="123.6" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="376.9" cy="117.9" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="377.6" cy="115.0" r="2.2" fill="#9aa1ae" opacity="0.6"/>
+<circle cx="148.8" cy="115.2" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="142.7" cy="127.2" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="381.8" cy="109.6" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="386.0" cy="113.1" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="375.5" cy="105.7" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="385.2" cy="117.6" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="387.0" cy="111.7" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="160.8" cy="116.1" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="138.9" cy="116.7" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="387.6" cy="116.9" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="165.6" cy="118.8" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="378.9" cy="119.7" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="382.9" cy="110.1" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="136.2" cy="121.5" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="391.8" cy="112.2" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="386.7" cy="103.9" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="392.7" cy="116.2" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="127.5" cy="110.3" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="379.7" cy="101.9" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="396.2" cy="118.5" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="380.9" cy="124.4" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="387.5" cy="115.8" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="377.3" cy="112.1" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="380.7" cy="122.3" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="144.3" cy="114.0" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="150.8" cy="119.5" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="385.1" cy="114.8" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="173.1" cy="115.2" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="160.6" cy="114.1" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="389.9" cy="105.8" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="383.8" cy="110.7" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="142.6" cy="112.7" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="149.6" cy="111.8" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="394.7" cy="112.5" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="147.6" cy="108.9" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="143.1" cy="116.0" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="147.7" cy="115.0" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="385.8" cy="121.7" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="153.8" cy="114.3" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="387.1" cy="121.8" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="146.7" cy="111.4" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="381.3" cy="107.8" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="371.9" cy="107.8" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="137.5" cy="114.1" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="386.4" cy="117.1" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="146.1" cy="113.5" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="384.4" cy="110.5" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="152.1" cy="116.1" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="138.5" cy="107.8" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="384.3" cy="118.4" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="150.8" cy="110.3" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="385.8" cy="108.2" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="145.1" cy="114.5" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="134.7" cy="114.0" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="376.3" cy="124.1" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="166.1" cy="110.6" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="142.6" cy="109.3" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="387.3" cy="118.1" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="143.7" cy="118.0" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="379.1" cy="103.8" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="380.7" cy="116.5" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="381.3" cy="119.2" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="385.2" cy="109.3" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="150.9" cy="123.1" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="148.9" cy="111.4" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="380.6" cy="117.7" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="390.6" cy="109.5" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="385.8" cy="112.1" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="391.6" cy="105.6" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="374.8" cy="113.6" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="150.3" cy="130.3" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="155.9" cy="114.4" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="148.1" cy="108.3" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="152.1" cy="114.4" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="156.0" cy="121.1" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="378.8" cy="118.3" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="380.0" cy="102.7" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="139.4" cy="110.2" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="379.2" cy="120.9" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="164.9" cy="113.8" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="387.0" cy="111.0" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="382.8" cy="120.8" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="382.5" cy="108.3" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="385.5" cy="120.9" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="144.8" cy="107.7" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="387.4" cy="109.6" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="385.5" cy="99.7" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="147.6" cy="117.3" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="375.4" cy="120.0" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="136.0" cy="112.8" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="385.4" cy="115.9" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="392.0" cy="110.0" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="381.9" cy="108.3" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="140.3" cy="117.7" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="144.8" cy="117.9" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="374.5" cy="113.3" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="384.1" cy="116.4" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="147.1" cy="126.2" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="380.3" cy="114.5" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="377.8" cy="115.1" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="144.2" cy="120.6" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="171.9" cy="128.2" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="151.6" cy="112.8" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="386.0" cy="115.3" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="158.5" cy="117.1" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="147.5" cy="110.0" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="390.2" cy="114.9" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="384.3" cy="109.5" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="383.9" cy="116.9" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="142.7" cy="111.4" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="144.5" cy="119.7" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="144.7" cy="118.0" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="158.1" cy="106.7" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="380.6" cy="117.9" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="370.8" cy="119.3" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="375.1" cy="115.9" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="150.0" cy="104.9" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="377.9" cy="105.5" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="148.5" cy="123.6" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="141.5" cy="114.5" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="137.6" cy="110.9" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="371.4" cy="108.4" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="386.5" cy="106.7" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="387.3" cy="109.9" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="152.2" cy="124.1" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="379.1" cy="122.1" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="147.4" cy="134.3" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="146.5" cy="111.2" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="376.9" cy="118.6" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="156.1" cy="123.0" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="154.5" cy="122.2" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="143.5" cy="108.4" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="384.9" cy="121.3" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="149.5" cy="126.2" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="377.5" cy="109.5" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="384.7" cy="117.5" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="393.6" cy="121.1" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="375.1" cy="114.2" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="146.8" cy="121.7" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="385.7" cy="107.1" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="149.3" cy="115.4" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="378.6" cy="121.0" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="131.3" cy="116.6" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="384.3" cy="107.8" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="140.0" cy="130.5" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="161.2" cy="117.3" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="146.3" cy="118.3" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="148.9" cy="113.0" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="150.4" cy="105.1" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="393.3" cy="110.6" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="405.3" cy="115.9" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="385.5" cy="113.9" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="197.7" cy="112.2" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="126.9" cy="106.3" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="389.3" cy="117.3" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="389.7" cy="114.7" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="131.9" cy="103.3" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="403.1" cy="111.0" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="142.5" cy="124.2" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="146.7" cy="120.1" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="133.1" cy="106.0" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="136.8" cy="119.0" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="376.9" cy="111.4" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="143.7" cy="116.6" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="151.1" cy="120.1" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="151.3" cy="104.5" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="146.9" cy="120.8" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="384.7" cy="117.5" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="143.2" cy="113.8" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="391.4" cy="103.5" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="144.9" cy="114.9" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="168.0" cy="120.2" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="157.5" cy="113.1" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="150.2" cy="116.2" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="135.1" cy="115.6" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="150.7" cy="119.1" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="386.4" cy="117.9" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="148.2" cy="111.7" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="382.8" cy="114.6" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="379.0" cy="118.8" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="136.6" cy="121.1" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="146.8" cy="110.6" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="378.9" cy="111.6" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="155.6" cy="117.4" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="145.5" cy="111.4" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="152.8" cy="125.8" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="382.3" cy="116.3" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="389.5" cy="106.3" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="156.9" cy="124.6" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="374.3" cy="112.7" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="147.1" cy="118.1" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="150.3" cy="110.5" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="131.2" cy="119.9" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="386.8" cy="110.9" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="140.1" cy="115.6" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="387.7" cy="102.5" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="138.9" cy="117.6" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="139.7" cy="117.6" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="367.2" cy="110.3" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="151.9" cy="115.9" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="387.2" cy="117.0" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="144.5" cy="120.0" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="151.6" cy="113.4" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="386.2" cy="108.4" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="126.5" cy="112.9" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="377.8" cy="109.3" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="143.9" cy="115.4" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="149.1" cy="118.7" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="145.1" cy="116.1" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="381.5" cy="118.6" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="141.7" cy="115.6" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="387.5" cy="111.8" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="386.5" cy="114.4" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="138.3" cy="116.4" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="380.8" cy="110.4" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="388.0" cy="107.9" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="142.4" cy="117.2" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="131.3" cy="115.1" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="376.2" cy="115.6" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="388.6" cy="103.2" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="144.2" cy="112.6" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="396.9" cy="114.8" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="144.2" cy="112.2" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="152.4" cy="119.4" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="402.2" cy="113.9" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="148.5" cy="125.3" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="377.6" cy="113.9" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="388.4" cy="119.3" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="386.7" cy="121.3" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="393.7" cy="115.9" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="136.0" cy="118.1" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="138.8" cy="117.6" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="155.0" cy="109.4" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="383.4" cy="121.5" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="381.1" cy="110.2" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="373.1" cy="117.0" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="147.0" cy="120.3" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="149.7" cy="118.9" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="152.7" cy="117.5" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="148.4" cy="119.3" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="142.0" cy="119.9" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="390.2" cy="113.0" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="393.0" cy="117.5" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="150.5" cy="112.9" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="384.1" cy="115.8" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="381.3" cy="113.4" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="172.2" cy="110.3" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="137.7" cy="111.8" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="387.8" cy="111.8" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="373.6" cy="114.2" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="374.6" cy="119.5" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="378.2" cy="114.7" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="339.7" cy="106.4" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="158.6" cy="110.3" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="143.0" cy="121.3" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="390.5" cy="112.4" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="150.5" cy="118.8" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="380.2" cy="114.4" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="377.4" cy="107.6" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="174.9" cy="104.6" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="387.8" cy="112.1" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="389.2" cy="112.7" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="156.3" cy="125.9" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="382.8" cy="105.0" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="384.3" cy="108.3" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="391.3" cy="116.2" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="124.4" cy="107.4" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="380.5" cy="123.9" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="161.7" cy="117.7" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="159.7" cy="124.0" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="140.8" cy="105.0" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="145.0" cy="106.8" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="141.6" cy="120.9" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="140.4" cy="131.0" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="164.6" cy="105.3" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="383.4" cy="120.5" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="146.9" cy="114.0" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="147.7" cy="119.9" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="399.3" cy="121.6" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="136.5" cy="120.5" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="142.0" cy="117.4" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="144.3" cy="113.8" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="168.6" cy="114.4" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="390.9" cy="108.2" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="143.5" cy="116.9" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="389.3" cy="129.8" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="144.4" cy="110.9" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="389.1" cy="108.6" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="382.4" cy="119.6" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="153.8" cy="114.6" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="165.9" cy="114.0" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="143.4" cy="120.0" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="380.3" cy="119.7" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="157.9" cy="128.5" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="379.1" cy="114.7" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="141.3" cy="115.6" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="386.6" cy="111.7" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="136.2" cy="122.7" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="371.6" cy="116.7" r="2.5" fill="#D9531E" opacity="0.8"/>
+<circle cx="389.4" cy="116.2" r="2.5" fill="#D9531E" opacity="0.8"/>
+<text x="254.6" y="113.3" fill="#C23A2B" font-size="26">×</text>
+<text x="232.5" y="185.8" fill="var(--ink-2)" font-size="12">장애물</text>
+<path d="M238.0,180.0 L282.0,180.0" fill="none" stroke="var(--ink-2)" stroke-width="6"/>
+<rect x="48" y="47" width="10" height="10" fill="#9aa1ae"/>
+<text x="64" y="56" fill="var(--ink)">시연 데이터 (두 갈래)</text>
+<rect x="48" y="63" width="10" height="10" fill="#D9531E"/>
+<text x="64" y="72" fill="var(--ink)">확산 샘플 (두 갈래 유지)</text>
+<rect x="48" y="79" width="10" height="10" fill="#C23A2B"/>
+<text x="64" y="88" fill="var(--ink)">× 회귀 예측 (가운데로 붕괴)</text>
+</svg><figcaption>회색 시연(두 갈래) · 빨간 × 회귀 예측(가운데로 붕괴) · 주황 확산 샘플(두 갈래 유지). 조건 c=0.</figcaption></figure>
+      <div class="repo"><strong>저장소와 같은 네 줄</strong> (<code>models/vlas/fisvla.py</code> 204~236행)
+<pre class="sh">noise = rng.normal(0, 1, a.shape)          <span class="c"># noise = torch.randn_like(actions)</span>
+t = rng.integers(0, T, len(a))             <span class="c"># timestep = torch.randint(0, num_timesteps)</span>
+x_t = q_sample(a, t, noise, alpha_bar)     <span class="c"># x = self.diffusion.q_sample(actions, timestep, noise)</span>
+loss = ((noise_pred - noise) ** 2).mean()  <span class="c"># loss = ((noise_pred - noise) ** 2).mean()</span></pre>
+      노이즈 스케줄 <code>squaredcos_cap_v2</code>, T=100도 저장소 <code>create_diffusion(...)</code>과 같다.</div>
+      <div class="try"><strong>해 볼 것</strong>: 학습 스텝 4000 → 500이면 샘플이 어떻게 흐트러지는가. <code>sample()</code>의 100 스텝을 10으로 줄이면?</div>
+    </article>
+
+    <article class="lab" id="lab4">
+      <div class="head"><div class="num">4</div><div><h3>행동 청크와 1:n 비동기, 117.7 Hz의 뜻</h3><div class="ref">가이드 <b>1.8 · 2.5 · 2.7</b> · <code>lab4_chunk_async.py</code> · 4초 · <code>out/lab4_ratio.svg</code></div></div></div>
+      <p><strong>모형</strong>: 점 로봇이 웨이포인트 수십 개(에피소드마다 20~44개)를 순서대로 방문한다. <span style="color:var(--slow);font-weight:600">System 2(90 ms)</span>는 "지금 어느 단계인지"를 보고 목표를 낸다. <span style="color:var(--fast);font-weight:600">System 1(30 ms)</span>은 매 스텝 최신 위치로 이동량을 낸다. 둘은 GPU 한 장에서 <strong>순차 실행</strong>(논문 3.3절의 조건). 단계가 끝나도 System 1은 다음 System 2 갱신까지 옛 목표를 붙든다.</p>
+      <div class="two">
+        <div>
+          <h4>(1) 비율 1:n, 청크 1</h4>
+          <div class="tbl"><table>
+            <thead><tr><th>비율</th><th class="n">성공률</th><th class="n">관측 Hz</th><th class="n">S2 Hz</th><th class="n">헛도는 시간</th></tr></thead>
+            <tbody>
+              <tr><td>1:1</td><td class="n">23.7%</td><td class="n">8.3</td><td class="n">8.3</td><td class="n">120 ms</td></tr>
+              <tr><td>1:2</td><td class="n">60.0%</td><td class="n">13.3</td><td class="n">6.7</td><td class="n">150 ms</td></tr>
+              <tr class="hi"><td>1:4</td><td class="n">94.7%</td><td class="n">19.0</td><td class="n">4.8</td><td class="n">210 ms</td></tr>
+              <tr><td>1:8</td><td class="n">29.3%</td><td class="n">24.2</td><td class="n">3.0</td><td class="n">330 ms</td></tr>
+              <tr><td>1:16</td><td class="n">0.0%</td><td class="n">28.1</td><td class="n">1.8</td><td class="n">570 ms</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+        <div>
+          <h4>(2) 청크 H, 비율 1:4</h4>
+          <div class="tbl"><table>
+            <thead><tr><th>청크</th><th class="n">성공률</th><th class="n">명령 Hz</th><th class="n">관측 Hz</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td class="n">94.7%</td><td class="n">19.0</td><td class="n">19.0</td></tr>
+              <tr><td>2</td><td class="n">95.7%</td><td class="n">38.1</td><td class="n">19.0</td></tr>
+              <tr><td>4</td><td class="n">95.7%</td><td class="n">76.2</td><td class="n">19.0</td></tr>
+              <tr><td>8</td><td class="n">95.7%</td><td class="n">152.4</td><td class="n">19.0</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+      </div>
+      <figure><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 360" font-family="system-ui, sans-serif" font-size="12">
+<rect width="520" height="360" fill="var(--plate)"/>
+<rect x="40" y="40" width="440" height="280" fill="none" stroke="var(--rule)"/>
+<text x="40" y="26" font-size="14" font-weight="700" fill="var(--ink)">주파수 비율 1:n 에 따른 성공률 (장난감 모형)</text>
+<path d="M84.0,256.9 L172.0,160.0 L260.0,67.6 L348.0,241.8 L436.0,320.0" fill="none" stroke="#2F3E9E" stroke-width="2"/>
+<circle cx="84.0" cy="256.9" r="5" fill="#D9531E" opacity="0.8"/>
+<circle cx="172.0" cy="160.0" r="5" fill="#D9531E" opacity="0.8"/>
+<circle cx="260.0" cy="67.6" r="5" fill="#D9531E" opacity="0.8"/>
+<circle cx="348.0" cy="241.8" r="5" fill="#D9531E" opacity="0.8"/>
+<circle cx="436.0" cy="320.0" r="5" fill="#D9531E" opacity="0.8"/>
+<text x="70.8" y="240.9" fill="var(--ink)" font-size="12">1:1</text>
+<text x="66.4" y="270.2" fill="#D9531E" font-size="12">24%</text>
+<text x="158.8" y="144.0" fill="var(--ink)" font-size="12">1:2</text>
+<text x="154.4" y="173.3" fill="#D9531E" font-size="12">60%</text>
+<text x="246.8" y="51.6" fill="var(--ink)" font-size="12">1:4</text>
+<text x="242.4" y="80.9" fill="#D9531E" font-size="12">95%</text>
+<text x="334.8" y="225.8" fill="var(--ink)" font-size="12">1:8</text>
+<text x="330.4" y="255.1" fill="#D9531E" font-size="12">29%</text>
+<text x="422.8" y="304.0" fill="var(--ink)" font-size="12">1:16</text>
+<text x="418.4" y="333.3" fill="#D9531E" font-size="12">0%</text>
+</svg><figcaption>1:1은 System 2를 매번 돌려 느리고, 1:16은 빠르지만 "이해가 낡아" 헛돈다. 논문 표 8(0.60 · 0.63 · 0.69 · 0.61)과 같은 모양. 값은 상수에 달려 있다.</figcaption></figure>
+      <div class="repo"><strong>저장소</strong>: <code>scripts/sim.py</code> 215행 <code>if slow_cnt % int(args.slow_fast_ratio) == 0:</code> → <code>slow_system_forward()</code>, 그 밖에는 <code>slow_latent_embedding</code> 재사용 → 242행 <code>for action in actions: env.step(action)</code>. (2)의 명령 Hz ×8, 관측 Hz 그대로가 논문 117.7 Hz의 뜻.</div>
+      <div class="try"><strong>해 볼 것</strong>: <code>C_SLOW</code>를 두 배로(더 큰 VLM) 하면 최적 비율이 어디로 가는가. 단계 전환이 드문 태스크로 만들면? 이것이 논문 5절 한계 "비율이 고정"의 의미.</div>
+    </article>
+
+    <article class="lab" id="lab5">
+      <div class="head"><div class="num">5</div><div><h3>공동학습과 파국적 망각, 식 (3)</h3><div class="ref">가이드 <b>2.6</b> · <code>lab5_cotraining_forgetting.py</code> · 6초</div></div></div>
+      <p><strong>모형</strong>: 공유 몸통(블록 31·32 역할) + 머리 A(4클래스 분류 = 이산 행동 토큰, 교차엔트로피 = L<sub>slow</sub>) + 머리 B(노이즈 예측, MSE = L<sub>fast</sub>). 1단계: A로 사전학습. 2단계: B를 배우되 A 손실을 빼거나 함께 둔다.</p>
+      <div class="tbl"><table>
+        <thead><tr><th>방식</th><th class="n">A 정확도 (전 → 후)</th><th class="n">B 오차</th><th></th></tr></thead>
+        <tbody>
+          <tr><td>L<sub>fast</sub> only</td><td class="n">94.8% → <b style="color:var(--fast)">75.0%</b></td><td class="n">0.0013</td><td>추론 능력을 잊었다</td></tr>
+          <tr class="hi"><td>co-training</td><td class="n">95.2% → 96.2%</td><td class="n">0.0050</td><td>둘 다 한다</td></tr>
+        </tbody>
+      </table></div>
+      <div class="repo"><strong>저장소</strong>: <code>training/strategies/base_strategy.py</code> 312~313행 <code>if ar_diff_loss: loss = loss + output.loss</code>. <code>train.sh</code> <code>AR_DIFF_LOSS=true</code>. 논문 4.2절 (4): L<sub>slow</sub> 제거 시 0.69 → 0.62.</div>
+      <div class="try"><strong>해 볼 것</strong>: 몸통 폭 32 → 128이면 망각이 줄어드는가(자리 다툼이 준다). 2단계 학습률을 낮추면?</div>
+    </article>
+
+    <article class="lab" id="lab6">
+      <div class="head"><div class="num">6</div><div><h3>코드 지도: 논문 문장을 저장소 줄 번호로</h3><div class="ref">가이드 <b>2.4 · 2.5 · 2.6 · 3.4</b> · <code>lab6_code_map.py</code> · 네트워크 150KB</div></div></div>
+      <p>저장소 전체(700MB)를 받지 않고 핵심 파일 5개만 GitHub에서 내려받아, 20개 앵커 문자열로 논문 개념이 구현된 줄을 앞뒤와 함께 출력한다. 줄 번호가 바뀌어도 찾는다.</p>
+<pre class="out">[train.sh]  System 1 = 블록 30 이후. 32블록 중 마지막 2개
+  ▶    10 | LLM_MIDDLE_LAYER=30
+[models/vlas/fisvla.py]  논문 식 (1) L_fast = ‖η − π(…)‖²
+  ▶   236 |             loss = ((noise_pred - noise) ** 2).mean()
+[training/strategies/base_strategy.py]  논문 식 (3): L = L_fast + L_slow
+  ▶   313 |                             loss = loss + output.loss
+[scripts/sim.py]  n스텝마다 한 번만 System 2 실행 (1:4 비동기 추론)
+  ▶   215 |                 if slow_cnt % int(args.slow_fast_ratio) == 0:</pre>
+      <p>읽는 순서: <code>train.sh</code>(설정) → <code>scripts/sim.py</code>(추론 루프) → <code>models/vlas/fisvla.py</code>(손실) → <code>models/vlms/prismatic.py</code>(블록 분기) → <code>training/strategies/base_strategy.py</code>(손실 합산).</p>
+      <div class="try"><strong>읽고 답할 것</strong>: (1) <code>LLM_MIDDLE_LAYER=30</code>인데 왜 논문은 "2블록"인가. (2) <code>POINTCLOUD_POS='fast'</code>를 <code>'slow'</code>로 바꾸면 논문 표 10의 어느 변형인가. (3) <code>if self.training_mode == 'sync': fast_projected_patch_embeddings = None</code>은 논문 2절의 어느 문장인가.</div>
+    </article>
+  </section>
+
+  <section>
+    <h2>2. 가이드 · 실습 · 저장소 지도</h2>
+    <div class="tbl"><table>
+      <thead><tr><th>가이드 절</th><th>개념</th><th>실습</th><th>저장소</th></tr></thead>
+      <tbody>
+        <tr><td>1.2 토큰과 임베딩</td><td>이종 정보를 같은 차원 벡터 열로</td><td>1 (1)</td><td><code>prismatic.py</code> _prepare_multimodal_embeddings</td></tr>
+        <tr><td>1.3 트랜스포머</td><td>어텐션 = 유사도 가중평균, 블록은 모양 보존</td><td>1 (2)(3) · 2 (1)</td><td><code>llama2.py</code></td></tr>
+        <tr><td>1.4 LLM·자기회귀</td><td>토큰 하나씩 → 느림</td><td>2 (2)</td><td><code>fisvla.py</code> predict_ar</td></tr>
+        <tr><td>1.7 행동 이산화</td><td>256 구간 계단</td><td>2 (3)</td><td><code>vla/action_tokenizer.py</code></td></tr>
+        <tr><td>1.8 확산 헤드</td><td>노이즈 예측 MSE, 다봉 분포</td><td>3</td><td><code>fisvla.py</code> 204~236</td></tr>
+        <tr><td>1.8 행동 청크</td><td>명령 Hz ×H, 관측 Hz 그대로</td><td>4 (2)</td><td><code>sim.py</code> 242</td></tr>
+        <tr><td>2.4 구조</td><td>블록 30에서 분기</td><td>1 (3) · 6</td><td><code>prismatic.py</code> 983 · 1031</td></tr>
+        <tr><td>2.5 비동기 1:4</td><td>순차 실행 비용 vs 낡은 이해</td><td>1 (4) · 4 (1)</td><td><code>sim.py</code> 215</td></tr>
+        <tr><td>2.6 식 (1)(2)(3)</td><td>L<sub>fast</sub> + L<sub>slow</sub>, 망각 방지</td><td>3 · 5</td><td><code>base_strategy.py</code> 313</td></tr>
+        <tr><td>2.7 117.7 Hz</td><td>이론 제어 주파수의 뜻</td><td>4 (2)</td><td>부록 표 9</td></tr>
+        <tr><td>3.4 코드 훑기</td><td>논문 → 줄 번호</td><td>6</td><td>전체</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section>
+    <h2>3. GPU가 있다면</h2>
+    <p>스터디 범위 밖, 참고. 저장소 README(확인 2026-09-11) 기준으로 디스크 2GB 이상, CUDA 12 GPU(7B 추론에 24GB급), Ubuntu 전제.</p>
+    <ol>
+      <li><code>git clone https://github.com/CHEN-H01/Fast-in-Slow</code> (LIFT3D 포함 약 700MB)</li>
+      <li>conda Python 3.10, <code>pip install -r requirement.txt</code>, 추가로 dlimp_openvla · openvla · pytorch3d · flash-attn 2.5.5</li>
+      <li>CoppeliaSim 4.1 설치, <code>LIFT3D/third_party/RLBench</code>와 <code>LIFT3D</code>를 <code>pip install -e .</code></li>
+      <li>HuggingFace <code>haosad/fisvla</code> 체크포인트</li>
+      <li><code>test_rlbench.sh</code> 경로를 고쳐 실행 — 기본 <code>close_box</code>, <code>--slow-fast-ratio 4 --llm_middle_layer 30 --ddim-steps 4 --action-chunk 1</code>, 20 에피소드</li>
+    </ol>
+    <p><code>train.sh</code>는 A800 8장 기준(배치 6/GPU, 300 에폭)이라 개인 GPU 학습은 현실적이지 않다. 스터디에서는 실습 6으로 코드를 읽는 것까지가 목표다.</p>
+  </section>
+
+  <section>
+    <h2>4. 알려진 한계</h2>
+    <ul>
+      <li>실습 4는 "순차 실행 비용"과 "이해가 낡는 비용" 두 힘만 뽑은 장난감이다. 최적 비율은 상수에 달려 있고, 논문의 1:4가 보편 상수라는 뜻이 아니다.</li>
+      <li>실습 5의 "추론 능력"은 4클래스 분류로 대신했다. 논문의 L<sub>slow</sub>는 LLM의 다음 토큰 예측이다.</li>
+      <li>실습 2의 시간은 numpy 단일 스레드 값이라 GPU 트랜스포머의 절대 속도와 무관하다. 비율만 본다.</li>
+      <li>저장소 줄 번호는 2026-09-11 main 기준. 실습 6은 앵커로 찾으므로 바뀌어도 동작하지만, 앵커 문자열 자체가 바뀌면 "찾지 못함"을 출력한다.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>5. 파일 위치</h2>
+    <p>이 페이지의 원본과 실습 코드가 저장소 어디에 있는지 적는다. 경로는 <code>30_ecosystem/ai2-robotics/</code> 기준이다.</p>
+    <div class="tbl"><table>
+      <thead><tr><th>무엇</th><th>저장소 경로</th></tr></thead>
+      <tbody>
+        <tr><td><strong>이 페이지의 원본</strong> (고칠 때 이 파일을 고친다)</td><td><code>fis-vla-lab/index.html</code></td></tr>
+        <tr><td>같은 내용의 마크다운 안내</td><td><code>fis-vla-lab/README.md</code></td></tr>
+        <tr><td>실습 스크립트 여섯 개 · 공용 도구</td><td><code>fis-vla-lab/labs/lab*.py</code> · <code>labs/tinynn.py</code></td></tr>
+        <tr><td>주피터 노트북판 (생성물)</td><td><code>fis-vla-lab/labs/notebooks/lab*.ipynb</code></td></tr>
+        <tr><td>노트북 생성기</td><td><code>fis-vla-lab/labs/make_notebooks.py</code></td></tr>
+        <tr><td>결과 그림 (이 페이지에 박힌 것)</td><td><code>fis-vla-lab/labs/out/*.svg</code></td></tr>
+        <tr><td>정독 가이드 · 두 쪽 요약 · 절별 독해 노트</td><td><code>fis-vla-study-guide.md</code> · <code>fis-vla-paper-summary.md</code> · <code>fis-vla-paper-ko.md</code></td></tr>
+        <tr><td>논문 원본 PDF</td><td><code>papers/2506.01953-fast-in-slow.pdf</code> (7.0MB)</td></tr>
+      </tbody>
+    </table></div>
+    <p>게시본 주소까지 포함한 전체 목록은 <a href="index.html">자료 위치 지도</a>에 있다.</p>
+  </section>
+
+  <footer>FiS-VLA 실습 세션 · 작성 2026-09-11 · 정독 가이드 · 논문 요약 · 절별 독해 노트와 함께 쓰는 자료. 이 페이지의 원본은 저장소 <code>30_ecosystem/ai2-robotics/fis-vla-lab/index.html</code>.</footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+    html { color-scheme: light; }
+    body { margin: 0; font: 14px system-ui, -apple-system, sans-serif; background: #fafaf9; }
+    img { max-width: 100%; }
+    [hidden] { display: none !important; }
+</style>
+<title>VLA 스터디 자료</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=Noto+Serif+KR:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+<header class="masthead">
+  <div class="wrap">
+    <div class="eyebrow">
+      <span>피지컬:52g VLA 논문 스터디</span>
+      <span class="dim">AI² Robotics 논문 6편 · 2026-09-14부터 10-04</span>
+    </div>
+    <h1>VLA 스터디 자료</h1>
+    <p class="standfirst">
+      1주차 두 논문 <strong>FiS-VLA</strong>와 <strong>RoboMamba</strong>의 정독 가이드와 실습 세션.
+      AI·트랜스포머 배경 없이 읽히도록 썼고, 실습은 GPU 없이 numpy만으로 돌아간다.
+    </p>
+    <div class="meta">
+      <span><strong>공개 주소</strong> <code>https://drum-grammer.github.io/vla-study/</code></span>
+      <span><strong>원본</strong> <code>30_ecosystem/ai2-robotics/</code></span>
+      <span class="dim">갱신 2026-09-11</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+<main>
+
+<h2>FiS-VLA — Fast-in-Slow (arXiv 2506.01953)</h2>
+<div class="docs">
+  <div class="doc">
+    <a class="t" href="fis-vla-guide.html">🐢🐇 FiS-VLA 정독 가이드</a>
+    <span class="d">느린 시스템 2와 빠른 시스템 1을 한 모델 안에서 합치는 법.
+    1부 기초 개념 → 2부 절별 해설 → 3부 스터디 도구<br><br>
+    <code>fis-vla-guide.html</code></span>
+  </div>
+  <div class="doc">
+    <a class="t" href="fis-vla-lab.html">🔬 FiS-VLA 실습 세션</a>
+    <span class="d">토큰 열·확산 행동 헤드·행동 청크·공동학습을 numpy 스크립트 6개로.
+    원 저장소의 정확히 그 줄로 건너간다<br><br>
+    <code>fis-vla-lab.html</code></span>
+  </div>
+</div>
+
+<h2>RoboMamba (arXiv 2406.04339)</h2>
+<div class="docs">
+  <div class="doc">
+    <a class="t" href="robomamba-guide.html">🐍 RoboMamba 정독 가이드</a>
+    <span class="d">트랜스포머도 Mamba도 몰라도 읽히는 해설. 1부 기초 개념 → 2부 절별 해설 →
+    3부 스터디 도구. 4시간 30분<br><br>
+    <code>robomamba-guide.html</code></span>
+  </div>
+  <div class="doc">
+    <a class="t" href="robomamba-lab.html">🧪 RoboMamba 실습 세션</a>
+    <span class="d">numpy만으로 돌아가는 실습 7개와 측정 결과. GPU 없이 30초<br><br>
+    <code>robomamba-lab.html</code></span>
+  </div>
+</div>
+
+<h2>공용</h2>
+<div class="docs">
+  <div class="doc">
+    <a class="t" href="lab-environment.html">⚙️ VLA 스터디 실습 환경</a>
+    <span class="d">로컬 numpy · 구글 코랩 · Apple Silicon MPS · 저장소 원본.
+    두 논문 공용<br><br>
+    <code>lab-environment.html</code></span>
+  </div>
+</div>
+
+<h2>읽는 순서</h2>
+<div class="tbl">
+<table>
+<thead><tr><th>나는 지금…</th><th>여기로</th><th>시간</th></tr></thead>
+<tbody>
+<tr><td>환경부터 맞춰야 한다</td><td><a href="lab-environment.html">실습 환경</a></td><td>10분</td></tr>
+<tr><td>FiS-VLA를 제대로 읽고 싶다</td><td><a href="fis-vla-guide.html">FiS-VLA 정독 가이드</a> → <a href="fis-vla-lab.html">실습</a></td><td>4시간 + 1시간</td></tr>
+<tr><td>RoboMamba를 제대로 읽고 싶다</td><td><a href="robomamba-guide.html">RoboMamba 정독 가이드</a> → <a href="robomamba-lab.html">실습</a></td><td>4시간 30분 + 1시간</td></tr>
+</tbody>
+<caption>두 논문은 서로 독립이다. 시스템 1·2 구분(FiS-VLA)과 선형 시간 시퀀스 모델(RoboMamba)은
+다른 문제를 푼다. 순서는 상관없다.</caption>
+</table>
+</div>
+
+<h2>배포</h2>
+<div class="tbl">
+<table>
+<thead><tr><th>채널</th><th>주소</th><th>용도</th></tr></thead>
+<tbody>
+<tr><td><strong>GitHub Pages</strong> (공개)</td><td><a href="https://drum-grammer.github.io/vla-study/">drum-grammer.github.io/vla-study</a></td><td>로그인 없이 누구나. 이 페이지가 그 목차다</td></tr>
+<tr><td>Artifact</td><td>페이지별 별도 링크 — <code>web/README.md</code> 0절</td><td>세션 안에서 빠르게 미리보기</td></tr>
+<tr><td>노션</td><td>52g 워크스페이스 스터디 보드</td><td>스터디 운영</td></tr>
+</tbody>
+<caption>재배포는 <code>web/publish-pages.sh</code> 한 번이다. 원본 HTML을 고친 뒤 실행하면
+<code>dist/</code>를 다시 만들어 공개 저장소에 밀어 넣는다. 절차는 <code>web/README.md</code> 3절.</caption>
+</table>
+</div>
+
+<h2>로컬에서 띄우기</h2>
+<pre class="code">cd 30_ecosystem/ai2-robotics/web
+python3 serve.py
+<span class="c"># → http://localhost:8765/ (브라우저 자동 실행)</span></pre>
+<p><code>python3 -m http.server</code>를 원본 폴더에서 쓰면 <strong>한글이 깨진다</strong> —
+charset 헤더를 안 보내고 원본 HTML에는 <code>&lt;meta charset&gt;</code>이 없다
+(Artifact가 배포 시 붙여 준다). <code>serve.py</code>가 <code>charset=utf-8</code>을 강제한다.
+<code>dist/</code>는 완전한 HTML이라 어느 서버로도 된다.</p>
+
+<h2>마크다운 정본</h2>
+<div class="tbl">
+<table>
+<thead><tr><th>문서</th><th>경로</th><th>웹 버전</th></tr></thead>
+<tbody>
+<tr><td>FiS-VLA 정독 가이드</td><td><code>fis-vla-study-guide.md</code></td><td>✅</td></tr>
+<tr><td>FiS-VLA 두 쪽 요약</td><td><code>fis-vla-paper-summary.md</code></td><td>노션만</td></tr>
+<tr><td>FiS-VLA 절별 독해 노트</td><td><code>fis-vla-paper-ko.md</code></td><td>노션만</td></tr>
+<tr><td>FiS-VLA 실습 세션</td><td><code>fis-vla-lab/README.md</code></td><td>✅</td></tr>
+<tr><td>RoboMamba 정독 가이드</td><td><code>robomamba/01-study-guide.md</code></td><td>✅</td></tr>
+<tr><td>RoboMamba 두 쪽 요약</td><td><code>robomamba/02-summary.md</code></td><td>노션만</td></tr>
+<tr><td>RoboMamba 절별 독해 노트</td><td><code>robomamba/03-reading-notes.md</code></td><td>노션만</td></tr>
+<tr><td>RoboMamba 실습 세션</td><td><code>robomamba/04-lab.md</code></td><td>✅</td></tr>
+<tr><td>실습 환경 구성 (두 논문 공용)</td><td><code>lab-environment-setup.md</code></td><td>✅</td></tr>
+<tr><td>실습 코드</td><td><code>fis-vla-lab/labs/</code> · <code>robomamba-lab/labs/</code></td><td>—</td></tr>
+</tbody>
+<caption>요약·독해 노트는 표 위주라 노션 페이지로만 만들었다.</caption>
+</table>
+</div>
+
+<footer>
+  마크다운이 정본, HTML이 사본이다. 고칠 때는 마크다운 → (실습 수치면 스크립트 재실행)
+  → HTML → 재배포 순서를 지킨다. 자세한 규칙은 <code>web/README.md</code>.
+</footer>
+</main>
+</div>
+</body>
+</html>
