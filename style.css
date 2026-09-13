@@ -327,3 +327,101 @@ footer {
 :focus-visible { outline: 2px solid var(--spike); outline-offset: 2px; border-radius: 2px; }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 hr { border: none; border-top: 1px solid var(--line); margin: 44px 0 0; max-width: var(--measure); }
+
+/* ── 스터디 허브·논문 페이지 (2026-09-13 추가) ─────────────────── */
+/* 논문 명판 — 머리말 안의 서지 정보 */
+.cite {
+  font-family: var(--f-ui); font-size: 14px; color: var(--ink-soft);
+  margin: 12px 0 0; line-height: 1.6; max-width: 70ch;
+}
+.cite b { color: var(--ink); }
+.links { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 0; }
+.links a {
+  font-family: var(--f-ui); font-size: 13px; font-weight: 600; text-decoration: none;
+  color: var(--accent-ink); background: var(--accent-wash);
+  padding: 5px 11px; border-radius: 999px; border: 1px solid transparent;
+}
+.links a:hover { border-color: var(--accent); }
+.links a.ext::after { content: " ↗"; font-weight: 400; }
+.pill {
+  display: inline-block; font-family: var(--f-ui); font-size: 11.5px; font-weight: 700;
+  letter-spacing: .06em; text-transform: uppercase; padding: 2px 8px; border-radius: 3px;
+  background: var(--accent-wash); color: var(--accent-ink); vertical-align: middle;
+}
+.pill.todo { background: var(--surface-2); color: var(--muted); }
+.pill.spike { background: var(--spike-wash); color: var(--spike); }
+
+/* 학습 경로 — 단계 카드 열 */
+.path { counter-reset: step; list-style: none; padding: 0; margin: 22px 0 0; max-width: 860px; display: grid; gap: 10px; }
+.path li {
+  counter-increment: step; display: grid; grid-template-columns: 34px 1fr auto; gap: 12px;
+  align-items: start; background: var(--surface); border: 1px solid var(--line);
+  border-radius: 6px; padding: 12px 16px; font-family: var(--f-ui); font-size: 14.5px; margin: 0;
+}
+.path li::before {
+  content: counter(step); font-family: var(--f-mono); font-weight: 600; font-size: 13px;
+  color: var(--surface); background: var(--accent); border-radius: 50%;
+  width: 26px; height: 26px; display: grid; place-items: center; margin-top: 1px;
+}
+:root[data-theme="dark"] .path li::before { color: #0c1716; }
+.path .what { line-height: 1.5; }
+.path .what b { display: block; font-weight: 700; }
+.path .where { font-size: 13px; color: var(--muted); margin-top: 3px; }
+.path .t { font-family: var(--f-mono); font-size: 12px; color: var(--muted); white-space: nowrap; padding-top: 3px; }
+@media (max-width: 560px) { .path li { grid-template-columns: 34px 1fr; } .path .t { grid-column: 2; padding-top: 0; } }
+
+/* 진행 체크리스트 — 이 브라우저에만 저장(localStorage), 서버 없음 */
+.checks { list-style: none; padding: 0; margin: 14px 0 0; max-width: 780px; font-family: var(--f-ui); font-size: 14.5px; }
+.checks li { margin: 0; border-top: 1px solid var(--line-soft); }
+.checks li:first-child { border-top: none; }
+.checks label { display: flex; gap: 10px; align-items: flex-start; padding: 8px 2px; cursor: pointer; line-height: 1.5; }
+.checks input { margin-top: 5px; accent-color: var(--accent); flex: none; }
+.checks input:checked + span { color: var(--muted); text-decoration: line-through; }
+
+/* 실습 카드 머리 — 번호·제목·메타 */
+.lab-head { display: flex; gap: 14px; align-items: flex-start; margin: 34px 0 0; }
+.lab-head .n {
+  flex: none; font-family: var(--f-mono); font-size: 13px; font-weight: 600;
+  background: var(--spike); color: #fff; padding: 4px 10px; border-radius: 4px; margin-top: 4px;
+}
+.lab-head h3 { margin: 0; }
+.lab-head .ref { font-family: var(--f-ui); font-size: 13px; color: var(--muted); margin-top: 3px; }
+.lab-head .ref a { color: var(--accent); }
+
+/* 논문 목록 (허브) */
+.papers { list-style: none; padding: 0; margin: 22px 0 0; border-top: 1px solid var(--line); max-width: 900px; }
+.paper { display: grid; grid-template-columns: 96px 1fr; gap: 0 18px; padding: 16px 0; border-bottom: 1px solid var(--line); margin: 0; }
+.paper .when { font-family: var(--f-mono); font-size: 12.5px; color: var(--muted); line-height: 1.5; padding-top: 3px; }
+.paper .when b { display: block; color: var(--spike); font-size: 15px; font-weight: 600; }
+.paper .name { font-family: var(--f-ui); font-weight: 700; font-size: 17px; margin: 0; }
+.paper .name .venue { font-weight: 500; font-size: 12.5px; color: var(--muted); margin-left: 8px; }
+.paper .line { margin: 4px 0 0; font-size: 15px; color: var(--ink-soft); max-width: 66ch; }
+.paper .links { margin-top: 10px; }
+.paper .links a.study { background: var(--spike-wash); color: var(--spike); }
+.paper .links span.study { font-family: var(--f-ui); font-size: 13px; color: var(--muted); padding: 5px 0; }
+@media (max-width: 480px) { .paper { grid-template-columns: 1fr; } }
+
+/* 계보 그림 */
+.lineage { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 14px; margin: 22px 0 0; overflow-x: auto; max-width: 900px; }
+.lineage svg { display: block; width: 100%; height: auto; min-width: 560px; }
+.lineage text { font-family: var(--f-ui); fill: var(--ink); font-size: 12px; }
+.lineage .num { fill: var(--spike); font-weight: 700; }
+.lineage .cap { fill: var(--muted); font-size: 11px; }
+.lineage .bx { fill: var(--surface-2); stroke: var(--line); }
+.lineage .hub { fill: var(--accent-wash); stroke: var(--accent); }
+.lineage .edge { stroke: var(--muted); fill: none; stroke-width: 1.2; }
+.lineage .edge.main { stroke: var(--accent); stroke-width: 1.8; }
+
+/* 두 열 대비 (개념 카드) */
+.terms { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px 20px; margin: 18px 0 0; max-width: 860px; }
+.terms div { border-left: 3px solid var(--accent); padding-left: 12px; font-family: var(--f-ui); font-size: 14.5px; line-height: 1.55; }
+.terms b { display: block; font-weight: 700; }
+
+/* 사이트 내비 (페이지 상단 한 줄) */
+.crumbs { font-family: var(--f-ui); font-size: 13px; color: var(--muted); margin: 0 0 6px; }
+.crumbs a { color: var(--accent); text-decoration: none; }
+.crumbs a:hover { text-decoration: underline; }
+.nextprev { display: flex; flex-wrap: wrap; gap: 12px; margin: 40px 0 0; max-width: 860px; }
+.nextprev a { flex: 1 1 240px; font-family: var(--f-ui); font-size: 14px; text-decoration: none; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 12px 16px; }
+.nextprev a small { display: block; font-size: 11.5px; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 3px; }
+.nextprev a:hover { border-color: var(--accent); }

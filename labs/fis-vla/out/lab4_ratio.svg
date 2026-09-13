@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="520" height="360" viewBox="0 0 520 360" font-family="system-ui, sans-serif" font-size="12">
+<rect width="520" height="360" fill="#fff"/>
+<rect x="40" y="40" width="440" height="280" fill="none" stroke="#bbb"/>
+<text x="40" y="26" font-size="14" font-weight="700" fill="#222">주파수 비율 1:n 에 따른 성공률 (장난감 모형)</text>
+<path d="M84.0,256.9 L172.0,160.0 L260.0,67.6 L348.0,241.8 L436.0,320.0" fill="none" stroke="#2F3E9E" stroke-width="2"/>
+<circle cx="84.0" cy="256.9" r="5" fill="#D9531E" opacity="0.8"/>
+<circle cx="172.0" cy="160.0" r="5" fill="#D9531E" opacity="0.8"/>
+<circle cx="260.0" cy="67.6" r="5" fill="#D9531E" opacity="0.8"/>
+<circle cx="348.0" cy="241.8" r="5" fill="#D9531E" opacity="0.8"/>
+<circle cx="436.0" cy="320.0" r="5" fill="#D9531E" opacity="0.8"/>
+<text x="70.8" y="240.9" fill="#222" font-size="12">1:1</text>
+<text x="66.4" y="270.2" fill="#D9531E" font-size="12">24%</text>
+<text x="158.8" y="144.0" fill="#222" font-size="12">1:2</text>
+<text x="154.4" y="173.3" fill="#D9531E" font-size="12">60%</text>
+<text x="246.8" y="51.6" fill="#222" font-size="12">1:4</text>
+<text x="242.4" y="80.9" fill="#D9531E" font-size="12">95%</text>
+<text x="334.8" y="225.8" fill="#222" font-size="12">1:8</text>
+<text x="330.4" y="255.1" fill="#D9531E" font-size="12">29%</text>
+<text x="422.8" y="304.0" fill="#222" font-size="12">1:16</text>
+<text x="418.4" y="333.3" fill="#D9531E" font-size="12">0%</text>
+</svg>

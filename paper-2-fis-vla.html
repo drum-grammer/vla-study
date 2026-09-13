@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+    html { color-scheme: light; }
+    body { margin: 0; font: 14px system-ui, -apple-system, sans-serif; background: #fafaf9; }
+    img { max-width: 100%; }
+    [hidden] { display: none !important; }
+</style>
+<title>FiS-VLA 스터디 페이지</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=Noto+Serif+KR:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+<header class="masthead">
+  <div class="wrap">
+    <p class="crumbs"><a href="index.html">VLA 논문 6편 읽기</a> › 스터디 페이지 ② · 1주차</p>
+    <div class="eyebrow">
+      <span>논문 ② · 2025-06 · preprint</span>
+      <span class="dim">개념 2시간 + 실습 90분 + 공유회 준비 30분</span>
+    </div>
+    <h1>FiS-VLA — 빠른 손을 느린 머리 안에 넣다</h1>
+    <p class="standfirst">
+      온전한 VLM(LLaMA2-7B, 32블록)을 느린 System 2로 그대로 쓰고, 그 <strong>마지막 블록 2개를 빠른 System 1</strong>(확산 행동 생성기)로 재활용한다.
+      두 시스템은 다른 입력을 받고 1:4 주기로 돌며, 확산 손실과 자기회귀 손실을 함께 학습한다.
+      이 페이지 하나로 개념 → 실습 → 공유회 준비까지 간다. 더 깊이 볼 곳은 정독 가이드의 절로 링크했다.
+    </p>
+    <p class="cite"><b>Fast-in-Slow: A Dual-System Foundation Model Unifying Fast Manipulation within Slow Reasoning.</b>
+      Hao Chen, Jiaming Liu, Chenyang Gu, Zhuoyang Liu 외 — CUHK · 베이징대 · <b>AI² Robotics</b> · BAAI. arXiv 2506.01953, 2025-06-02.
+      회사가 오픈소스 모델 "GOVLA 0.5"의 원형으로 내세우는 논문(2차 출처). 실기 실험 중 AlphaBot 결과가 제품과 가장 가깝다.</p>
+    <div class="links">
+      <a class="ext" href="https://arxiv.org/abs/2506.01953">arXiv</a>
+      <a class="ext" href="https://arxiv.org/pdf/2506.01953">PDF</a>
+      <a class="ext" href="https://github.com/CHEN-H01/Fast-in-Slow">원 저장소 CHEN-H01/Fast-in-Slow</a>
+      <a class="ext" href="https://fast-in-slow.github.io/">프로젝트 페이지</a>
+      <a class="ext" href="https://huggingface.co/haosad/fisvla">체크포인트 haosad/fisvla</a>
+      <a class="ext" href="https://github.com/drum-grammer/vla-study/tree/main/labs/fis-vla">실습 코드 (공개)</a>
+    </div>
+    <div class="meta">
+      <span><strong>주차</strong> 1주 (2026-09-14 ~ 09-20)</span>
+      <span><strong>대표자</strong> 죠셉</span>
+      <span><strong>짝 논문</strong> <a href="paper-1-robomamba.html">① RoboMamba</a></span>
+      <span><strong>심화</strong> <a href="fis-vla-guide.html">정독 가이드</a> · <a href="fis-vla-lab.html">실습 상세</a></span>
+      <span class="dim">갱신 2026-09-13</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+<main>
+
+<details class="toc" open>
+  <summary>이 페이지의 차례</summary>
+  <div class="toc-body">
+    <div class="grp">시작</div>
+    <a href="#how"><span class="num">0</span>이 페이지로 공부하는 법 · 진행 체크</a>
+    <a href="#summary"><span class="num">S</span>한 장 요약</a>
+    <div class="grp">1부 · 개념</div>
+    <a href="#c1"><span class="num">1.1</span>먼저 알아야 할 개념 여섯 개</a>
+    <a href="#c2"><span class="num">1.2</span>문제 — 두 개의 딜레마</a>
+    <a href="#c3"><span class="num">1.3</span>핵심 아이디어 — 그림 1</a>
+    <a href="#c4"><span class="num">1.4</span>구조 — 그림 2, 입력·출력·손실</a>
+    <a href="#c5"><span class="num">1.5</span>두 시스템의 조율 — 1:4 비동기</a>
+    <a href="#c6"><span class="num">1.6</span>학습 — 식 세 개</a>
+    <a href="#c7"><span class="num">1.7</span>결과 읽기</a>
+    <a href="#c8"><span class="num">1.8</span>소거 실험</a>
+    <a href="#c9"><span class="num">1.9</span>한계와 비판적으로 읽기</a>
+    <a href="#c10"><span class="num">1.10</span>계보 — RoboMamba와의 대비</a>
+    <div class="grp">2부 · 실습 (numpy)</div>
+    <a href="#prep"><span class="num">2.0</span>준비 — 세 가지 실행 방법</a>
+    <a href="#lab1"><span class="num">2.1</span>토큰 열, 어텐션, 블록 쌓기</a>
+    <a href="#lab2"><span class="num">2.2</span>자기회귀는 왜 느리고 이산화는 왜 끊기나</a>
+    <a href="#lab3"><span class="num">2.3</span>확산으로 행동 만들기, 식 (1)</a>
+    <a href="#lab4"><span class="num">2.4</span>행동 청크와 1:n 비동기, 117.7 Hz</a>
+    <a href="#lab5"><span class="num">2.5</span>공동학습과 파국적 망각, 식 (3)</a>
+    <a href="#lab6"><span class="num">2.6</span>코드 지도 — 논문 문장을 줄 번호로</a>
+    <a href="#labmap"><span class="num">2.7</span>실습 ↔ 개념 ↔ 저장소 지도</a>
+    <a href="#gpu"><span class="num">2.8</span>GPU가 있다면 · 알려진 한계</a>
+    <div class="grp">3부 · 공유회 준비</div>
+    <a href="#draw"><span class="num">3.1</span>대표자용 그림 한 장 지시서</a>
+    <a href="#q3"><span class="num">3.2</span>공유회에서 던질 질문 세 개</a>
+    <a href="#quiz"><span class="num">3.3</span>자가 점검 퀴즈 10문항</a>
+    <a href="#booth"><span class="num">3.4</span>부스 질문의 근거</a>
+    <div class="grp">4부</div>
+    <a href="#map"><span class="num">4</span>자료 지도</a>
+  </div>
+</details>
+
+<h2 id="how"><span class="num">0</span>이 페이지로 공부하는 법</h2>
+<p class="col">위에서 아래로 읽으면 된다. 논문 PDF는 옆에 펴 둔다 — 각 절에 "논문에서 볼 곳"을 적었다.
+배경이 부족하다고 느끼면 1.1절의 링크로 정독 가이드 1부에 다녀온다. 실습은 파이썬 3.9와 numpy만 있으면 1분 안에 돈다.</p>
+<ol class="path">
+  <li><div class="what"><b>한 장 요약을 읽고 논문 그림 1·2와 초록을 본다</b><div class="where">아래 S절. 시간이 없으면 여기까지만 해도 공유회 참여가 된다</div></div><span class="t">20분</span></li>
+  <li><div class="what"><b>1부 개념 — 문제 → 아이디어 → 구조 → 조율 → 학습 → 결과 → 한계</b><div class="where">각 절 끝의 "논문에서" 표시대로 원문 절·그림·표를 함께 본다</div></div><span class="t">2시간</span></li>
+  <li><div class="what"><b>2부 실습 여섯 개 — 순서대로</b><div class="where">명령 한 줄씩. 코드는 GitHub, 노트북은 코랩 버튼. 각 실습이 어느 개념을 만지는지 표시했다</div></div><span class="t">90분</span></li>
+  <li><div class="what"><b>3부 — 그림 한 장, 질문 세 개, 퀴즈 10문항</b><div class="where">대표자는 3.1·3.2, 참여자는 3.3. 부스 질문 근거는 3.4</div></div><span class="t">30분</span></li>
+</ol>
+<h3>진행 체크</h3>
+<p class="col">이 브라우저에만 저장된다(서버 없음). 다른 기기에서는 다시 비어 있다.</p>
+<ul class="checks">
+  <li><label><input type="checkbox" id="k-summary"><span>한 장 요약 + 논문 그림 1·2·초록</span></label></li>
+  <li><label><input type="checkbox" id="k-concept"><span>1부 개념 1.1 ~ 1.10</span></label></li>
+  <li><label><input type="checkbox" id="k-lab1"><span>실습 1·2 (토큰 열 · 자기회귀)</span></label></li>
+  <li><label><input type="checkbox" id="k-lab3"><span>실습 3·4 (확산 헤드 · 청크와 비동기)</span></label></li>
+  <li><label><input type="checkbox" id="k-lab5"><span>실습 5·6 (공동학습 · 코드 지도)</span></label></li>
+  <li><label><input type="checkbox" id="k-quiz"><span>퀴즈 10문항 중 8개 이상</span></label></li>
+  <li><label><input type="checkbox" id="k-share"><span>공유회 준비물 (그림 한 장 또는 질문) 완료</span></label></li>
+</ul>
+
+<h2 id="summary"><span class="num">S</span>한 장 요약</h2>
+<div class="figs">
+  <div class="fig"><span class="v">0.69</span><span class="k">RLBench 10태스크 평균 성공률. CogACT 0.61, π0 0.55</span></div>
+  <div class="fig"><span class="v">21.9 Hz</span><span class="k">청크 1일 때 추론 속도 (RTX 4090). OpenVLA 6.3 Hz</span></div>
+  <div class="fig spike"><span class="v">117.7 Hz</span><span class="k">청크 8·비율 1:4의 이론 제어 주파수 — 관측 빈도는 그대로</span></div>
+  <div class="fig"><span class="v">1 : 4</span><span class="k">System 2 : System 1 동작 주파수 비율</span></div>
+  <div class="fig"><span class="v">2 블록</span><span class="k">LLaMA2-7B 32블록 중 System 1로 쓰는 마지막 블록 수</span></div>
+</div>
+<div class="box key"><span class="h">한 문장</span>
+  System 1을 <strong>별도 모듈이 아니라 System 2 VLM의 마지막 트랜스포머 블록</strong>으로 만들어, 빠른 손이 느린 머리의 사전학습 지식과 중간 표현을 물려받게 했다.
+  두 시스템은 다른 입력(System 1만 3D 포인트클라우드와 로봇 상태를 본다)을 받고 1:4로 돌며, 확산 손실 + 자기회귀 손실을 함께 학습해 추론 능력의 망각을 막는다.
+</div>
+<h3>기여 세 가지 (논문 1절)</h3>
+<ol>
+  <li><strong>Fast-in-Slow 구조</strong> — 두 시스템이 같은 파운데이션 모델에서 나온다. System 1은 System 2의 일부다.</li>
+  <li><strong>이종 입력 + 비동기 주파수</strong> — System 2는 언어 + 2D 이미지(저주파), System 1은 2D 이미지 + 3D 포인트클라우드 + 로봇 상태(고주파). 비율 1:4.</li>
+  <li><strong>이중 인식 공동학습(dual-aware co-training)</strong> — L = L_fast(확산 노이즈 예측) + L_slow(다음 토큰 예측). 후자가 없으면 System 2의 추론 능력이 망각된다.</li>
+</ol>
+<p class="col"><strong>논문에서 볼 곳</strong>: 초록, 그림 1(아이디어), 그림 2(4쪽 전체 구조도). 그림 2의 범례(언어·이미지·포인트클라우드·상태·노이즈 행동 토큰의 색)를 먼저 익혀 두면 뒤가 편하다.</p>
+
+<div class="part">1부 · 개념</div>
+
+<h2 id="c1"><span class="num">1.1</span>먼저 알아야 할 개념 여섯 개</h2>
+<p class="col">각 항목의 링크는 정독 가이드 1부의 해당 절이다. 이미 아는 것은 건너뛴다.</p>
+<div class="terms">
+  <div><b>토큰과 임베딩</b>언어·이미지 패치·로봇 상태·노이즈 행동을 전부 "같은 크기의 벡터 열"로 만들어 한 행렬에 세로로 쌓는다. 트랜스포머는 그 행렬만 본다. → <a href="fis-vla-guide.html#s12">가이드 1.2</a></div>
+  <div><b>트랜스포머 블록</b>어텐션(질문과 비슷한 제목표의 책을 더 많이 가져오는 가중평균) + MLP. 입력과 출력 모양이 같아서 <em>어느 블록 사이에서든</em> 중간 표현을 꺼낼 수 있다. FiS-VLA의 핵심 전제. → <a href="fis-vla-guide.html#s13">가이드 1.3</a></div>
+  <div><b>LLM · 자기회귀 · VLM</b>토큰을 하나씩 순서대로 뽑는 방식이 자기회귀. 느리다. VLM은 이미지 토큰을 앞에 붙인 LLM. → <a href="fis-vla-guide.html#s14">가이드 1.4</a></div>
+  <div><b>VLA와 "행동을 어떻게 내보내는가"</b>행동을 256 구간 토큰으로 이산화하면(OpenVLA) 끊기고 느리다. 연속값을 한 번에 내는 헤드가 대안. → <a href="fis-vla-guide.html#s17">가이드 1.7</a></div>
+  <div><b>확산 행동 헤드와 행동 청크</b>노이즈에서 행동을 복원한다. 두 갈래 시연(왼쪽/오른쪽)을 회귀는 가운데로 뭉개고 확산은 갈래를 지킨다. 청크는 한 번에 H 스텝을 내는 것. → <a href="fis-vla-guide.html#s18">가이드 1.8</a></div>
+  <div><b>System 1 / System 2 이중 시스템</b>π0, CogACT, GR00T N1, Helix는 VLM 밖에 별도 행동 헤드를 붙인다. FiS-VLA는 그 헤드를 VLM 안으로 넣는다. 포인트클라우드는 → <a href="fis-vla-guide.html#s19">가이드 1.9</a> · <a href="fis-vla-guide.html#s110">1.10</a></div>
+</div>
+
+<h2 id="c2"><span class="num">1.2</span>문제 — 두 개의 딜레마</h2>
+<div class="tbl">
+<table>
+<thead><tr><th>기존 접근</th><th>장점</th><th>한계</th></tr></thead>
+<tbody>
+<tr><td><strong>단일 VLA</strong> (OpenVLA 등) — VLM이 행동 토큰을 자기회귀로 뽑는다</td><td>사전학습 지식으로 범용적</td><td>느리다(수 Hz), 행동이 끊긴다(action discontinuities)</td></tr>
+<tr><td><strong>이중 시스템 VLA</strong> (π0, CogACT, GR00T N1, Helix) — VLM(System 2) + <em>별도</em> 행동 헤드(System 1)</td><td>빠르다</td><td>System 1이 새로 만든 모듈이라 <strong>VLM의 사전학습 지식이 없고</strong>, System 2가 준 특징만 본다</td></tr>
+</tbody>
+<caption>저자의 질문: VLM이 로봇의 뇌라면, System 1과 System 2를 한 뇌 안에서 통합할 수 없는가? — 논문 1·2절. 더 깊이: <a href="fis-vla-guide.html#s22">가이드 2.2</a></caption>
+</table>
+</div>
+
+<h2 id="c3"><span class="num">1.3</span>핵심 아이디어 — 그림 1 읽기</h2>
+<p class="col">그림 1은 세 칸이다. 왼쪽이 단일 VLA(느림), 가운데가 기존 이중 시스템(System 1이 VLM 밖), 오른쪽이 FiS-VLA — <strong>System 1이 VLM의 꼬리 블록 안에 들어가 있다.</strong>
+그림에서 확인할 것 두 가지: (1) System 1로 들어가는 화살표가 System 2보다 많다(고주파 입력이 추가된다). (2) 두 시스템의 시계가 다르다(1:4).</p>
+<div class="box"><span class="h">비유</span>
+  느린 머리(System 2)가 "지금 어느 단계인지"를 4스텝에 한 번 정리해 주면, 빠른 손(System 1)은 매 스텝 최신 위치와 3D 장면을 보고 움직인다.
+  손은 머리와 같은 뇌 조직(마지막 블록)이라 머리가 배운 것을 그대로 쓴다. 더 깊이: <a href="fis-vla-guide.html#s23">가이드 2.3</a>
+</div>
+
+<h2 id="c4"><span class="num">1.4</span>구조 — 그림 2 읽기, 입력·출력·손실</h2>
+<div class="tbl">
+<table>
+<thead><tr><th>부품</th><th>내용</th></tr></thead>
+<tbody>
+<tr><td>초기화</td><td>Prismatic VLM — 비전 인코더 SigLIP + DINOv2, LLM LLaMA2-7B (32블록)</td></tr>
+<tr><td><strong>System 2</strong></td><td>LLM 블록 1~30. <strong>입력</strong>: 언어 지시, 2D 이미지. <strong>출력</strong>: 중간 잠재 특징(+ 자기회귀로 이산 행동/언어 계획)</td></tr>
+<tr class="hi"><td><strong>System 1</strong></td><td>LLM 블록 31~32. <strong>입력</strong>: 중간 특징 + 2D 이미지 + 3D 포인트클라우드(1024점, 3D 토크나이저 → 같은 비전 인코더) + 로봇 상태 + 노이즈 섞인 행동 + 확산 단계 τ. <strong>출력</strong>: 노이즈 예측 → 행동 청크</td></tr>
+<tr><td>확산</td><td>T=100, 노이즈 예측 MSE (식 1). 추론 시 DDIM 수 스텝(저장소 기본 4)</td></tr>
+<tr><td>비동기</td><td>System 2 출력 하나가 System 1의 다음 n=4 스텝을 안내. 단일 GPU 순차 실행(Helix식 병렬 아님). 학습 때도 비동기 샘플링</td></tr>
+<tr><td>행동 공간</td><td>시뮬 7-DoF 엔드이펙터 포즈 · AgileX 14-DoF 포즈 제어 · AlphaBot 16-DoF 관절 제어</td></tr>
+</tbody>
+<caption>논문 3.1~3.3절, 그림 2. "입력·출력·손실 세 가지만 표로" — 손실은 1.6절. 더 깊이(부품 목록 전체): <a href="fis-vla-guide.html#s24">가이드 2.4</a></caption>
+</table>
+</div>
+<div class="lab-link"><span class="n">실습 1</span><span>블록 6개짜리 장난감 트랜스포머로 "0~3 통과 → 고주파 토큰 붙이기 → 4~5 통과"를 직접 돌린다. 저장소 <code>prismatic.py</code>가 <code>llm_middle_layer</code>에서 두 번 호출되는 것과 같은 구조. → <a href="#lab1">2.1</a></span></div>
+
+<h2 id="c5"><span class="num">1.5</span>두 시스템의 조율 — 1:4 비동기와 이종 입력 (3.3절)</h2>
+<p class="col">System 2는 90 ms급, System 1은 30 ms급이라고 치자. 매 스텝 둘 다 돌리면(1:1) 느리고, System 2를 너무 드물게 돌리면(1:16) 손이 "낡은 이해"로 움직인다.
+사이 어딘가에 최적점이 있고 논문은 <strong>1:4</strong>를 택했다(부록 표 8: 1:1 0.60 · 1:2 0.63 · 1:4 0.69 · 1:8 0.61).</p>
+<p class="col">이종 입력이 중요한 이유: 고주파로 바뀌는 정보(로봇 상태, 3D 장면)를 System 2에 넣으면 4스텝 동안 낡는다. 그래서 System 1에만 넣는다. 부록 표 10의 "입력 배치 변형"이 이것을 검증한다(1.8절). 더 깊이: <a href="fis-vla-guide.html#s25">가이드 2.5</a></p>
+<div class="lab-link"><span class="n">실습 4</span><span>점 로봇 모형에서 비율을 1:1 ~ 1:16으로 바꿔 성공률이 1:4 근처에서 최고가 되는 것, 그리고 청크를 늘리면 명령 Hz만 오르고 관측 Hz는 그대로인 것을 본다. → <a href="#lab4">2.4</a></span></div>
+
+<h2 id="c6"><span class="num">1.6</span>학습 — 식 세 개와 레시피 (3.4절)</h2>
+<div class="eq"><span class="tag">식 (1) · L_fast — 확산 노이즈 예측</span>
+<pre>L_fast = E_{a, ε, τ} ‖ ε − ε_θ( a_τ , τ , c ) ‖²
+   a_τ = √ᾱ_τ · a + √(1−ᾱ_τ) · ε        (정답 행동 청크 a 에 노이즈 ε 을 τ 단계만큼 섞는다)
+   c   = System 2 중간 특징 + 2D 이미지 + 3D 포인트클라우드 + 로봇 상태</pre>
+<p class="gloss">System 1(블록 31~32)이 "섞인 노이즈가 무엇이었나"를 맞힌다. 추론 때는 순수 노이즈에서 시작해 이 예측으로 되감아 행동 청크를 만든다. 저장소 <code>models/vlas/fisvla.py</code> 204~236행의 네 줄이 그대로 이 식이다.</p></div>
+<div class="eq"><span class="tag">식 (2) · L_slow — 자기회귀 다음 토큰 예측</span>
+<pre>L_slow = − Σ_t log p_θ( y_t | y_&lt;t , 언어 , 2D 이미지 )      y = 이산 행동 토큰 또는 언어 계획</pre>
+<p class="gloss">System 2가 원래 하던 일. 이것을 계속 학습시켜야 블록 1~30이 "노이즈 예측기의 부속품"으로 변하지 않는다.</p></div>
+<div class="eq"><span class="tag">식 (3) · 이중 인식 공동학습</span>
+<pre>L = L_fast + L_slow</pre>
+<p class="gloss">L_slow를 빼면 0.69 → 0.62 (4.2절 (4)). 저장소 <code>training/strategies/base_strategy.py</code> 312~313행 <code>if ar_diff_loss: loss = loss + output.loss</code>. 더 깊이: <a href="fis-vla-guide.html#s26">가이드 2.6</a></p></div>
+<div class="tbl">
+<table>
+<thead><tr><th>단계</th><th>데이터</th><th>설정</th></tr></thead>
+<tbody>
+<tr><td>사전학습</td><td>37개 오픈 데이터셋, 86만 궤적, 3,600만 프레임</td><td>5 에폭, 단일 이미지</td></tr>
+<tr><td>파인튜닝 (시뮬)</td><td>RLBench 태스크당 100 궤적</td><td>300 에폭, A800 8장</td></tr>
+<tr><td>파인튜닝 (실기)</td><td>태스크당 100 데모, 3시점 RGB</td><td>AgileX · AlphaBot</td></tr>
+</tbody>
+</table>
+</div>
+<div class="lab-link"><span class="n">실습 3 · 5</span><span>실습 3은 식 (1)을 2차원 장난감에서 직접 학습해 회귀와의 차이를 본다. 실습 5는 L_slow를 빼면 몸통이 원래 일을 잊는 것(94.8% → 75.0%)을 재현한다. → <a href="#lab3">2.3</a> · <a href="#lab5">2.5</a></span></div>
+
+<h2 id="c7"><span class="num">1.7</span>결과 읽기 — 표 1·2·3</h2>
+<p class="col"><strong>베이스라인이 누구인가부터.</strong> 표 1은 ManipLLM·OpenVLA(단일 VLA), π0·CogACT(이중 시스템)와 비교한다 — 자체 소거만 한 것이 아니다. 단, 속도는 <em>청크 1로 통일</em>해서 쟀다.</p>
+<div class="tbl">
+<table>
+<thead><tr><th>모델</th><th class="n">파라미터</th><th class="n">RLBench 평균 성공률</th><th class="n">속도 (4090, 청크 1)</th></tr></thead>
+<tbody>
+<tr><td>ManipLLM</td><td class="n">7B</td><td class="n">0.38</td><td class="n">2.2 Hz</td></tr>
+<tr><td>OpenVLA</td><td class="n">7B</td><td class="n">0.40</td><td class="n">6.3 Hz</td></tr>
+<tr><td>π0</td><td class="n">2.6B</td><td class="n">0.55</td><td class="n">13.8 Hz</td></tr>
+<tr><td>CogACT</td><td class="n">7B</td><td class="n">0.61</td><td class="n">9.8 Hz</td></tr>
+<tr class="hi"><td>FiS-VLA</td><td class="n">7B</td><td class="n">0.69</td><td class="n">21.9 Hz</td></tr>
+</tbody>
+<caption>논문 표 1. 10개 태스크 중 8개 최고. CogACT 대비 +8%p, π0 대비 +14%p.</caption>
+</table>
+</div>
+<ul>
+  <li><strong>실기 양팔</strong> (π0 대비, 태스크별 단일 학습, 20 롤아웃): AgileX 평균 0.68 vs 0.59, <strong>AlphaBot 평균 0.74 vs 0.61</strong>. 최대 격차는 수건 접기(0.60 vs 0.40). — 표 2·3</li>
+  <li><strong>일반화</strong>: 미지 물체·복잡 배경·조명 변화에서 FiS-VLA의 하락 폭(−19~−31%)이 π0(−27~−46%)보다 작다.</li>
+  <li><strong>실기 로봇이 AlphaBot</strong>이므로 이 논문은 제품 기술과 직결된다. 16-DoF 관절 제어라는 점도 기억해 둔다.</li>
+</ul>
+<p class="col">더 깊이(표 1~3 전부, 태스크별 수치): <a href="fis-vla-guide.html#s27">가이드 2.7</a></p>
+
+<h2 id="c8"><span class="num">1.8</span>소거 실험 — 무엇이 성능을 만들었나 (부록 표 6~10)</h2>
+<div class="tbl">
+<table>
+<thead><tr><th>무엇을 바꿨나</th><th>결과</th><th>읽는 법</th></tr></thead>
+<tbody>
+<tr><td>System 1 블록 수 1 / <strong>2</strong> / 4 / 8</td><td class="n">0.49 / <strong>0.69</strong> / 0.66 / 0.64</td><td>2개에서 포화. 1개는 부족, 8개는 System 2가 얕아져 손해</td></tr>
+<tr><td>System 1 입력 제거: 3D / 3D+2D / 전부</td><td class="n">0.61 / 0.44 / <strong>0.22</strong></td><td>고주파 입력이 없으면 절반 이하. 기존 이중 시스템 비판의 근거</td></tr>
+<tr><td>주파수 비율 1:1 / 1:2 / <strong>1:4</strong> / 1:8</td><td class="n">0.60 / 0.63 / <strong>0.69</strong> / 0.61</td><td>실습 4의 모양 그대로</td></tr>
+<tr><td>행동 청크 1 / 2 / 4 / 8</td><td class="n">0.69 / 0.68 / 0.66 / 0.69</td><td>성공률 유지, 주파수만 비례 상승 (청크 8 = 117.7 Hz 이론값)</td></tr>
+<tr><td>L_slow 제거</td><td class="n">0.69 → 0.62</td><td>공동학습의 근거. 실습 5</td></tr>
+<tr><td>입력 배치 변형 1 / 2 / 3</td><td class="n">0.63 / 0.61 / 0.68</td><td>고주파 정보는 System 1에 있어야 한다</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2 id="c9"><span class="num">1.9</span>한계와 비판적으로 읽기</h2>
+<h3>논문이 밝힌 것 (5절, 부록 D)</h3>
+<ul>
+  <li>System 1 블록 수와 주파수 비율이 <strong>고정</strong>. 태스크·환경에 따라 동적으로 바꾸는 것이 후속 과제.</li>
+  <li>실기 실패 4종: 양팔 충돌, 얇은 변형 물체의 높이 오차, 물체 위치 오인, 건네주기 회전 오차. System 2가 실패를 인식·수정하는 능력이 미래 과제.</li>
+</ul>
+<h3>논문이 밝히지 않은 것 — 스터디에서 따져 볼 것</h3>
+<ol>
+  <li><strong>117.7 Hz는 이론값이다.</strong> 청크 8을 한 번에 내는 값이라 새 관측을 보는 빈도는 21.9 Hz급 그대로다.</li>
+  <li><strong>속도 비교 조건.</strong> 베이스라인 속도는 청크 1로 통일 측정. π0는 원래 긴 청크를 쓰는 모델이라 불리할 수 있다.</li>
+  <li><strong>규모 차이.</strong> π0(2.6B) vs FiS-VLA(7B). 논문도 각주로 인정.</li>
+  <li><strong>"System 1이 VLM 지식을 물려받는다"의 증거는 간접적</strong>(블록 수 소거, L_slow 소거, 일반화 하락 폭). 같은 크기의 <em>별도</em> 트랜스포머 블록 2개를 붙인 대조군과 직접 비교한 표가 없다.</li>
+  <li>두 시스템을 같은 GPU에서 순차 실행했다 — Helix처럼 병렬 배치가 아니다. 제품에서는 어떤지가 부스 질문.</li>
+  <li>arXiv v1 기준. 학회 채택 여부·후속 판 미확인(2026-09-11).</li>
+</ol>
+<p class="col">더 깊이: <a href="fis-vla-guide.html#s28">가이드 2.8</a> · <a href="fis-vla-guide.html#s29">2.9</a></p>
+
+<h2 id="c10"><span class="num">1.10</span>계보 — RoboMamba와의 대비</h2>
+<div class="tbl">
+<table>
+<thead><tr><th></th><th>① RoboMamba (2024-06)</th><th>② FiS-VLA (2025-06)</th></tr></thead>
+<tbody>
+<tr><td>백본</td><td>Mamba 2.8B (SSM, 선형 복잡도)</td><td>LLaMA2-7B (트랜스포머)</td></tr>
+<tr><td>비전 인코더</td><td>CLIP 하나 (앙상블 거부)</td><td>SigLIP + DINOv2</td></tr>
+<tr><td>입력</td><td>RGB 1장 + 언어</td><td>RGB 3장 + 포인트클라우드 + 로봇 상태</td></tr>
+<tr><td>행동 출력</td><td>MLP 헤드 2개 (백본 밖)</td><td>확산 헤드 (VLM 마지막 2블록 재활용)</td></tr>
+<tr><td>추론 능력 보존</td><td><strong>백본 동결</strong></td><td><strong>L_slow 공동학습</strong></td></tr>
+<tr><td>제어</td><td>개루프 단발 포즈</td><td>폐루프, 행동 청크, 1:4 비동기</td></tr>
+<tr><td>속도</td><td>9.0 Hz (A100, 개루프)</td><td>21.9 Hz (4090, 청크 1)</td></tr>
+<tr><td>공개 범위</td><td>모델 코드만 (학습 코드 비공개)</td><td>학습·평가 모두 공개</td></tr>
+</tbody>
+<caption>같은 문제(조작을 배우면 추론을 잊는다)를 RoboMamba는 "건드리지 않음"으로, FiS-VLA는 "같이 학습함"으로 풀었다. 제1저자 Jiaming Liu가 두 논문 모두의 프로젝트 리드. 백본이 Mamba에서 트랜스포머로 되돌아간 이유는 논문에 없다 — 부스 질문. 더 깊이: <a href="fis-vla-guide.html#s210">가이드 2.10</a> · <a href="paper-1-robomamba.html">RoboMamba 스터디 페이지</a></caption>
+</table>
+</div>
+
+<div class="part">2부 · 실습 — numpy 여섯 개로 느린 머리와 빠른 손을 만져 보기</div>
+
+<h2 id="prep"><span class="num">2.0</span>준비 — 세 가지 실행 방법</h2>
+<p class="col"><strong>GPU 없이, PyTorch 없이, numpy만으로</strong> 실습 6개가 각 1~6초에 돈다. 원 저장소는 LIFT3D 포함 약 700MB + CoppeliaSim + Flash-Attention이 필요해서 스터디 범위 밖(2.8절)이다.
+코드는 공개 저장소 <a href="https://github.com/drum-grammer/vla-study/tree/main/labs/fis-vla">drum-grammer/vla-study/labs/fis-vla</a>에 있다.</p>
+<div class="tbl">
+<table>
+<thead><tr><th>방법</th><th>준비물</th><th>어떻게</th></tr></thead>
+<tbody>
+<tr class="hi"><td><strong>A. 터미널</strong></td><td>파이썬 3.9+, numpy</td><td>아래 명령. 결과 그림은 <code>out/*.svg</code>로 떨어진다(브라우저로 연다)</td></tr>
+<tr><td><strong>B. 주피터</strong> (권장)</td><td>+ jupyterlab</td><td><code>notebooks/lab1_tokens_blocks.ipynb</code>부터. 중간 변수를 들여다볼 수 있고 그림이 노트북 안에 뜬다</td></tr>
+<tr><td><strong>C. 구글 코랩</strong></td><td>브라우저만</td><td>각 실습의 <em>코랩에서 열기</em> 링크. 첫 셀이 공개 저장소에서 <code>tinynn.py</code>를 받아 온다</td></tr>
+</tbody>
+<caption>설치가 막히면 <a href="lab-environment.html">실습 환경</a> 페이지(가상환경, Apple Silicon, 자주 나오는 문제).</caption>
+</table>
+</div>
+<pre class="code"><span class="c"># A. 터미널</span>
+git clone https://github.com/drum-grammer/vla-study
+cd vla-study/labs/fis-vla
+python3 --version            <span class="c"># 3.9 이상</span>
+python3 -c "import numpy"    <span class="c"># 없으면: pip install numpy</span>
+python3 lab1_tokens_blocks.py
+
+<span class="c"># B. 주피터</span>
+pip install jupyterlab
+cd notebooks && jupyter lab   <span class="c"># lab1_tokens_blocks.ipynb 부터 연다</span></pre>
+<div class="tbl">
+<table>
+<thead><tr><th>파일</th><th>역할</th><th class="n">실행 시간</th></tr></thead>
+<tbody>
+<tr><td><a href="https://github.com/drum-grammer/vla-study/blob/main/labs/fis-vla/tinynn.py"><code>tinynn.py</code></a></td><td>공용 도구: 수동 역전파 MLP, Adam, 트랜스포머 블록(순전파), 저장소와 같은 squaredcos_cap_v2 확산 스케줄, SVG 그리기</td><td class="n">import 전용</td></tr>
+<tr><td><a href="https://github.com/drum-grammer/vla-study/blob/main/labs/fis-vla/lab1_tokens_blocks.py"><code>lab1_tokens_blocks.py</code></a></td><td>실습 1 토큰 열·어텐션·블록 분기</td><td class="n">1초</td></tr>
+<tr><td><a href="https://github.com/drum-grammer/vla-study/blob/main/labs/fis-vla/lab2_autoregressive_vs_chunk.py"><code>lab2_autoregressive_vs_chunk.py</code></a></td><td>실습 2 자기회귀 비용·이산화 계단</td><td class="n">1초</td></tr>
+<tr><td><a href="https://github.com/drum-grammer/vla-study/blob/main/labs/fis-vla/lab3_diffusion_action.py"><code>lab3_diffusion_action.py</code></a></td><td>실습 3 확산 행동 헤드, L_fast 학습</td><td class="n">6초</td></tr>
+<tr><td><a href="https://github.com/drum-grammer/vla-study/blob/main/labs/fis-vla/lab4_chunk_async.py"><code>lab4_chunk_async.py</code></a></td><td>실습 4 행동 청크·1:n 비동기</td><td class="n">4초</td></tr>
+<tr><td><a href="https://github.com/drum-grammer/vla-study/blob/main/labs/fis-vla/lab5_cotraining_forgetting.py"><code>lab5_cotraining_forgetting.py</code></a></td><td>실습 5 공동학습과 망각</td><td class="n">6초</td></tr>
+<tr><td><a href="https://github.com/drum-grammer/vla-study/blob/main/labs/fis-vla/lab6_code_map.py"><code>lab6_code_map.py</code></a></td><td>실습 6 논문 → 저장소 줄 번호 (네트워크 150KB)</td><td class="n">3초</td></tr>
+<tr><td><a href="https://github.com/drum-grammer/vla-study/tree/main/labs/fis-vla/notebooks"><code>notebooks/lab*.ipynb</code></a></td><td>위 여섯 개의 주피터 노트북판. <code>.py</code>가 정본이고 노트북은 <code>make_notebooks.py</code>가 만든 산출물</td><td class="n">—</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="lab-head" id="lab1"><span class="n">실습 1</span><div><h3>토큰 열, 어텐션, 블록 쌓기</h3><div class="ref">개념 <a href="#c1">1.1</a> · <a href="#c4">1.4</a> — 가이드 <a href="fis-vla-guide.html#s12">1.2</a> · <a href="fis-vla-guide.html#s13">1.3</a> · <a href="fis-vla-guide.html#s24">2.4</a> · 1초</div></div></div>
+<pre class="code">python3 lab1_tokens_blocks.py</pre>
+<div class="links">
+  <a class="ext" href="https://github.com/drum-grammer/vla-study/blob/main/labs/fis-vla/lab1_tokens_blocks.py">코드 (GitHub)</a>
+  <a class="ext" href="https://colab.research.google.com/github/drum-grammer/vla-study/blob/main/labs/fis-vla/notebooks/lab1_tokens_blocks.ipynb">코랩에서 열기</a>
+  <a href="fis-vla-lab.html#lab1">상세 해설</a>
+</div>
+<p class="col"><strong>보는 것</strong></p>
+<ol>
+  <li>언어 토큰 5개, 이미지 패치 9개, 로봇 상태 1개, 노이즈 행동 1개가 전부 <code>(토큰 수, 16)</code> 행렬이고, 세로로 이어 붙이면 <code>(14, 16)</code> 한 행렬이 된다. 논문 그림 2 범례가 그리는 것.</li>
+  <li>Q=K=V=x로 둔 어텐션에서 "wine" 토큰이 병 패치(4번)에 가장 큰 가중치를 준다.</li>
+  <li>블록 6개를 만들어 0~3만 통과(System 2) → 모양 그대로 <code>(14, 16)</code> 중간 표현 → 뒤에 고주파 토큰 11개를 붙여 <code>(25, 16)</code> → 4~5 통과(System 1). 마지막 행(노이즈 행동 자리)의 출력 벡터가 노이즈 예측이 된다.</li>
+  <li>같은 중간 표현을 4번 재사용하며 상태 토큰만 바꿔 System 1을 돌린다 = 1:4 비동기.</li>
+</ol>
+<p class="col"><strong>저장소 대응</strong>: <a href="https://github.com/CHEN-H01/Fast-in-Slow/blob/main/models/vlms/prismatic.py"><code>models/vlms/prismatic.py</code></a> — <code>llm_layer_end=self.llm_middle_layer</code>로 한 번, <code>llm_layer_start=self.llm_middle_layer</code>로 한 번. <code>tinynn.run_blocks(blocks, x, start, end)</code>가 그 축소판.</p>
+<div class="box"><span class="h">해 볼 것</span><code>MIDDLE</code>을 1이나 5로 바꿔 System 1 크기를 바꿔 본다(논문 표 6: 1블록 0.49, 2블록 0.69, 8블록 0.64). <code>img[4]</code>를 <code>lang[2]</code>와 무관하게 만들면 어텐션이 어디로 가는지 본다.</div>
+
+<div class="lab-head" id="lab2"><span class="n">실습 2</span><div><h3>자기회귀는 왜 느리고, 이산화는 왜 끊기는가</h3><div class="ref">개념 <a href="#c2">1.2</a> — 가이드 <a href="fis-vla-guide.html#s13">1.3</a> · <a href="fis-vla-guide.html#s14">1.4</a> · <a href="fis-vla-guide.html#s17">1.7</a> · 1초 · <code>out/lab2_quantize.svg</code></div></div></div>
+<pre class="code">python3 lab2_autoregressive_vs_chunk.py</pre>
+<div class="links">
+  <a class="ext" href="https://github.com/drum-grammer/vla-study/blob/main/labs/fis-vla/lab2_autoregressive_vs_chunk.py">코드 (GitHub)</a>
+  <a class="ext" href="https://colab.research.google.com/github/drum-grammer/vla-study/blob/main/labs/fis-vla/notebooks/lab2_autoregressive_vs_chunk.ipynb">코랩에서 열기</a>
+  <a href="fis-vla-lab.html#lab2">상세 해설</a>
+</div>
+<div class="tbl">
+<table>
+<thead><tr><th>실험</th><th>결과 (M1 Mac, numpy 단일 스레드)</th></tr></thead>
+<tbody>
+<tr><td>토큰 수 64 → 128 → 256 → 512</td><td>1.5 → 2.8 → 5.9 → 14.4 ms. 두 배마다 두 배 이상, 512에서 ×9.8 (제곱 항이 보이기 시작)</td></tr>
+<tr class="hi"><td>7-DoF를 토큰 7개 순차(자기회귀) vs 연속값 7개 한 번에</td><td>50 ms (20 Hz) vs 7 ms (141 Hz), ×7</td></tr>
+<tr><td>부드러운 Δx 궤적을 256 구간 / 16 구간으로 자르기</td><td>최대 오차 0.004 / 0.06, 서로 다른 값 91개 / 7개</td></tr>
+</tbody>
+<caption>논문 표 1의 OpenVLA 6.3 Hz(토큰 자기회귀) vs FiS-VLA 21.9 Hz가 두 번째 줄의 차이. 세 번째 줄이 논문 2절의 "action discontinuities". 절대 시간은 GPU와 무관하다 — 비율만 본다.</caption>
+</table>
+</div>
+<div class="box warn"><span class="h">주의</span>실제 확산은 디노이징을 여러 번 반복한다(저장소 <code>test_rlbench.sh</code>의 <code>--ddim-steps 4</code>). "한 번에"는 토큰 순차 생성과 대비되는 축이고, 디노이징 반복은 또 다른 축이다.</div>
+
+<div class="lab-head" id="lab3"><span class="n">실습 3</span><div><h3>확산으로 행동 만들기, 식 (1) 직접 학습</h3><div class="ref">개념 <a href="#c6">1.6</a> — 가이드 <a href="fis-vla-guide.html#s18">1.8</a> · <a href="fis-vla-guide.html#s26">2.6</a> · 6초 · <code>out/lab3_diffusion.svg</code></div></div></div>
+<pre class="code">python3 lab3_diffusion_action.py</pre>
+<div class="links">
+  <a class="ext" href="https://github.com/drum-grammer/vla-study/blob/main/labs/fis-vla/lab3_diffusion_action.py">코드 (GitHub)</a>
+  <a class="ext" href="https://colab.research.google.com/github/drum-grammer/vla-study/blob/main/labs/fis-vla/notebooks/lab3_diffusion_action.ipynb">코랩에서 열기</a>
+  <a href="fis-vla-lab.html#lab3">상세 해설 + 결과 그림</a>
+</div>
+<ul>
+  <li>시연 데이터: 장애물을 왼쪽(x=−0.65) 또는 오른쪽(x=+0.65)으로 돌아가는 <strong>두 갈래</strong>. 조건 c로 위/아래가 바뀐다.</li>
+  <li>행동을 직접 MSE로 맞히는 <strong>회귀</strong>는 <code>(+0.00, +0.55)</code> — 두 갈래의 가운데, 장애물 위. 실제 로봇이면 충돌.</li>
+  <li>노이즈를 맞히는 <strong>확산</strong>은 샘플 300개가 왼쪽 52% / 오른쪽 48%, |x| 평균 0.64(정답 0.65). 갈래를 지킨다.</li>
+</ul>
+<pre class="code"><span class="c"># 저장소 models/vlas/fisvla.py 204~236행과 같은 네 줄</span>
+noise = rng.normal(0, 1, a.shape)          <span class="c"># noise = torch.randn_like(actions)</span>
+t = rng.integers(0, T, len(a))             <span class="c"># timestep = torch.randint(0, num_timesteps)</span>
+x_t = q_sample(a, t, noise, alpha_bar)     <span class="c"># x = self.diffusion.q_sample(actions, timestep, noise)</span>
+loss = ((noise_pred - noise) ** 2).mean()  <span class="c"># loss = ((noise_pred - noise) ** 2).mean()</span></pre>
+<p class="col">노이즈 스케줄 <code>squaredcos_cap_v2</code>, T=100도 저장소 <code>create_diffusion(...)</code> 인자와 같다. <a href="https://github.com/CHEN-H01/Fast-in-Slow/blob/main/models/vlas/fisvla.py">fisvla.py (원 저장소)</a></p>
+<div class="box"><span class="h">해 볼 것</span>학습 스텝을 500으로 줄이면 샘플이 어떻게 흐트러지는지. <code>sample()</code>의 100 스텝을 10 스텝으로 줄이면 품질이 어떻게 되는지.</div>
+
+<div class="lab-head" id="lab4"><span class="n">실습 4</span><div><h3>행동 청크와 1:n 비동기, 117.7 Hz의 뜻</h3><div class="ref">개념 <a href="#c5">1.5</a> · <a href="#c8">1.8</a> — 가이드 <a href="fis-vla-guide.html#s18">1.8</a> · <a href="fis-vla-guide.html#s25">2.5</a> · <a href="fis-vla-guide.html#s27">2.7</a> · 4초 · <code>out/lab4_ratio.svg</code></div></div></div>
+<pre class="code">python3 lab4_chunk_async.py</pre>
+<div class="links">
+  <a class="ext" href="https://github.com/drum-grammer/vla-study/blob/main/labs/fis-vla/lab4_chunk_async.py">코드 (GitHub)</a>
+  <a class="ext" href="https://colab.research.google.com/github/drum-grammer/vla-study/blob/main/labs/fis-vla/notebooks/lab4_chunk_async.ipynb">코랩에서 열기</a>
+  <a href="fis-vla-lab.html#lab4">상세 해설 + 결과 그림</a>
+</div>
+<p class="col"><strong>모형</strong>: 점 로봇이 웨이포인트 수십 개를 순서대로 방문한다. System 2(90 ms)는 "지금 어느 단계인지"를 보고 목표를 낸다. System 1(30 ms)은 매 스텝 최신 위치로 이동량을 낸다.
+둘은 GPU 한 장에서 <strong>순차 실행</strong>(논문 3.3절의 조건). 단계가 끝나도 System 1은 다음 System 2 갱신까지 옛 목표를 붙든다. 시간 예산 안에 다 돌면 성공.</p>
+<div class="tbl">
+<table>
+<thead><tr><th class="n">비율</th><th class="n">성공률 (300 에피소드)</th><th class="n">관측 Hz</th><th class="n">System 2 Hz</th><th class="n">단계 전환 후 최대 헛도는 시간</th></tr></thead>
+<tbody>
+<tr><td class="n">1:1</td><td class="n">23.7%</td><td class="n">8.3</td><td class="n">8.3</td><td class="n">120 ms</td></tr>
+<tr><td class="n">1:2</td><td class="n">60.0%</td><td class="n">13.3</td><td class="n">6.7</td><td class="n">150 ms</td></tr>
+<tr class="hi"><td class="n">1:4</td><td class="n">94.7%</td><td class="n">19.0</td><td class="n">4.8</td><td class="n">210 ms</td></tr>
+<tr><td class="n">1:8</td><td class="n">29.3%</td><td class="n">24.2</td><td class="n">3.0</td><td class="n">330 ms</td></tr>
+<tr><td class="n">1:16</td><td class="n">0.0%</td><td class="n">28.1</td><td class="n">1.8</td><td class="n">570 ms</td></tr>
+</tbody>
+<caption>(1) 비율 1:n, 청크 1. 1:1은 System 2를 매번 돌려 느리고, 1:16은 빠르지만 "이해가 낡아" 헛돈다. 논문 부록 표 8(1:1 0.60 · 1:2 0.63 · 1:4 0.69 · 1:8 0.61)과 같은 모양. 값 자체는 상수(<code>C_SLOW</code>, <code>C_FAST</code>, <code>BUDGET</code>)에 달려 있다.</caption>
+</table>
+</div>
+<p class="col"><strong>(2) 청크 H, 비율 1:4</strong>: 성공률 94.7 → 95.7 → 95.7 → 95.7%로 거의 그대로, 명령 Hz 19 → 38 → 76 → 152, 관측 Hz는 19로 그대로. 논문 표 9(0.69·0.68·0.66·0.69)와 같은 모양이고, <strong>117.7 Hz(청크 8)가 "한 번 추론에 8개"라는 뜻</strong>이라는 것이 표로 보인다.</p>
+<p class="col"><strong>저장소 대응</strong>: <a href="https://github.com/CHEN-H01/Fast-in-Slow/blob/main/scripts/sim.py"><code>scripts/sim.py</code></a> 215행 <code>if slow_cnt % int(args.slow_fast_ratio) == 0:</code> → <code>slow_system_forward()</code>, 그 밖에는 <code>slow_latent_embedding</code> 재사용 → 242행 <code>for action in actions: env.step(action)</code>.</p>
+<div class="box"><span class="h">해 볼 것</span><code>C_SLOW</code>를 두 배로(더 큰 VLM) 하면 최적 비율이 어디로 가는가. <code>N_WAYPOINTS</code>를 줄여 단계 전환이 드문 태스크로 만들면? 이것이 논문 5절 한계 "비율이 고정"이 뜻하는 바다.</div>
+
+<div class="lab-head" id="lab5"><span class="n">실습 5</span><div><h3>공동학습과 파국적 망각, 식 (3)</h3><div class="ref">개념 <a href="#c6">1.6</a> — 가이드 <a href="fis-vla-guide.html#s26">2.6</a> · 6초</div></div></div>
+<pre class="code">python3 lab5_cotraining_forgetting.py</pre>
+<div class="links">
+  <a class="ext" href="https://github.com/drum-grammer/vla-study/blob/main/labs/fis-vla/lab5_cotraining_forgetting.py">코드 (GitHub)</a>
+  <a class="ext" href="https://colab.research.google.com/github/drum-grammer/vla-study/blob/main/labs/fis-vla/notebooks/lab5_cotraining_forgetting.ipynb">코랩에서 열기</a>
+  <a href="fis-vla-lab.html#lab5">상세 해설</a>
+</div>
+<p class="col"><strong>모형</strong>: 공유 몸통(블록 31·32 역할) + 머리 A(4클래스 분류 = 이산 행동 토큰, 교차엔트로피 = L_slow) + 머리 B(노이즈 예측 2차원, MSE = L_fast).
+1단계: A로 사전학습. 2단계: B를 배우되 A 손실을 빼거나(L_fast only) 함께 둔다(co-training).</p>
+<div class="tbl">
+<table>
+<thead><tr><th>방식</th><th class="n">A 정확도 (전 → 후)</th><th class="n">B 오차</th></tr></thead>
+<tbody>
+<tr class="dim"><td>L_fast only</td><td class="n">94.8% → <strong>75.0%</strong></td><td class="n">0.0013</td></tr>
+<tr class="hi"><td>co-training</td><td class="n">95.2% → <strong>96.2%</strong></td><td class="n">0.0050</td></tr>
+</tbody>
+<caption>확산 손실만 흘리면 몸통이 노이즈 예측기로 변해 원래 일을 잊는다. 논문 4.2절 (4): L_slow 제거 시 0.69 → 0.62. 저장소 <a href="https://github.com/CHEN-H01/Fast-in-Slow/blob/main/training/strategies/base_strategy.py"><code>training/strategies/base_strategy.py</code></a> 312~313행 <code>if ar_diff_loss: loss = loss + output.loss</code>.</caption>
+</table>
+</div>
+<div class="box"><span class="h">해 볼 것</span>몸통 폭을 32에서 128로 늘리면 망각이 줄어드는가(자리 다툼이 줄어든다). 2단계 학습률을 낮추면?</div>
+
+<div class="lab-head" id="lab6"><span class="n">실습 6</span><div><h3>코드 지도 — 논문 문장을 저장소 줄 번호로</h3><div class="ref">개념 <a href="#c4">1.4</a> · <a href="#c5">1.5</a> · <a href="#c6">1.6</a> — 가이드 <a href="fis-vla-guide.html#s34">3.4</a> · 3초 · 네트워크 150KB</div></div></div>
+<pre class="code">python3 lab6_code_map.py              <span class="c"># 핵심 파일 5개만 내려받음 (out/src/)</span>
+python3 lab6_code_map.py --offline    <span class="c"># 두 번째부터</span></pre>
+<div class="links">
+  <a class="ext" href="https://github.com/drum-grammer/vla-study/blob/main/labs/fis-vla/lab6_code_map.py">코드 (GitHub)</a>
+  <a class="ext" href="https://colab.research.google.com/github/drum-grammer/vla-study/blob/main/labs/fis-vla/notebooks/lab6_code_map.ipynb">코랩에서 열기</a>
+  <a href="fis-vla-lab.html#lab6">상세 해설</a>
+  <a class="ext" href="https://github.com/CHEN-H01/Fast-in-Slow">원 저장소</a>
+</div>
+<p class="col"><code>train.sh</code>(설정) → <code>scripts/sim.py</code>(추론 루프) → <code>models/vlas/fisvla.py</code>(손실) → <code>models/vlms/prismatic.py</code>(블록 분기) → <code>training/strategies/base_strategy.py</code>(손실 합산) 순으로
+20개 앵커를 찾아 앞뒤 줄과 함께 출력한다. 줄 번호가 바뀌어도 앵커 문자열로 찾는다. 2026-09-11 기준 결과 표는 <a href="fis-vla-guide.html#s34">가이드 3.4</a>.</p>
+<div class="box key"><span class="h">읽고 답할 것</span>
+  (1) <code>LLM_MIDDLE_LAYER=30</code>인데 왜 논문은 "2블록"이라 하는가.
+  (2) <code>POINTCLOUD_POS='fast'</code>를 <code>'slow'</code>로 바꾸면 논문의 어느 변형 실험인가(부록 표 10).
+  (3) <code>if self.training_mode == 'sync': fast_projected_patch_embeddings = None</code>은 논문 2절의 어느 문장인가.
+</div>
+
+<h2 id="labmap"><span class="num">2.7</span>실습 ↔ 개념 ↔ 저장소 지도</h2>
+<div class="tbl">
+<table>
+<thead><tr><th>가이드 절</th><th>개념</th><th>실습</th><th>원 저장소</th></tr></thead>
+<tbody>
+<tr><td>1.2 토큰과 임베딩</td><td>이종 정보를 같은 차원 벡터 열로</td><td>1 (1)</td><td><code>prismatic.py</code> <code>_prepare_multimodal_embeddings</code></td></tr>
+<tr><td>1.3 트랜스포머</td><td>어텐션 = 유사도 가중평균, 블록은 모양 보존</td><td>1 (2)(3), 2 (1)</td><td><code>llama2.py</code></td></tr>
+<tr><td>1.4 LLM·자기회귀</td><td>토큰 하나씩 → 느림</td><td>2 (2)</td><td><code>fisvla.py</code> <code>predict_ar</code></td></tr>
+<tr><td>1.7 행동 이산화</td><td>256 구간 계단</td><td>2 (3)</td><td><code>vla/action_tokenizer.py</code></td></tr>
+<tr><td>1.8 확산 헤드</td><td>노이즈 예측 MSE, 다봉 분포</td><td>3</td><td><code>fisvla.py</code> 204~236</td></tr>
+<tr><td>1.8 행동 청크</td><td>명령 Hz ×H, 관측 Hz 그대로</td><td>4 (2)</td><td><code>sim.py</code> 242</td></tr>
+<tr><td>2.4 구조</td><td>블록 30에서 분기</td><td>1 (3), 6</td><td><code>prismatic.py</code> 983·1031</td></tr>
+<tr><td>2.5 비동기 1:4</td><td>순차 실행 비용 vs 낡은 이해</td><td>1 (4), 4 (1)</td><td><code>sim.py</code> 215</td></tr>
+<tr><td>2.6 식 (1)(2)(3)</td><td>L_fast + L_slow, 망각 방지</td><td>3, 5</td><td><code>base_strategy.py</code> 313</td></tr>
+<tr><td>2.7 117.7 Hz</td><td>이론 제어 주파수의 뜻</td><td>4 (2)</td><td>부록 표 9</td></tr>
+<tr><td>3.4 코드 훑기</td><td>논문 → 줄 번호</td><td>6</td><td>전체</td></tr>
+</tbody>
+<caption>줄 번호는 2026-09-11 main 기준.</caption>
+</table>
+</div>
+
+<h2 id="gpu"><span class="num">2.8</span>GPU가 있다면 · 알려진 한계</h2>
+<p class="col"><strong>실제 모델 실행(스터디 범위 밖, 참고).</strong> 저장소 README(확인 2026-09-11) 기준 — 디스크 2GB 이상, CUDA 12 GPU(7B 추론에 24GB급), Ubuntu 전제.</p>
+<ol>
+  <li><code>git clone https://github.com/CHEN-H01/Fast-in-Slow</code> (LIFT3D 포함 약 700MB)</li>
+  <li>conda 환경 Python 3.10, <code>pip install -r requirement.txt</code>, 추가로 dlimp_openvla · openvla · pytorch3d · flash-attn 2.5.5</li>
+  <li>CoppeliaSim 4.1 (RLBench용) 설치, <code>LIFT3D/third_party/RLBench</code>와 <code>LIFT3D</code> <code>pip install -e .</code></li>
+  <li>HuggingFace <code>haosad/fisvla</code> 체크포인트 다운로드</li>
+  <li><code>test_rlbench.sh</code>의 경로를 고치고 실행 — 기본 태스크 <code>close_box</code>, <code>--slow-fast-ratio 4 --llm_middle_layer 30 --ddim-steps 4 --action-chunk 1</code>, 에피소드 20</li>
+</ol>
+<p class="col"><code>train.sh</code>는 A800 8장 기준(배치 6/GPU, 300 에폭)이라 개인 GPU에서 학습은 현실적이지 않다. 스터디에서는 실습 6으로 코드를 읽는 것까지를 목표로 한다.</p>
+<h3>실습의 알려진 한계</h3>
+<ul>
+  <li>실습 4는 논문의 로봇·모델이 아니라 "순차 실행 비용"과 "이해가 낡는 비용" 두 힘만 뽑은 장난감이다. 최적 비율은 상수에 달려 있고, 논문의 1:4가 보편 상수라는 뜻이 아니다.</li>
+  <li>실습 5의 "추론 능력"은 4클래스 분류로 대신했다. 논문의 L_slow는 LLM의 다음 토큰 예측이다.</li>
+  <li>실습 2의 시간은 numpy 단일 스레드 값이라 GPU 트랜스포머의 절대 속도와 무관하다. 비율만 본다.</li>
+  <li>저장소 줄 번호는 2026-09-11 main 기준. 실습 6은 앵커로 찾으므로 바뀌어도 동작하지만, 앵커 문자열 자체가 바뀌면 "찾지 못함"을 출력한다.</li>
+</ul>
+
+<div class="part">3부 · 공유회 준비</div>
+
+<h2 id="draw"><span class="num">3.1</span>대표자용 "그림 한 장" 지시서</h2>
+<p class="col">손으로 그릴 구조도. 논문 그림 2를 단순화한다. 이 그림 한 장으로 1.3~1.6절이 모두 설명된다.</p>
+<ol class="path">
+  <li><div class="what"><b>가로로 긴 상자 32칸</b><div class="where">"LLaMA2-7B 블록 1~32"라 쓴다. 1~30을 한 색, <strong>31~32를 다른 색</strong>으로 칠하고 "System 1"이라 적는다</div></div></li>
+  <li><div class="what"><b>왼쪽 아래에서 상자 시작점으로 들어가는 화살표 두 개</b><div class="where">"언어 지시", "2D 이미지 (저주파, 4스텝마다)". 묶어 "System 2 입력"</div></div></li>
+  <li><div class="what"><b>블록 30과 31 사이 위에서 들어오는 화살표 네 개</b><div class="where">"2D 이미지", "3D 포인트클라우드", "로봇 상태", "노이즈 행동 a_t…a_{t+H}". 묶어 "System 1 입력 (고주파, 매 스텝)"</div></div></li>
+  <li><div class="what"><b>블록 32 오른쪽에서 나가는 화살표 두 개</b><div class="where">위: "노이즈 예측 → 확산 → 행동 청크 H개 (L_fast)". 아래: "다음 토큰 (이산 행동/언어) (L_slow)"</div></div></li>
+  <li><div class="what"><b>아래에 시간축 하나</b><div class="where">System 2는 4칸마다 점, System 1은 매 칸 점. "1:4"라 쓴다</div></div></li>
+</ol>
+
+<h2 id="q3"><span class="num">3.2</span>공유회에서 던질 질문 세 개</h2>
+<ol>
+  <li><strong>System 1을 VLM 마지막 블록으로 만든 것과, 같은 크기의 새 트랜스포머 블록 2개를 붙인 것의 차이는 무엇인가?</strong> 논문의 증거는 무엇이고, 빠진 실험은 무엇인가. (1.9절 4번)</li>
+  <li><strong>1:4 비율이 1:1보다 성공률이 높은 이유가 "속도" 때문인가 "학습 신호" 때문인가?</strong> 학습 때 비동기 샘플링을 했다는 점이 어떤 역할을 하는가. (1.5절, 실습 4)</li>
+  <li><strong>부록 표 7에서 System 1 입력을 다 빼면 22%로 떨어진다.</strong> 이것이 기존 이중 시스템(π0, CogACT)에 대한 비판으로 성립하는가, 아니면 FiS-VLA 특유의 구조(마지막 2블록만 쓰는) 때문인가. (1.8절)</li>
+</ol>
+
+<h2 id="quiz"><span class="num">3.3</span>자가 점검 퀴즈 10문항</h2>
+<p class="col">논문을 읽고 나서 푼다. 8개 이상이면 공유회 준비 완료.</p>
+<ol>
+  <li>FiS-VLA의 System 1은 어디에 있는가?</li>
+  <li>System 2와 System 1의 동작 주파수 비율은? 그 비율을 정한 실험은?</li>
+  <li>System 1이 받지만 System 2는 받지 않는 입력 두 가지는?</li>
+  <li>L_fast와 L_slow는 각각 어떤 종류의 손실이고 무엇을 지키는가?</li>
+  <li>"117.7 Hz"와 "21.9 Hz"의 관계를 한 문장으로 설명하라.</li>
+  <li>RLBench에서 FiS-VLA의 평균 성공률과 CogACT·π0 대비 차이는?</li>
+  <li>실기 로봇 두 종과 각각의 제어 모드(포즈/관절)는?</li>
+  <li>사전학습 데이터 규모는?</li>
+  <li>System 1 블록 수를 2에서 8로 늘리면 성공률은 어떻게 되는가?</li>
+  <li>논문이 스스로 밝힌 한계 하나와, 논문이 밝히지 않은 비교의 한계 하나를 들어라.</li>
+</ol>
+<details class="quiz"><summary></summary>
+<ol>
+  <li>LLaMA2-7B의 마지막 트랜스포머 블록 2개. 별도 모듈이 아니라 System 2 VLM의 일부.</li>
+  <li>1:4. 4.2절 (3), 부록 표 8. 1:1 0.60, 1:2 0.63, 1:4 0.69, 1:8 0.61.</li>
+  <li>3D 포인트클라우드, 로봇 상태. (2D 이미지는 양쪽 다 받는다.)</li>
+  <li>L_fast는 확산 노이즈 예측 MSE로 행동 생성을 배우고, L_slow는 자기회귀 교차엔트로피로 System 2의 추론 능력(망각 방지)을 지킨다.</li>
+  <li>21.9 Hz는 청크 1일 때 모델 추론 속도이고, 117.7 Hz는 청크 8로 한 번에 8스텝을 낼 때의 이론 제어 주파수다.</li>
+  <li>0.69. CogACT(0.61) 대비 +8%p, π0(0.55) 대비 +14%p.</li>
+  <li>AgileX 양팔 14-DoF 엔드이펙터 포즈 제어, AlphaBot 양팔 16-DoF 관절 위치 제어.</li>
+  <li>37개 데이터셋, 86만 궤적, 3,600만 프레임.</li>
+  <li>0.69 → 0.64로 떨어진다(4블록 0.66). 2개에서 포화.</li>
+  <li>밝힌 것: 블록 수·주파수 비율이 고정(5절). 밝히지 않은 것(예): 청크 1 통일 비교가 π0에 불리할 수 있음, 별도 헤드 대조군 부재, 7B vs 2.6B 규모 차이.</li>
+</ol>
+</details>
+
+<h2 id="booth"><span class="num">3.4</span>부스 질문의 근거 (2026-09-21~22)</h2>
+<div class="tbl">
+<table>
+<thead><tr><th>부스 질문</th><th>이 논문에서의 근거</th></tr></thead>
+<tbody>
+<tr><td>1. 오픈소스 공개 범위 — 코드·가중치 외에 제품 모델도?</td><td>코드·체크포인트는 공개(<code>CHEN-H01/Fast-in-Slow</code>, <code>haosad/fisvla</code>). 회사가 "GOVLA 0.5"라 부르는 것과 제품 Alpha Brain의 관계는 2차 출처뿐. 1.10절 공개 범위 대비</td></tr>
+<tr><td>2. 제품의 System 1:2 주파수 비율과 배치 하드웨어</td><td>논문은 1:4, 단일 4090에서 순차 실행(3.3절). 1.5절·1.9절 5번</td></tr>
+<tr><td>3. 현장 배치 시 실제로 학습하는 부분</td><td>논문은 전체 co-training(식 3). 블록 31~32만 열 수 있는 구조인지가 질문. 1.6절</td></tr>
+<tr><td>4. 백본이 Mamba에서 트랜스포머로 돌아간 이유</td><td>이 논문은 LLaMA2-7B. RoboMamba 5절의 "더 발전된 선형 복잡도 LLM" 예고와 어긋난다. 1.10절 · <a href="paper-1-robomamba.html#q3">RoboMamba 3.2</a></td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="part">4부</div>
+
+<h2 id="map"><span class="num">4</span>자료 지도</h2>
+<div class="tbl">
+<table>
+<thead><tr><th>무엇</th><th>어디</th><th>비고</th></tr></thead>
+<tbody>
+<tr class="hi"><td>이 페이지</td><td><code>paper-2-fis-vla.html</code></td><td>개념 + 실습 + 공유회 준비. 1주차</td></tr>
+<tr><td>정독 가이드 (심화, 4시간)</td><td><a href="fis-vla-guide.html">fis-vla-guide.html</a></td><td>1부 기초 개념 11절 → 2부 절별 해설 10절 → 3부 스터디 도구. 이 페이지의 "더 깊이" 링크가 전부 여기로 간다</td></tr>
+<tr><td>실습 세션 (상세)</td><td><a href="fis-vla-lab.html">fis-vla-lab.html</a></td><td>결과 그림 SVG 3장 포함</td></tr>
+<tr><td>실습 환경</td><td><a href="lab-environment.html">lab-environment.html</a></td><td>로컬 numpy · 코랩 · Apple Silicon · 원 저장소 실행 조건</td></tr>
+<tr><td><strong>실습 코드 (GitHub, 공개)</strong></td><td><a href="https://github.com/drum-grammer/vla-study/tree/main/labs/fis-vla">vla-study/labs/fis-vla</a></td><td>스크립트 6개 + <code>tinynn.py</code> + <code>notebooks/</code></td></tr>
+<tr><td>원 저장소 · 체크포인트</td><td><a href="https://github.com/CHEN-H01/Fast-in-Slow">CHEN-H01/Fast-in-Slow</a> · <a href="https://huggingface.co/haosad/fisvla">haosad/fisvla</a></td><td>학습·평가 코드 공개. 실습 6이 줄 번호로 잇는다</td></tr>
+<tr><td>논문</td><td><a href="https://arxiv.org/abs/2506.01953">arXiv 2506.01953</a> · <a href="https://arxiv.org/pdf/2506.01953">PDF</a> · <a href="https://fast-in-slow.github.io/">프로젝트</a></td><td>arXiv v1 기준(확인 2026-09-11)</td></tr>
+<tr><td>사내 노션 (계정 필요)</td><td><a href="https://app.notion.com/p/gsholdings/3d8f800bd1c181f694bff673f3b84b8d">FiS-VLA 정독 가이드</a> · <a href="https://app.notion.com/p/gsholdings/3d8f800bd1c181849993e5b23d2bbfab">두 쪽 요약</a> · <a href="https://app.notion.com/p/gsholdings/3d8f800bd1c18147a215c99f42704010">절별 독해 노트</a> · <a href="https://app.notion.com/p/gsholdings/3d8f800bd1c181929f93ea845766ce2f">실습 세션</a></td><td>공유회 논의 기록은 <a href="https://app.notion.com/p/gsholdings/3d6f800bd1c180e58a4ce5ece278485d">운영 페이지</a> 1주차 칸에</td></tr>
+<tr><td>메인 문서</td><td><a href="index.html">VLA 논문 6편 읽기</a></td><td>일정 · 논문 6편 · 계보 · 부스 질문</td></tr>
+</tbody>
+</table>
+</div>
+<div class="nextprev">
+  <a href="index.html"><small>메인 문서</small>VLA 논문 6편 읽기</a>
+  <a href="paper-1-robomamba.html"><small>짝 논문 · 1주차</small>① RoboMamba 스터디 페이지 →</a>
+</div>
+
+<footer>
+  논문 수치는 arXiv 2506.01953 v1 본문·부록 표에서 옮겼다(확인 2026-09-11). 실습 결과는 스크립트를 실제로 돌려 나온 값이다(M1 Mac, numpy).
+  논문 밖 사실(저장소 내용·줄 번호·환경)에는 확인일을 붙였다. 갱신 2026-09-13.
+</footer>
+</main>
+</div>
+
+<script>
+(function () {
+  var key = 'vla-study:' + location.pathname;
+  var boxes = document.querySelectorAll('.checks input[type=checkbox]');
+  var saved = {};
+  try { saved = JSON.parse(localStorage.getItem(key) || '{}') || {}; } catch (e) { saved = {}; }
+  Array.prototype.forEach.call(boxes, function (b) {
+    if (saved[b.id]) b.checked = true;
+    b.addEventListener('change', function () {
+      saved[b.id] = b.checked;
+      try { localStorage.setItem(key, JSON.stringify(saved)); } catch (e) {}
+    });
+  });
+})();
+</script>
+</body>
+</html>
