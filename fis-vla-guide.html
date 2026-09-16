@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+    html { color-scheme: light; }
+    body { margin: 0; font: 14px system-ui, -apple-system, sans-serif; background: #fafaf9; }
+    img { max-width: 100%; }
+    [hidden] { display: none !important; }
+</style>
+<title>FiS-VLA 정독 가이드</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gothic+A1:wght@500;700;800;900&family=Noto+Serif+KR:wght@400;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --ground: #F2F4F3;
+    --plate: #FFFFFF;
+    --ink: #14202B;
+    --ink-2: #47535E;
+    --muted: #6F7B86;
+    --rule: #D6DCE0;
+    --slow: #2F3E9E;
+    --slow-soft: #E8EBFA;
+    --fast: #D9531E;
+    --fast-soft: #FCEAE2;
+    --note: #F6F1DF;
+    --note-ink: #6B5A15;
+    --shadow: 0 1px 2px rgba(20,32,43,.05), 0 10px 30px rgba(20,32,43,.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #0E1318;
+      --plate: #161C23;
+      --ink: #E7EBEE;
+      --ink-2: #B9C2CA;
+      --muted: #8A96A1;
+      --rule: #2A333C;
+      --slow: #97A4F5;
+      --slow-soft: #1E2440;
+      --fast: #F0895F;
+      --fast-soft: #3A2218;
+      --note: #2E2A1C;
+      --note-ink: #E3D39A;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 10px 30px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #0E1318;
+    --plate: #161C23;
+    --ink: #E7EBEE;
+    --ink-2: #B9C2CA;
+    --muted: #8A96A1;
+    --rule: #2A333C;
+    --slow: #97A4F5;
+    --slow-soft: #1E2440;
+    --fast: #F0895F;
+    --fast-soft: #3A2218;
+    --note: #2E2A1C;
+    --note-ink: #E3D39A;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 10px 30px rgba(0,0,0,.35);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "Noto Serif KR", "Apple SD Gothic Neo", "Noto Sans KR", serif;
+    font-size: 16.5px;
+    line-height: 1.8;
+    -webkit-font-smoothing: antialiased;
+    word-break: keep-all;
+  }
+  h1, h2, h3, h4, .sans { font-family: "Gothic A1", "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif; }
+  code, .mono { font-family: "JetBrains Mono", ui-monospace, Menlo, monospace; font-size: .86em; }
+  a { color: var(--slow); text-decoration: none; border-bottom: 1px solid color-mix(in srgb, var(--slow) 35%, transparent); }
+  a:hover { border-bottom-color: var(--slow); }
+  a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid var(--fast); outline-offset: 2px; }
+
+  .shell { max-width: 1160px; margin: 0 auto; padding: 40px 20px 100px; display: grid; grid-template-columns: 232px minmax(0, 1fr); gap: 48px; }
+  @media (max-width: 900px) { .shell { grid-template-columns: 1fr; gap: 24px; padding-top: 24px; } }
+
+  /* 목차 */
+  nav.toc { position: sticky; top: 24px; align-self: start; font-family: "Gothic A1", sans-serif; font-size: 13px; line-height: 1.5; }
+  @media (max-width: 900px) { nav.toc { position: static; } nav.toc details { border: 1px solid var(--rule); background: var(--plate); padding: 10px 14px; } }
+  nav.toc summary { cursor: pointer; font-weight: 800; letter-spacing: .04em; color: var(--muted); font-size: 12px; text-transform: uppercase; list-style: none; }
+  nav.toc summary::-webkit-details-marker { display: none; }
+  @media (min-width: 901px) { nav.toc summary { pointer-events: none; } }
+  nav.toc ol { list-style: none; margin: 10px 0 0; padding: 0; }
+  nav.toc li { margin: 0; }
+  nav.toc .part { margin-top: 14px; font-weight: 800; color: var(--ink); font-size: 13px; }
+  nav.toc .part:first-child { margin-top: 0; }
+  nav.toc a { display: block; padding: 3px 0 3px 10px; border: 0; border-left: 2px solid var(--rule); color: var(--ink-2); }
+  nav.toc a:hover { color: var(--ink); border-left-color: var(--ink); }
+  nav.toc .part a { border-left-color: transparent; padding-left: 0; color: var(--ink); font-weight: 800; }
+  nav.toc li.p1 > a.part-a { border-left-color: transparent; }
+  nav.toc .s1 a { border-left-color: var(--slow-soft); }
+  nav.toc .s2 a { border-left-color: var(--fast-soft); }
+  nav.toc li.sub a { padding-left: 22px; font-size: 12.5px; color: var(--muted); }
+
+  /* 머리 */
+  header.head { grid-column: 1 / -1; background: var(--plate); border: 1px solid var(--rule); box-shadow: var(--shadow); padding: 34px 40px 30px; position: relative; overflow: hidden; }
+  @media (max-width: 900px) { header.head { padding: 26px 22px 22px; } }
+  header.head .eyebrow { font-family: "Gothic A1", sans-serif; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: 0 0 12px; display: flex; gap: 14px; flex-wrap: wrap; }
+  header.head h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: -.03em; font-weight: 900; text-wrap: balance; }
+  header.head h1 .fast { color: var(--fast); }
+  header.head h1 .slow { color: var(--slow); }
+  header.head .sub { margin: 14px 0 0; font-size: 17px; color: var(--ink-2); max-width: 62ch; }
+  header.head .paper { margin: 22px 0 0; padding: 14px 18px; border-left: 3px solid var(--rule); font-size: 14px; color: var(--ink-2); line-height: 1.6; }
+  header.head .paper b { color: var(--ink); font-family: "Gothic A1", sans-serif; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0 0; }
+  .chip { font-family: "Gothic A1", sans-serif; font-size: 12.5px; font-weight: 700; padding: 5px 11px; border: 1px solid var(--rule); border-radius: 4px; color: var(--ink-2); background: var(--ground); }
+  .chip.slow { color: var(--slow); background: var(--slow-soft); border-color: transparent; }
+  .chip.fast { color: var(--fast); background: var(--fast-soft); border-color: transparent; }
+
+  /* 본문 */
+  main.article { min-width: 0; }
+  main.article > section { margin: 0 0 56px; }
+  .part-head { display: grid; grid-template-columns: auto 1fr; gap: 16px; align-items: baseline; border-bottom: 2px solid var(--ink); padding-bottom: 10px; margin: 0 0 26px; }
+  .part-head .num { font-family: "Gothic A1", sans-serif; font-weight: 900; font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+  .part-head h2 { margin: 0; font-size: 26px; letter-spacing: -.025em; font-weight: 800; text-wrap: balance; }
+  h3 { font-size: 19px; letter-spacing: -.015em; font-weight: 800; margin: 40px 0 12px; scroll-margin-top: 24px; text-wrap: balance; }
+  h3 .k { color: var(--muted); font-weight: 700; margin-right: 8px; font-variant-numeric: tabular-nums; }
+  h4 { font-size: 15.5px; font-weight: 800; margin: 26px 0 8px; }
+  p { margin: 0 0 14px; max-width: 70ch; }
+  ul, ol { margin: 0 0 14px; padding-left: 22px; max-width: 70ch; }
+  li { margin: 0 0 6px; }
+  li::marker { color: var(--muted); }
+  strong { font-weight: 600; color: var(--ink); }
+  .lede { font-size: 17.5px; color: var(--ink-2); }
+
+  /* 표 */
+  .tbl { overflow-x: auto; margin: 14px 0 20px; border: 1px solid var(--rule); background: var(--plate); }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; line-height: 1.55; font-variant-numeric: tabular-nums; }
+  th, td { padding: 9px 12px; border-bottom: 1px solid var(--rule); vertical-align: top; text-align: left; }
+  th { font-family: "Gothic A1", sans-serif; font-weight: 800; font-size: 12.5px; letter-spacing: .02em; color: var(--muted); background: var(--ground); white-space: nowrap; }
+  tr:last-child td { border-bottom: 0; }
+  td.n { text-align: right; white-space: nowrap; }
+  tr.hi td { background: color-mix(in srgb, var(--fast-soft) 55%, var(--plate)); font-weight: 600; }
+  td .slow-t { color: var(--slow); font-weight: 700; }
+  td .fast-t { color: var(--fast); font-weight: 700; }
+
+  /* 콜아웃 */
+  .box { position: relative; margin: 18px 0 20px; padding: 16px 20px 14px 20px; border: 1px solid var(--rule); background: var(--plate); max-width: 74ch; }
+  .box::before { content: attr(data-label); position: absolute; top: -9px; left: 14px; padding: 0 8px; background: var(--plate); font-family: "Gothic A1", sans-serif; font-size: 11.5px; font-weight: 800; letter-spacing: .1em; color: var(--muted); }
+  .box p:last-child, .box ul:last-child, .box ol:last-child { margin-bottom: 0; }
+  .box.analogy { border-color: transparent; background: var(--note); color: var(--note-ink); }
+  .box.analogy::before { background: var(--note); color: var(--note-ink); }
+  .box.analogy strong { color: inherit; }
+  .box.warn { border-left: 3px solid var(--fast); }
+  .box.warn::before { color: var(--fast); }
+  .box.paper { border-left: 3px solid var(--slow); }
+  .box.paper::before { color: var(--slow); }
+  .box.eq { font-family: "JetBrains Mono", monospace; font-size: 14px; line-height: 1.7; }
+  .box.lab { border-color: transparent; background: var(--fast-soft); }
+  .box.lab::before { background: var(--fast-soft); color: var(--fast); content: "▶ 실습 · " attr(data-label); }
+  .box.lab .cmd { display: inline-block; margin: 6px 0 0; padding: 3px 9px; background: var(--plate); border: 1px solid var(--rule); font-family: "JetBrains Mono", monospace; font-size: 12.5px; }
+  .box.lab a { color: var(--fast); border-bottom-color: color-mix(in srgb, var(--fast) 40%, transparent); }
+  .box.eq .read { font-family: "Noto Serif KR", serif; font-size: 15px; color: var(--ink-2); margin-top: 8px; display: block; }
+
+  /* 그림 */
+  figure { margin: 22px 0 26px; padding: 18px 18px 12px; background: var(--plate); border: 1px solid var(--rule); }
+  figure svg { width: 100%; height: auto; display: block; }
+  figcaption { font-family: "Gothic A1", sans-serif; font-size: 13px; color: var(--muted); margin-top: 10px; line-height: 1.55; }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; font-family: "Gothic A1", sans-serif; font-size: 12.5px; color: var(--ink-2); margin-top: 8px; }
+  .legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; margin-right: 6px; vertical-align: -1px; border-radius: 2px; }
+  .legend .l-slow::before { background: var(--slow); }
+  .legend .l-fast::before { background: var(--fast); }
+  .legend .l-in::before { background: var(--rule); }
+
+  /* 퀴즈 */
+  details.quiz { border: 1px solid var(--rule); background: var(--plate); padding: 12px 18px; margin: 14px 0; max-width: 74ch; }
+  details.quiz summary { cursor: pointer; font-family: "Gothic A1", sans-serif; font-weight: 800; }
+  details.quiz ol { margin-top: 10px; }
+
+  /* 정의 목록 */
+  dl.terms { display: grid; grid-template-columns: max-content 1fr; gap: 6px 18px; font-size: 14.5px; max-width: 78ch; margin: 0 0 14px; }
+  dl.terms dt { font-family: "Gothic A1", sans-serif; font-weight: 800; color: var(--ink); }
+  dl.terms dd { margin: 0; color: var(--ink-2); }
+  @media (max-width: 600px) { dl.terms { grid-template-columns: 1fr; gap: 2px; } dl.terms dd { margin-bottom: 8px; } }
+
+  footer.foot { grid-column: 1 / -1; border-top: 1px solid var(--rule); padding-top: 18px; font-size: 13.5px; color: var(--muted); font-family: "Gothic A1", sans-serif; line-height: 1.7; }
+</style>
+
+</head>
+<body>
+<div class="shell">
+  <header class="head">
+    <p class="eyebrow"><span>사내 VLA 논문 스터디 · 1주차</span><span>2026-09-14 ~ 09-20</span><span>작성 2026-09-11 · 개정 2026-09-16</span></p>
+    <h1><span class="fast">빠른 손</span>을 <span class="slow">느린 머리</span> 안에 넣다<br>FiS-VLA 정독 가이드</h1>
+    <p class="sub">트랜스포머·확산 모델·VLA를 배운 적이 없는 컴퓨터공학 학부생이, 논문 한 편을 그림·표 번호까지 대조하며 끝까지 읽을 수 있도록 쓴 해설.</p>
+    <div class="paper"><b>Fast-in-Slow: A Dual-System Foundation Model Unifying Fast Manipulation within Slow Reasoning</b><br>Hao Chen, Jiaming Liu, Chenyang Gu, Zhuoyang Liu 외 · CUHK · 베이징대 · AI² Robotics · BAAI · arXiv 2506.01953 (v1, 2025-06-02) · <a href="https://arxiv.org/abs/2506.01953">arXiv</a> · <a href="https://github.com/CHEN-H01/Fast-in-Slow">코드</a> · <a href="https://fast-in-slow.github.io/">프로젝트</a></div>
+    <div class="chips">
+      <span class="chip slow">System 2 · LLaMA2-7B 32블록 · 저주파</span>
+      <span class="chip fast">System 1 · 마지막 2블록 · 고주파</span>
+      <span class="chip">주파수 비율 1:4</span>
+      <span class="chip">RLBench 평균 0.69</span>
+      <span class="chip">21.9 Hz (청크 1) → 117.7 Hz (청크 8)</span>
+    </div>
+  </header>
+
+  <nav class="toc" aria-label="목차">
+    <details open>
+      <summary>목차</summary>
+      <ol>
+        <li class="part"><a href="#p1" class="part-a">1부 · 기초 개념</a></li>
+        <li class="s1"><a href="#s11">1.1 신경망 30초 복습</a></li>
+        <li class="s1"><a href="#s12">1.2 토큰과 임베딩</a></li>
+        <li class="s1"><a href="#s13">1.3 트랜스포머와 어텐션</a></li>
+        <li class="s1 sub"><a href="#s131">1.3.1 어텐션을 숫자로 한 번</a></li>
+        <li class="s1 sub"><a href="#s132">1.3.2 셀프·크로스 어텐션과 마스크</a></li>
+        <li class="s1"><a href="#s14">1.4 LLM · 자기회귀 · VLM</a></li>
+        <li class="s1 sub"><a href="#s141">1.4.1 자기회귀를 한 스텝씩</a></li>
+        <li class="s1 sub"><a href="#s142">1.4.2 인코더·디코더란</a></li>
+        <li class="s1"><a href="#s15">1.5 사전학습과 파인튜닝</a></li>
+        <li class="s1"><a href="#s16">1.6 로봇 조작을 학습 문제로</a></li>
+        <li class="s1"><a href="#s17">1.7 VLA와 행동 출력</a></li>
+        <li class="s1"><a href="#s18">1.8 확산 헤드와 행동 청크</a></li>
+        <li class="s1"><a href="#s19">1.9 System 1 / 2 — 중심 한 쌍</a></li>
+        <li class="s1"><a href="#s110">1.10 포인트클라우드</a></li>
+        <li class="s1"><a href="#s111">1.11 용어 사전</a></li>
+        <li class="part"><a href="#p2" class="part-a">2부 · 논문 정독</a></li>
+        <li class="s2"><a href="#s21">2.1 한 문장 요약·저자</a></li>
+        <li class="s2"><a href="#s22">2.2 문제 정의</a></li>
+        <li class="s2"><a href="#s23">2.3 핵심 아이디어 (그림 1)</a></li>
+        <li class="s2"><a href="#s24">2.4 구조 (그림 2)</a></li>
+        <li class="s2"><a href="#s25">2.5 두 시스템의 조율</a></li>
+        <li class="s2"><a href="#s26">2.6 학습 · 식 세 개</a></li>
+        <li class="s2"><a href="#s27">2.7 결과 읽기</a></li>
+        <li class="s2"><a href="#s28">2.8 실패와 한계</a></li>
+        <li class="s2"><a href="#s29">2.9 비판적으로 읽기</a></li>
+        <li class="s2"><a href="#s210">2.10 계보 안의 자리</a></li>
+        <li class="part"><a href="#p3" class="part-a">3부 · 스터디 도구</a></li>
+        <li><a href="#s31">3.1 그림 한 장 지시서</a></li>
+        <li><a href="#s32">3.2 질문 세 개</a></li>
+        <li><a href="#s33">3.3 자가 점검 퀴즈</a></li>
+        <li><a href="#s34">3.4 코드 훑기</a></li>
+        <li><a href="#s35">3.5 더 읽을 것</a></li>
+      </ol>
+    </details>
+  </nav>
+
+  <main class="article">
+
+    <section id="intro">
+      <p class="lede">이 문서는 논문 원문(arXiv v1)을 처음부터 부록까지 읽고 정리했다. 수치는 모두 논문 본문·부록 표에서 옮겼고, 논문 밖 사실에는 출처와 확인일을 따로 달았다.</p>
+      <p><strong>읽는 법.</strong> 1부는 위에서 아래로 한 번 읽는다(2시간). 2부는 논문 PDF를 옆에 펴 놓고 그림·표 번호를 대조하며 읽는다(2시간). 3부는 공유회 준비용이다(30분). 이 페이지 전체에서 <span class="sans" style="color:var(--slow);font-weight:800">파랑은 System 2(느린 추론)</span>, <span class="sans" style="color:var(--fast);font-weight:800">주황은 System 1(빠른 실행)</span>이다.</p>
+      <p><strong>함께 쓰는 자료.</strong> 네 문서가 한 벌이다. 저장소 경로는 모두 <code>50_skills/ai2-vla-paper-study/</code> 기준.</p>
+      <div class="tbl"><table>
+        <thead><tr><th>무엇</th><th>저장소 파일</th><th>언제 보나</th></tr></thead>
+        <tbody>
+          <tr><td><a href="https://github.com/drum-grammer/ai2-vla-paper-study/blob/main/fis-vla-paper-summary.md">두 쪽 요약</a></td><td><code>fis-vla-paper-summary.md</code></td><td>시간 없을 때 먼저</td></tr>
+          <tr><td><strong>이 문서</strong> (정독 가이드)</td><td><code>fis-vla-study-guide.md</code> · 이 웹판의 원본 <code>fis-vla-study-guide.html</code></td><td>본체</td></tr>
+          <tr><td><a href="https://github.com/drum-grammer/ai2-vla-paper-study/blob/main/fis-vla-paper-ko.md">절별 독해 노트</a></td><td><code>fis-vla-paper-ko.md</code></td><td>원문 PDF를 옆에 펴 놓고</td></tr>
+          <tr><td><a href="fis-vla-lab.html">실습 세션</a></td><td><code>fis-vla-lab/README.md</code> · 코드 <code>fis-vla-lab/labs/</code></td><td>손으로 만져 볼 때</td></tr>
+        </tbody>
+      </table></div>
+      <p>각 절 끝의 <span class="sans" style="color:var(--fast);font-weight:800">▶ 실습</span> 상자가 해당 스크립트를 가리킨다. 이론 한 절, 실습 하나의 순서를 권한다. 게시본 주소까지 포함한 전체 목록은 <a href="index.html">자료 위치 지도</a>에 있다.</p>
+      <p>논문 제목을 한 단어씩 풀면 배워야 할 개념이 다 나온다.</p>
+      <div class="tbl"><table>
+        <thead><tr><th>제목의 단어</th><th>알아야 할 개념</th><th>1부 절</th></tr></thead>
+        <tbody>
+          <tr><td>Foundation Model</td><td>사전학습·파인튜닝, 파운데이션 모델</td><td>1.5</td></tr>
+          <tr><td><span class="slow-t">Reasoning (Slow)</span></td><td>트랜스포머, LLM, 자기회귀 생성, 시각·언어 모델(VLM)</td><td>1.2 ~ 1.4</td></tr>
+          <tr><td><span class="fast-t">Manipulation (Fast)</span></td><td>로봇 조작 문제, 관측·행동·제어 주파수, 모방학습</td><td>1.6</td></tr>
+          <tr><td>Dual-System</td><td>System 1 / System 2, 기존 이중 시스템 VLA</td><td>1.9</td></tr>
+          <tr><td>Unifying … within</td><td>확산 모델 행동 헤드, 행동 청크</td><td>1.7, 1.8</td></tr>
+          <tr><td>(본문) 3D point cloud</td><td>포인트클라우드</td><td>1.10</td></tr>
+        </tbody>
+      </table></div>
+      <div class="box" data-label="먼저 붙잡아 둘 한 쌍">
+        <p>이 문서에서 가장 자주 나오는 말이 <strong>System 1</strong>과 <strong>System 2</strong>다. 1부와 2부 전체가 이 두 단어를 축으로 돈다. 한 줄로 줄이면 <strong><span class="sans" style="color:var(--slow);font-weight:700">System 2는 느린 머리</span>, <span class="sans" style="color:var(--fast);font-weight:700">System 1은 빠른 손</span></strong>이다. 머리는 "무엇을 할지"를 판단하고 크고 느리다. 손은 "지금 이 순간 어떻게 움직일지"를 정하고 작고 빠르다. 논문 제목의 <strong>Slow가 머리, Fast가 손</strong>이다.</p>
+        <p>아래 1.1~1.8절에서 이 말이 먼저 나오더라도 이 한 줄만 붙들면 읽힌다. 제대로 된 정의와 "왜 나누는가"는 <a href="#s19">1.9절</a>에 몰아 두었다.</p>
+      </div>
+    </section>
+
+    <!-- ───────── 1부 ───────── -->
+    <section id="p1">
+      <div class="part-head"><span class="num">1부</span><h2>논문을 읽기 위한 기초 개념</h2></div>
+
+      <h3 id="s11"><span class="k">1.1</span>신경망 30초 복습</h3>
+      <p>신경망은 <strong>입력을 출력으로 바꾸는 함수 f(x; θ)</strong>다. θ는 수백만~수십억 개의 숫자(파라미터)이고, "학습"은 정답과 출력의 차이(<strong>손실 함수</strong>)를 줄이는 방향으로 θ를 조금씩 고치는 일이다(경사하강법). 이 문서에서 손실 함수는 두 종류만 나온다.</p>
+      <ul>
+        <li><strong>평균제곱오차(MSE)</strong>: 연속값 예측. 예측과 정답의 차이를 제곱해 평균. <span class="sans" style="color:var(--fast);font-weight:700">System 1</span>(빠른 손, <a href="#s19">1.9절</a>)이 쓴다.</li>
+        <li><strong>교차엔트로피(cross-entropy)</strong>: 분류·다음 토큰 예측. "정답 항목에 얼마나 높은 확률을 줬나"를 벌점으로 바꾼다. <span class="sans" style="color:var(--slow);font-weight:700">System 2</span>(느린 머리, <a href="#s19">1.9절</a>)가 쓴다.</li>
+      </ul>
+      <p>"7B 모델"은 θ가 70억 개라는 뜻이다. FiS-VLA는 7B급이고, 비교 대상 π0는 2.6B, RoboMamba는 2.7B다.</p>
+
+      <h3 id="s12"><span class="k">1.2</span>토큰과 임베딩 — 모든 입력을 "같은 크기의 벡터 열"로</h3>
+      <p>트랜스포머는 입력을 <strong>토큰의 열</strong>로 받는다. 토큰 하나는 고정 길이의 실수 벡터(예: 4096차원)다.</p>
+      <ul>
+        <li><strong>텍스트</strong>: 문장을 단어 조각으로 쪼개고(토크나이저) 각 조각을 벡터로 바꾼다(임베딩 표). "Place the wine on the rack" → 6~8개 토큰.</li>
+        <li><strong>이미지</strong>: 224×224 이미지를 격자(패치)로 나누고 각 패치를 벡터로 바꾼다(비전 인코더). 수백 개 토큰.</li>
+        <li><strong>로봇 상태, 3D 점, 노이즈 섞인 행동</strong>: 작은 신경망(MLP)으로 벡터 크기를 맞춰 넣는다.</li>
+      </ul>
+      <div class="box" data-label="핵심">
+        <p><strong>종류가 다른 정보라도 같은 차원의 벡터 열로 바꾸면 한 트랜스포머에 나란히 넣을 수 있다.</strong> FiS-VLA 그림 2의 범례(언어·2D 이미지·3D 포인트클라우드·로봇 상태·노이즈 행동 토큰)는 정확히 이 "한 줄에 섞어 넣기"를 그린 것이다.</p>
+      </div>
+
+      <h3 id="s13"><span class="k">1.3</span>트랜스포머 — 어텐션 블록을 쌓은 것</h3>
+      <p>트랜스포머는 <strong>같은 모양의 블록을 N개 쌓은 구조</strong>다. LLaMA2-7B는 32개, FiS-VLA도 이 32블록을 그대로 쓴다. 블록 하나에 들어가는 것은 토큰 벡터 열, 나오는 것도 같은 개수·같은 차원의 토큰 벡터 열이다. 그래서 <strong>블록 사이 어디서든 "중간 표현"을 꺼내 쓸 수 있다.</strong> 이 성질이 FiS-VLA의 핵심 장치와 직결된다.</p>
+      <div class="box analogy" data-label="비유 · 어텐션">
+        <p>도서관에서 질문(Query)을 들고 서가를 돈다. 각 책에는 제목표(Key)가 붙어 있고, 질문과 제목표가 비슷할수록 그 책의 내용(Value)을 많이 가져온다. 모든 책의 내용을 "비슷한 정도"로 가중평균한 것이 답이다.</p>
+      </div>
+      <p>토큰 하나하나가 이 질문자다. 문장의 "wine" 토큰은 이미지 패치 토큰들 중 병 모양 패치에 높은 가중치를 주고 그 정보를 끌어온다. 이렇게 <strong>토큰들이 서로의 정보를 섞는 것</strong>이 어텐션이고, 그 뒤에 작은 MLP가 붙어 블록 하나가 된다. 32개를 지나면 각 토큰 벡터에는 문장·이미지·상태 전체의 맥락이 스며들어 있다.</p>
+      <h4 id="s131">1.3.1 어텐션을 숫자로 한 번 — "가중 평균"이 전부다</h4>
+      <p>비유로 안 잡히면 숫자로 한 번 해 보면 된다. 토큰을 3개로, 벡터 차원을 2로 줄인 장난감 예다.</p>
+      <div class="tbl"><table>
+        <thead><tr><th>번호</th><th>토큰</th><th>벡터</th></tr></thead>
+        <tbody>
+          <tr><td>①</td><td>"wine" (언어 토큰)</td><td><code>[1, 0]</code></td></tr>
+          <tr><td>②</td><td>와인병이 찍힌 이미지 패치</td><td><code>[0.9, 0.1]</code></td></tr>
+          <tr><td>③</td><td>빈 벽이 찍힌 이미지 패치</td><td><code>[0, 1]</code></td></tr>
+        </tbody>
+      </table></div>
+      <p>①번 "wine" 토큰이 자기 벡터를 갱신한다고 하자. 세 단계뿐이다.</p>
+      <ol>
+        <li><strong>닮은 정도를 잰다.</strong> 내적(같은 자리끼리 곱해서 더하기)을 쓴다. <code>wine·wine = 1×1 + 0×0 = 1</code>, <code>wine·와인병 = 1×0.9 + 0×0.1 = 0.9</code>, <code>wine·빈 벽 = 1×0 + 0×1 = 0</code>.</li>
+        <li><strong>합이 1인 비율로 바꾼다(softmax).</strong> 대략 자기 자신 0.45, 와인병 0.42, 빈 벽 0.13. 이 비율이 <strong>어텐션 가중치</strong>다.</li>
+        <li><strong>그 비율로 가중 평균을 낸다.</strong> <code>0.45×[1,0] + 0.42×[0.9,0.1] + 0.13×[0,1] = [0.83, 0.17]</code>.</li>
+      </ol>
+      <div class="box" data-label="핵심">
+        <p>원래 <code>[1, 0]</code>이던 "wine" 토큰이 <code>[0.83, 0.17]</code>이 됐다. 와인병 패치 쪽 정보가 섞여 들어온 것이다. 이제 이 벡터는 "wine이라는 단어"인 동시에 "화면 저쪽의 저 병"을 가리킨다. <strong>어텐션은 곧 닮은 토큰의 정보를 더 많이 섞는 가중 평균이다.</strong></p>
+      </div>
+      <p>세 토큰이 동시에 각자 이 계산을 한다. 빈 벽 패치는 끌어올 것이 없어 거의 그대로 남는다. 여기까지가 블록 하나의 앞 절반이고, 뒤 절반이 토큰별 MLP다.</p>
+      <p>실제 모델이 이 장난감과 다른 점은 둘뿐이다. 차원이 2가 아니라 4096이고 토큰이 3개가 아니라 수백 개라는 것, 그리고 벡터를 날것으로 비교하지 않고 <strong>세 갈래로 먼저 변환</strong>한다는 것이다.</p>
+      <div class="tbl"><table>
+        <thead><tr><th>갈래</th><th>이름</th><th>맡는 말</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Q</strong></td><td>Query (질문)</td><td>나는 무엇을 찾고 있나</td></tr>
+          <tr><td><strong>K</strong></td><td>Key (제목표)</td><td>나는 무엇으로 검색되고 싶나</td></tr>
+          <tr><td><strong>V</strong></td><td>Value (내용)</td><td>내가 실제로 건네줄 정보</td></tr>
+        </tbody>
+      </table></div>
+      <p>1단계의 내적은 Q와 K 사이에서 일어나고, 3단계의 가중 평균은 V끼리 일어난다. "찾는 것"과 "가진 것"과 "건네는 것"을 따로 적게 해 주는 장치일 뿐, <strong>내적 → 비율 → 가중 평균</strong>이라는 뼈대는 위 세 단계 그대로다. 학습이란 이 세 변환 행렬을 "쓸모 있는 닮음"이 나오도록 조정하는 일이다.</p>
+
+      <h4 id="s132">1.3.2 셀프 어텐션·크로스 어텐션, 그리고 마스크</h4>
+      <ul>
+        <li><strong>셀프 어텐션(self-attention)</strong>: Q·K·V를 <strong>모두 같은 토큰 열</strong>에서 뽑는다. 위 예가 이것이다. 언어·이미지·상태 토큰을 한 줄로 이어 붙인 뒤 셀프 어텐션을 걸면 그 한 줄 안에서 모달리티가 저절로 섞인다. FiS-VLA를 비롯한 최근 VLA 대부분이 이 방식이다.</li>
+        <li><strong>크로스 어텐션(cross-attention)</strong>: Q는 이쪽 열에서, K·V는 <strong>다른 열</strong>에서 뽑는다. "행동 토큰은 이미지 토큰만 참조한다"처럼 참조 방향을 고정하고 싶을 때 쓴다(Flamingo 계열).</li>
+        <li><strong>마스크(mask)</strong>: 어떤 토큰이 어떤 토큰을 못 보게 막는 장치. 언어 생성에서는 <strong>인과 마스크(causal mask)</strong>로 "각 토큰은 자기보다 앞만 본다"를 강제한다. 미래를 미리 보면 다음 토큰 맞히기 학습이 성립하지 않기 때문이다.</li>
+      </ul>
+
+      <p>계산량은 토큰 수의 제곱에 비례한다(모든 토큰이 모든 토큰을 본다). 토큰이 많으면 느리고, 이것이 "VLA는 느리다"의 첫 원인이다.</p>
+      <div class="box lab" data-label="1 · 토큰 열과 블록 쌓기">
+        <p>언어·이미지 패치·상태·노이즈 행동 토큰이 한 행렬에 놓이는 것, "wine" 토큰이 병 패치에 어텐션을 주는 것, 블록 6개를 0~3(System 2)과 4~5(System 1)로 나눠(<a href="#s19">1.9절</a>) 중간 표현을 꺼내 4번 재사용하는 것을 1초 안에 본다. 저장소 <code>prismatic.py</code>의 <code>llm_layer_end</code> / <code>llm_layer_start</code> 두 번 호출의 축소판.</p>
+        <span class="cmd">python3 labs/lab1_tokens_blocks.py</span>
+      </div>
+
+      <h3 id="s14"><span class="k">1.4</span>LLM, 자기회귀, 그리고 VLM</h3>
+      <p><strong>LLM</strong>은 트랜스포머로 "다음 토큰"을 맞히는 모델이다. 학습 목표는 앞 토큰들이 주어졌을 때 다음 토큰의 확률을 최대화하는 것(= 교차엔트로피 최소화). 생성할 때는 한 토큰을 뽑고, 입력 끝에 붙이고, 또 다음을 뽑는다. 이것이 <strong>자기회귀(autoregressive)</strong>다. 10개 토큰을 만들려면 모델을 10번 돌려야 한다. <strong>"VLA는 느리다"의 둘째 원인</strong>이다. LLaMA2처럼 앞에서부터 읽으며 생성만 하는 구조를 <strong>디코더 전용</strong> 트랜스포머라 부른다(1.4.2절).</p>
+
+      <h4 id="s141">1.4.1 자기회귀를 한 스텝씩 — 왜 한 번에 못 내나</h4>
+      <p>"모델을 10번 돌린다"가 무슨 뜻인지 표로 보면 분명하다. "Place the wine"까지 주어진 LLM이 뒤를 이어 쓰는 상황이다.</p>
+      <div class="tbl"><table>
+        <thead><tr><th>회차</th><th>모델에 넣는 것</th><th>모델이 내는 것</th><th>그다음</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>Place the wine</td><td><code>on</code></td><td>입력 끝에 붙인다</td></tr>
+          <tr><td>2</td><td>Place the wine on</td><td><code>the</code></td><td>입력 끝에 붙인다</td></tr>
+          <tr><td>3</td><td>Place the wine on the</td><td><code>rack</code></td><td>입력 끝에 붙인다</td></tr>
+          <tr><td>4</td><td>Place the wine on the rack</td><td><code>&lt;끝&gt;</code></td><td>종료</td></tr>
+        </tbody>
+      </table></div>
+      <p>핵심은 <strong>2회차의 입력이 1회차의 출력에 의존한다</strong>는 것이다. 자기 출력을 자기 입력으로 되먹인다고 해서 "자기(自)회귀"다. 앞 결과를 모르면 다음 계산을 시작할 수 없으니, 네 토큰을 GPU 네 장에 나눠 동시에 만들 수 없다. 학습할 때는 정답 문장이 이미 있어서 전체를 한 번에 병렬로 계산하지만(인과 마스크가 컨닝을 막는다), <strong>생성할 때만은 순차</strong>다. 이 비대칭이 VLA 속도 문제의 뿌리다.</p>
+      <div class="box" data-label="KV 캐시">
+        <p>실제 구현은 앞 토큰들의 K·V를 저장해 두고 재사용해(KV 캐시) 회차마다 앞부분을 다시 계산하지는 않는다. 그래도 <strong>모델 호출 횟수 자체는 토큰 수만큼</strong> 남으므로 순차성은 사라지지 않는다.</p>
+      </div>
+      <p>그래서 행동을 토큰으로 이산화한 1세대 VLA는 7-DoF 행동 하나를 내는 데 모델을 7번 돌린다(1.7절). FiS-VLA의 <span class="sans" style="color:var(--fast);font-weight:700">System 1</span>(빠른 손, <a href="#s19">1.9절</a>)이 확산 헤드로 실수 7개를 <strong>한 번에</strong> 내는 것은 정확히 이 순차성을 끊으려는 선택이다.</p>
+      <p><strong>VLM(시각·언어 모델)</strong>은 LLM 앞에 비전 인코더를 붙여 이미지도 토큰으로 넣을 수 있게 한 것이다. 세 조각으로 이뤄진다.</p>
+      <ol>
+        <li><strong>비전 인코더</strong>: 이미지 → 패치 토큰. FiS-VLA는 두 개를 병렬로 쓴다. <strong>SigLIP</strong>은 이미지·텍스트 쌍으로 학습돼 "이게 무엇인지"(의미)를, <strong>DINOv2</strong>는 자기지도학습으로 "어디에 어떤 모양이 있는지"(국소 공간)를 잘 잡는다. 두 출력을 채널 방향으로 이어 붙인다(3.2절: 토큰당 1024 + 1152 차원).</li>
+        <li><strong>프로젝터</strong>: 비전 토큰의 차원을 LLM 토큰 차원에 맞추는 작은 MLP.</li>
+        <li><strong>LLM</strong>: 언어 토큰과 이미지 토큰을 한 줄로 받아 처리.</li>
+      </ol>
+
+      <h4 id="s142">1.4.2 인코더·디코더는 무슨 말인가</h4>
+      <p>2017년 원조 트랜스포머는 기계번역용이라 두 덩어리였다. 원문을 읽는 <strong>인코더</strong>와 번역문을 쓰는 <strong>디코더</strong>다. 지금은 셋 중 하나를 골라 쓴다.</p>
+      <div class="tbl"><table>
+        <thead><tr><th>구조</th><th>어떻게 보나</th><th>잘하는 일</th><th>이 논문에 나오는 예</th></tr></thead>
+        <tbody>
+          <tr><td><strong>인코더 전용</strong></td><td>모든 토큰이 앞뒤를 전부 본다 (마스크 없음)</td><td>입력을 <strong>이해해 벡터로 요약</strong></td><td>SigLIP, DINOv2 — 위 1번의 비전 인코더</td></tr>
+          <tr><td><strong>디코더 전용</strong></td><td>각 토큰이 자기 앞만 본다 (인과 마스크)</td><td>토큰을 <strong>이어서 생성</strong></td><td>LLaMA2 — FiS-VLA의 LLM 32블록</td></tr>
+          <tr><td>인코더–디코더</td><td>인코더가 읽고, 디코더가 크로스 어텐션으로 그것을 참조하며 쓴다</td><td>번역·요약</td><td>(이 논문에는 없음) 원조 트랜스포머, T5</td></tr>
+        </tbody>
+      </table></div>
+      <p>용어 하나만 풀어 두자. "디코더 전용"의 디코더는 <strong>크로스 어텐션을 받는 쪽</strong>이라는 원래 뜻이 아니라, <strong>인과 마스크를 쓰고 생성을 맡는다</strong>는 뜻으로 굳은 말이다. 디코더 전용 모델에는 참조할 인코더가 따로 없으므로 크로스 어텐션도 없다. 셀프 어텐션 하나로 전부 처리한다.</p>
+      <div class="box" data-label="그림 2를 이 눈으로">
+        <p><strong>인코더(SigLIP·DINOv2)가 이미지를 토큰으로 요약</strong> → <strong>프로젝터가 차원을 맞춤</strong> → <strong>디코더 전용 LLM이 언어·이미지·상태·노이즈 행동 토큰을 한 줄로 받아 셀프 어텐션으로 섞음</strong>. 조건을 따로 받는 크로스 어텐션 모듈은 없다. 1.2절의 "한 줄에 섞어 넣기"가 구조적으로 가능한 이유가 여기 있다.</p>
+      </div>
+      <p>FiS-VLA의 출발점 <strong>Prismatic VLM</strong>은 이 조합을 체계적으로 비교한 연구이고, OpenVLA도 같은 뿌리다. FiS-VLA는 OpenVLA의 "친척"이며 코드도 OpenVLA 계열을 물려받았다(저장소 <code>vla/</code> 디렉터리, 확인 2026-09-11).</p>
+
+      <h3 id="s15"><span class="k">1.5</span>파운데이션 모델, 사전학습, 파인튜닝</h3>
+      <ul>
+        <li><strong>사전학습</strong>: 인터넷 규모의 이미지·텍스트로 먼저 크게 학습. 논문이 "internet-scale pretrained knowledge", "commonsense reasoning"이라 부르는 것. 와인병이 무엇인지, 랙에 놓는다는 게 어떤 배치인지.</li>
+        <li><strong>파인튜닝</strong>: 그 모델을 목표 과제 데이터로 추가 학습. 로봇 데이터로 파인튜닝하면 VLA가 된다.</li>
+        <li><strong>파운데이션 모델</strong>: 한 번 크게 사전학습해 두고 여러 하류 과제에 재활용하는 모델.</li>
+      </ul>
+      <p>FiS-VLA는 한 단계 더 나눈다. VLM 초기화 → <strong>로봇 데이터 86만 궤적으로 로봇용 사전학습</strong>(5 에폭) → <strong>목표 과제로 파인튜닝</strong>(RLBench 태스크별 100 궤적, 실기 태스크별 100 데모). 논문 3.4절.</p>
+
+      <h3 id="s16"><span class="k">1.6</span>로봇 조작 문제를 학습 문제로 바꾸기</h3>
+      <p><strong>입력(관측 o)</strong>: 카메라 이미지(1장 또는 3장), 로봇 상태(관절 각도·그리퍼 개폐 등 고유수용감각), 깊이 카메라로 만든 3D 포인트클라우드, 언어 지시 l.</p>
+      <p><strong>출력(행동 a)</strong>: 시뮬레이션은 <strong>7자유도(7-DoF) 엔드이펙터 포즈</strong> — 위치 변화량 3개(Δx, Δy, Δz), 회전 3개(오일러각), 그리퍼 1개. 실기 AgileX는 양팔 14-DoF(포즈 제어), AlphaBot은 양팔 16-DoF(<strong>관절 위치 제어</strong>). "제어 모드가 다른 두 로봇에서 모두 됐다"가 실기 실험의 한 주장이다(3.1절).</p>
+      <p><strong>학습 방식 — 모방학습</strong>: 사람이 원격조종(master-puppet)으로 시연한 데이터 D에서 "이 관측이면 이 행동"을 흉내 낸다.</p>
+      <div class="box eq" data-label="논문 3.1절 · 목적식">
+        max E[ log π<sub>θ</sub>(a<sub>t:t+H</sub> | o<sub>t−1</sub>, l) ]
+        <span class="read">직전 관측과 지시가 주어졌을 때, 시연자가 실제로 한 앞으로 H스텝의 행동에 높은 확률을 주도록 θ를 고친다.</span>
+      </div>
+      <p><strong>제어 주파수(Hz)</strong>: 1초에 행동 명령을 몇 번 내보내는가. 카메라는 30 Hz로 찍힌다(부록 A.3). 모델이 3 Hz면 카메라 열 프레임에 한 번 반응하는 셈이라 물체가 움직이거나 손이 미끄러질 때 대응이 늦다.</p>
+      <p><strong>폐루프</strong>: 행동 → 새 관측 → 다음 행동의 반복. 부록 B.1은 "초기 실수가 다음 관측을 학습 분포 밖으로 밀어내 실패가 누적된다(compounding error)"는 모방학습의 고전적 문제를 짚는다.</p>
+
+      <h3 id="s17"><span class="k">1.7</span>VLA와 "행동을 어떻게 내보내는가" 문제</h3>
+      <p><strong>VLA</strong> = VLM에 행동 출력을 붙인 것. 첫 세대(RT-2, OpenVLA)는 <strong>행동을 토큰으로 이산화</strong>했다. Δx를 256개 구간으로 쪼개 "구간 137번" 토큰을 만들고, 텍스트 생성하듯 행동 토큰을 자기회귀로 뽑는다. LLM을 고칠 필요가 없다는 장점 대신 단점이 둘이다.</p>
+      <ul>
+        <li><strong>느리다</strong>: 7-DoF면 토큰 7개를 순서대로 뽑는다. 표 1의 OpenVLA가 6.3 Hz.</li>
+        <li><strong>행동이 끊긴다</strong>: 연속값을 구간으로 자르니 부드럽지 않다(2절 "action discontinuities").</li>
+      </ul>
+      <p>그래서 둘째 세대는 <strong>연속 행동을 한 번에 내는 별도 헤드</strong>를 붙인다. 대표가 확산 모델이다.</p>
+      <div class="box lab" data-label="2 · 자기회귀는 왜 느리고 이산화는 왜 끊기는가">
+        <p>토큰 수를 두 배로 늘리면 시간이 네 배 가까이 늘고(1.3절), 토큰 7개를 순차로 뽑는 것과 연속값 7개를 한 번에 내는 것의 Hz 차이를 직접 잰다(1.4절). 부드러운 궤적을 256·16 구간으로 자른 계단 그림도 만든다(1.7절).</p>
+        <span class="cmd">python3 labs/lab2_autoregressive_vs_chunk.py</span>
+      </div>
+
+      <h3 id="s18"><span class="k">1.8</span>확산 모델 행동 헤드와 행동 청크</h3>
+      <p><strong>확산 모델</strong>은 "노이즈에서 데이터를 복원하는 법"을 배운다. 학습 절차는 단순하다.</p>
+      <ol>
+        <li>정답 행동 ã에 가우시안 노이즈 η를 섞는다. 얼마나 섞는지는 시각 τ(1~T, 논문은 T=100)로 정한다. τ가 클수록 거의 순수 노이즈.</li>
+        <li>모델에 "노이즈 섞인 행동, 조건 c, τ"를 주고 <strong>섞었던 노이즈 η를 맞히게</strong> 한다.</li>
+        <li>예측 노이즈와 실제 노이즈의 차이(MSE)가 손실이다. 이것이 식 (1) L<sub>fast</sub>다.</li>
+      </ol>
+      <div class="box eq" data-label="논문 식 (1) · L_fast">
+        L<sub>fast</sub> = E[ ‖ η − π<sub>θf</sub>( √β<sub>τ</sub>·ã + √(1−β<sub>τ</sub>)·η , c, τ ) ‖² ]
+        <span class="read">첫 인수가 "노이즈 섞인 행동", c가 조건, τ가 노이즈 단계. π<sub>θf</sub>가 System 1이다.</span>
+      </div>
+      <p>추론할 때는 순수 노이즈에서 시작해 예측된 노이즈를 조금씩 빼면서 행동으로 수렴시킨다. 연속값을 직접 내므로 부드럽고, 7-DoF를 한 번에 내므로 토큰 7개를 순서대로 뽑는 것보다 빠르다. Diffusion Policy(2023)가 로봇에 처음 크게 성공시켰고, π0·CogACT·GR00T N1도 확산 계열 헤드를 쓴다.</p>
+      <p><strong>행동 청크</strong>: 한 번 추론으로 앞으로 <strong>H스텝의 행동을 묶어</strong> 내는 것. H=8이면 한 번 돌려 8개 행동을 얻고 순서대로 실행한다. 호출 횟수가 1/8이 되어 제어 주파수가 오르고, 결정 지점이 줄어 실수 누적도 줄고, 8개를 함께 내니 앞뒤가 부드럽다(부록 B.1).</p>
+      <div class="box warn" data-label="첫 관문">
+        <p>논문의 <strong>117.7 Hz</strong>는 청크 8일 때, <strong>21.9 Hz</strong>는 청크 1일 때 값이다. 두 숫자의 관계를 정확히 이해하는 것이 이 논문 읽기의 첫 관문이다(2.7절).</p>
+      </div>
+      <div class="box lab" data-label="3 · 확산으로 행동 만들기">
+        <p>장애물을 왼쪽·오른쪽 어느 쪽으로 돌아도 되는 "두 갈래" 시연 데이터를 만들고, 행동을 직접 맞히는 회귀는 가운데(장애물 위)로 붕괴하는 반면 노이즈를 맞히는 확산은 두 갈래를 모두 만드는 것을 본다. 학습 코드 네 줄이 저장소 <code>fisvla.py</code>의 네 줄과 같고, 노이즈 스케줄도 같은 squaredcos_cap_v2, T=100.</p>
+        <span class="cmd">python3 labs/lab3_diffusion_action.py</span>
+      </div>
+      <div class="box lab" data-label="4 · 행동 청크">
+        <p>청크 H를 1→8로 늘리면 명령 Hz는 8배가 되지만 관측 Hz는 그대로인 것을 표로 본다. 117.7 Hz의 뜻이 여기서 몸에 붙는다. 같은 스크립트의 (1)번 실험은 2.5절에서.</p>
+        <span class="cmd">python3 labs/lab4_chunk_async.py</span>
+      </div>
+
+      <h3 id="s19"><span class="k">1.9</span>System 1 / System 2 — 이 논문의 중심 한 쌍</h3>
+      <p><strong>이 절이 정본이다.</strong> 앞뒤 어디서든 System 1·System 2가 나오면 여기로 돌아오면 된다.</p>
+
+      <h4>운전을 배우던 때를 떠올리면 된다</h4>
+      <p>처음 운전을 배울 때는 클러치·기어·사이드미러를 하나하나 의식하며 몬다. 머릿속이 꽉 차서 옆 사람 말이 들리지 않는다. 몇 달 지나면 손발이 알아서 움직이고 머리는 길 찾기와 대화를 한다. <strong>한 사람 안에서 두 종류의 처리가 나뉜 것</strong>이다. 심리학자 대니얼 카너먼이 『생각에 관한 생각』에서 이 둘에 붙인 이름이 System 1과 System 2다.</p>
+      <div class="tbl"><table>
+        <thead><tr><th></th><th>System 1</th><th>System 2</th></tr></thead>
+        <tbody>
+          <tr><td>성격</td><td>빠르고 자동적</td><td>느리고 의식적</td></tr>
+          <tr><td>예</td><td>날아오는 공을 받는 손, 모국어 알아듣기</td><td>17 × 24 계산, 체스 수 읽기</td></tr>
+          <tr><td>드는 힘</td><td>거의 없다</td><td>집중해야 하고 피곤하다</td></tr>
+        </tbody>
+      </table></div>
+
+      <h4>로봇으로 옮기면</h4>
+      <p>"와인병을 랙에 놓아라"를 받은 로봇을 생각하자. 성격이 다른 두 일이 동시에 필요하다.</p>
+      <ul>
+        <li><strong>판단</strong>: 저 물체가 와인병이고, 랙은 저쪽이고, 병목을 잡아 세워서 넣어야 한다. 상식과 언어 이해가 필요하다.</li>
+        <li><strong>실행</strong>: 지금 이 순간 관절을 각각 몇 도 돌릴까. 손이 미끄러지면 즉시 고쳐야 한다.</li>
+      </ul>
+      <p>앞이 <span class="sans" style="color:var(--slow);font-weight:700">System 2</span>, 뒤가 <span class="sans" style="color:var(--fast);font-weight:700">System 1</span>이다.</p>
+      <div class="tbl"><table>
+        <thead><tr><th></th><th><span class="slow-t">System 2 · 느린 머리</span></th><th><span class="fast-t">System 1 · 빠른 손</span></th></tr></thead>
+        <tbody>
+          <tr><td>하는 일</td><td>무엇을 할지 판단</td><td>어떻게 움직일지 실행</td></tr>
+          <tr><td>정체</td><td>VLM (1.4절)</td><td>행동 정책, 보통 확산 헤드 (1.8절)</td></tr>
+          <tr><td>보는 것</td><td>언어 지시, 2D 이미지</td><td>로봇 상태, 3D 포인트클라우드, 이미지</td></tr>
+          <tr><td>크기·속도</td><td>크고 느리다 (수 Hz)</td><td>작고 빠르다 (수십~수백 Hz)</td></tr>
+          <tr><td>내놓는 것</td><td>요약된 잠재 특징</td><td>실제 관절 명령</td></tr>
+          <tr><td>논문 제목의</td><td><span class="slow-t">Slow</span></td><td><span class="fast-t">Fast</span></td></tr>
+        </tbody>
+      </table></div>
+      <p>이 페이지 전체에서 파랑이 System 2, 주황이 System 1인 것도 이 표를 따른 것이다.</p>
+
+      <h4>왜 굳이 나누나</h4>
+      <p>하나로 합치면 둘 중 하나를 포기해야 하기 때문이다.</p>
+      <ul>
+        <li><strong>큰 모델 하나로 매 순간 명령을 내면</strong>: 똑똑하지만 수 Hz라 손이 굼뜨다. 카메라는 30 Hz로 찍히는데 열 프레임에 한 번 반응하는 꼴이다(1.6절).</li>
+        <li><strong>작은 모델 하나만 쓰면</strong>: 빠르지만 "와인병"이 무엇인지 모른다. 인터넷 규모 사전학습 지식이 없다(1.5절).</li>
+      </ul>
+      <div class="box analogy" data-label="비유 · 운전">
+        <p>그래서 <strong>머리는 가끔, 손은 자주</strong> 돌린다. 사람도 운전 중에 목적지를 매 순간 다시 정하지 않는다. 한 번 정해 두고 그 안에서 손발이 계속 움직인다. 이 "가끔 대 자주"의 비율이 FiS-VLA에서 <strong>1:4</strong>다(<a href="#s25">2.5절</a>).</p>
+      </div>
+
+      <h4>기존 이중 시스템 VLA는 두 갈래</h4>
+      <p>논문 2절이 선행 연구를 이렇게 나눈다. 나누는 기준은 "머리를 얼마나 자주 돌리나" 하나다.</p>
+      <div class="tbl"><table>
+        <thead><tr><th>유형</th><th>설명</th><th>예</th></tr></thead>
+        <tbody>
+          <tr><td>동기(synchronous)</td><td>머리와 손이 <strong>같은 주파수</strong>로 돈다. 손이 따로 있어도 매 스텝 머리를 부른다</td><td>π0, CogACT, GR00T N1</td></tr>
+          <tr><td>비동기(asynchronous)</td><td>머리는 가끔, 손은 자주 돈다</td><td>HiRT, Helix(Figure AI), Bu et al. 2025</td></tr>
+        </tbody>
+      </table></div>
+
+      <h4>둘이 공통으로 가진 한계 — FiS-VLA의 출발점</h4>
+      <p>두 갈래 모두 <strong>System 1을 새로 만들어 붙인 별도 모듈</strong>로 둔다. 그림으로 하면 상자가 두 개다. 여기서 두 가지가 따라온다.</p>
+      <ol>
+        <li>손 쪽에는 사전학습 지식이 <strong>없다</strong>. 백지에서 시작한다.</li>
+        <li>손은 머리가 건네준 요약만 본다. 머리가 놓친 것은 손도 놓친다.</li>
+      </ol>
+      <p>논문 제목이 바로 여기서 나온다. 빠른 손을 느린 머리 <strong>안에</strong> 넣겠다는 것이 Fast-in-Slow다. 별도 상자를 새로 만들지 않고 머리의 마지막 부품 몇 개에 손 역할을 겸업시킨다는 뜻이다. 어떻게 하는지는 <a href="#s23">2.3절</a>.</p>
+      <div class="box warn" data-label="용어 주의">
+        <p>System 1/2는 카너먼의 비유를 빌린 말일 뿐 표준 정의가 아니다. 논문마다 경계가 다르고, <strong>"무엇을 System 1로 볼 것인가"가 곧 그 논문의 주장</strong>이다. FiS-VLA의 답은 "VLM의 마지막 트랜스포머 블록 2개"다.</p>
+      </div>
+
+      <h3 id="s110"><span class="k">1.10</span>포인트클라우드</h3>
+      <p>깊이 카메라는 픽셀마다 거리를 준다. 카메라의 내부 파라미터(초점거리 등)와 외부 파라미터(위치·방향)를 알면 각 픽셀을 3차원 점 (x, y, z)로 되돌릴 수 있다. 이 점들의 집합이 <strong>포인트클라우드</strong>다. FiS-VLA는 외부 카메라 한 대의 깊이 맵에서 만들고 1024개 점으로 줄여 쓴다(4.1절). 2D 이미지는 "잔이 컵 앞인지 뒤인지"를 원근으로 추측해야 하지만 포인트클라우드는 그 거리를 직접 준다.</p>
+      <p><strong>3D 토크나이저</strong>(3.2절)는 세 단계를 3번 반복한다. 가장 먼 점 샘플링(FPS)으로 점 수를 줄이고, k-최근접 이웃(kNN)으로 주변 점을 묶고, 선형층으로 특징을 만든다. 그 결과를 <strong>2D용 비전 인코더에 그대로 통과시켜</strong> LLM 차원으로 맞춘다(Lift3D 방식). 새 3D 인코더를 붙이지 않아 파라미터가 거의 늘지 않는다.</p>
+
+      <h3 id="s111"><span class="k">1.11</span>용어 한 줄 사전</h3>
+      <dl class="terms">
+        <dt>ablation (소거 실험)</dt><dd>구성요소를 하나씩 빼거나 바꿔 기여도를 재는 실험. 4.2절과 부록 B</dd>
+        <dt>AdamW</dt><dd>가중치 감쇠를 분리한 Adam 최적화기. 학습 알고리즘 이름</dd>
+        <dt>attention (어텐션)</dt><dd>토큰들이 서로 얼마나 닮았는지 재서 닮은 쪽 정보를 더 많이 섞는 가중 평균. 1.3.1절</dd>
+        <dt>baseline</dt><dd>비교 대상 기존 방법. ManipLLM, OpenVLA, π0, CogACT</dd>
+        <dt>catastrophic forgetting</dt><dd>새 과제를 배우며 원래 능력을 잃는 현상. L<sub>slow</sub>를 함께 두는 이유</dd>
+        <dt>causal mask (인과 마스크)</dt><dd>각 토큰이 자기보다 뒤를 못 보게 막는 장치. 다음 토큰 맞히기 학습이 성립하는 조건</dd>
+        <dt>cross-attention</dt><dd>Q는 이쪽 토큰 열, K·V는 저쪽 열에서 뽑는 어텐션. FiS-VLA는 쓰지 않는다</dd>
+        <dt>DoF (자유도)</dt><dd>독립적으로 움직일 수 있는 축의 수</dd>
+        <dt>embodiment (기체)</dt><dd>로봇 몸체 종류. cross-embodiment = 여러 로봇에서 모은 데이터</dd>
+        <dt>end-effector</dt><dd>팔 끝의 도구, 여기서는 그리퍼</dd>
+        <dt>epoch</dt><dd>학습 데이터 전체를 한 바퀴 도는 단위. 사전학습 5, 파인튜닝 300</dd>
+        <dt>KV 캐시</dt><dd>자기회귀 생성에서 앞 토큰의 K·V를 저장해 재사용하는 최적화. 호출 횟수 자체는 줄지 않는다</dd>
+        <dt>latent feature</dt><dd>신경망 중간층의 벡터. 사람이 읽을 수 없지만 정보를 담는다</dd>
+        <dt>MLP</dt><dd>다층 퍼셉트론. 가장 단순한 완전연결 신경망. 여기서는 "작은 변환기"</dd>
+        <dt>mixed precision</dt><dd>16·32비트 부동소수를 섞어 속도·메모리를 아끼는 학습 기법</dd>
+        <dt>proprioception</dt><dd>로봇이 자기 관절 상태를 아는 것. 논문의 "robot state"</dd>
+        <dt>Q / K / V</dt><dd>Query·Key·Value. "찾는 것 · 검색되는 표지 · 건네는 내용" 세 갈래 변환. 1.3.1절</dd>
+        <dt>RLBench</dt><dd>CoppeliaSim 위의 조작 벤치마크. 100+ 태스크 중 10개 사용</dd>
+        <dt>rollout</dt><dd>정책을 처음부터 끝까지 한 번 실행. 태스크당 20 롤아웃 × 3회</dd>
+        <dt>SE(3) 포즈</dt><dd>3차원 위치 + 3차원 회전. 그리퍼의 "자세"</dd>
+        <dt>System 1 / System 2</dt><dd>카너먼에서 빌린 이름. System 2 = 무엇을 할지 판단하는 느린 머리(VLM), System 1 = 어떻게 움직일지 정하는 빠른 손(행동 정책). 정본은 <a href="#s19">1.9절</a></dd>
+        <dt>self-attention</dt><dd>한 토큰 열 안에서 Q·K·V를 모두 뽑는 어텐션. 모달리티가 섞이는 지점</dd>
+        <dt>softmax</dt><dd>여러 점수를 합이 1인 비율로 바꾸는 함수. 어텐션 가중치를 만든다</dd>
+        <dt>SOTA</dt><dd>state of the art. 그 시점 최고 성능</dd>
+        <dt>teleoperation</dt><dd>사람이 조종기로 로봇을 움직여 시연 데이터를 만드는 것</dd>
+      </dl>
+    </section>
+
+    <!-- ───────── 2부 ───────── -->
+    <section id="p2">
+      <div class="part-head"><span class="num">2부</span><h2>논문 정독</h2></div>
+
+      <h3 id="s21"><span class="k">2.1</span>한 문장 요약과 저자</h3>
+      <div class="box paper" data-label="한 문장">
+        <p><strong>느린 머리(<span class="slow-t">System 2</span>)인 VLM을 온전히 그대로 둔 채, 그 머리의 마지막 트랜스포머 블록 2개에 빠른 손(<span class="fast-t">System 1</span>) 역할을 겸업시킨 VLA.</strong> 두 시스템은 다른 입력을 받고 다른 주기(1:4)로 돌며, 확산 손실과 자기회귀 손실을 함께 학습한다.</p>
+      </div>
+      <ul>
+        <li><strong>저자</strong>: Hao Chen, Jiaming Liu(프로젝트 리드), Chenyang Gu, Zhuoyang Liu (공동 1저자) 외. CUHK, 베이징대 Shanghang Zhang 연구실, <strong>AI² Robotics(Xiao He, Yandong Guo)</strong>, BAAI. 스터디 대상 회사의 CEO가 공저자다.</li>
+        <li><strong>게시</strong>: arXiv 2025-06-02 (v1), "Preprint. Under review". 학회 채택 여부 미확인(2026-09-11).</li>
+        <li><strong>공개물</strong>: 코드 GitHub <code>CHEN-H01/Fast-in-Slow</code>, 체크포인트 HuggingFace <code>haosad/fisvla</code>, 프로젝트 페이지 fast-in-slow.github.io (확인 2026-09-11).</li>
+        <li><strong>회사 맥락</strong>: AI² Robotics는 이 모델을 "GOVLA 0.5"로 부르며 오픈소스 모델의 원형으로 내세운다(2차 출처).</li>
+      </ul>
+
+      <h3 id="s22"><span class="k">2.2</span>문제 정의 — 두 개의 딜레마</h3>
+      <p>초록 첫 문장이 문제를 둘로 압축한다. <strong>"Generalized policy and execution efficiency"</strong>, 범용성과 실행 효율.</p>
+      <ol>
+        <li>VLM 기반 VLA는 사전학습 지식 덕에 범용적이지만 <strong>느리다</strong>(1.3~1.4절의 두 원인).</li>
+        <li>이중 시스템으로 나누면 빨라지지만, <strong>손이 머리의 지식을 물려받지 못한다</strong>. 별도 헤드는 백지에서 시작해 System 2가 던져 준 요약만 본다(<a href="#s19">1.9절</a> 마지막).</li>
+      </ol>
+      <p>저자들의 질문(1절 끝): "VLM이 로봇의 '뇌'라면, System 1과 System 2를 한 뇌 안에서 통합할 수 없는가?"</p>
+
+      <h3 id="s23"><span class="k">2.3</span>핵심 아이디어 — 그림 1 읽기</h3>
+      <p>논문 그림 1(2쪽)은 네 칸이다.</p>
+      <ul>
+        <li><strong>(a) 기존 이중 시스템</strong>: VLM(블록 1~n) → 특징 → <strong>별도 정책 모델</strong>(System 1) → 행동. 상자가 둘.</li>
+        <li><strong>(b) FiS-VLA</strong>: VLM 블록 1~n이 그대로 있는데, <strong>마지막 블록들에 System 1 표시</strong>가 붙고 그 블록들이 로봇 상태·포인트클라우드를 추가로 받아 행동을 낸다. 상자가 하나.</li>
+        <li><strong>(c)</strong> 제어 방식 비교, <strong>(d)</strong> 성공률(세로)과 추론 속도(가로)에서 FiS-VLA가 π0(2.6B), CogACT(7B)보다 오른쪽 위.</li>
+      </ul>
+      <p>"Fast-in-Slow"는 (b)를 그대로 말한 이름이다. <strong>빠른 시스템이 느린 시스템 안에 들어 있다.</strong> System 1은 System 2의 부품이므로 (i) 사전학습 가중치를 물려받고 (ii) System 2의 중간 표현을 "자기 언어"로 읽을 수 있다.</p>
+
+      <h3 id="s24"><span class="k">2.4</span>구조 — 그림 2 읽기 (부품 목록)</h3>
+      <figure>
+        <svg viewBox="0 0 960 400" role="img" aria-label="FiS-VLA 구조 단순화 도식">
+          <defs>
+            <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--ink-2)"/></marker>
+            <marker id="arf" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--fast)"/></marker>
+            <marker id="ars" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--slow)"/></marker>
+          </defs>
+          <style>
+            .lab { font-family: "Gothic A1", sans-serif; font-size: 12.5px; fill: var(--ink-2); }
+            .lab.b { font-weight: 800; fill: var(--ink); }
+            .lab.s { fill: var(--slow); font-weight: 800; }
+            .lab.f { fill: var(--fast); font-weight: 800; }
+            .lab.sm { font-size: 11px; fill: var(--muted); }
+          </style>
+          <!-- 블록 띠 -->
+          <g id="blocks">
+            <rect x="120" y="170" width="20" height="60" fill="var(--slow)" opacity=".85"/><rect x="144" y="170" width="20" height="60" fill="var(--slow)" opacity=".85"/><rect x="168" y="170" width="20" height="60" fill="var(--slow)" opacity=".85"/><rect x="192" y="170" width="20" height="60" fill="var(--slow)" opacity=".85"/>
+            <text x="245" y="205" class="lab sm" text-anchor="middle">· · ·</text>
+            <rect x="280" y="170" width="20" height="60" fill="var(--slow)" opacity=".85"/><rect x="304" y="170" width="20" height="60" fill="var(--slow)" opacity=".85"/><rect x="328" y="170" width="20" height="60" fill="var(--slow)" opacity=".85"/><rect x="352" y="170" width="20" height="60" fill="var(--slow)" opacity=".85"/><rect x="376" y="170" width="20" height="60" fill="var(--slow)" opacity=".85"/><rect x="400" y="170" width="20" height="60" fill="var(--slow)" opacity=".85"/><rect x="424" y="170" width="20" height="60" fill="var(--slow)" opacity=".85"/><rect x="448" y="170" width="20" height="60" fill="var(--slow)" opacity=".85"/><rect x="472" y="170" width="20" height="60" fill="var(--slow)" opacity=".85"/><rect x="496" y="170" width="20" height="60" fill="var(--slow)" opacity=".85"/><rect x="520" y="170" width="20" height="60" fill="var(--slow)" opacity=".85"/><rect x="544" y="170" width="20" height="60" fill="var(--slow)" opacity=".85"/><rect x="568" y="170" width="20" height="60" fill="var(--slow)" opacity=".85"/>
+            <rect x="600" y="164" width="26" height="72" fill="var(--fast)"/><rect x="630" y="164" width="26" height="72" fill="var(--fast)"/>
+          </g>
+          <text x="130" y="158" class="lab s">블록 1</text>
+          <text x="578" y="158" class="lab s" text-anchor="end">블록 30</text>
+          <text x="613" y="153" class="lab f" text-anchor="middle">31</text>
+          <text x="643" y="153" class="lab f" text-anchor="middle">32</text>
+          <text x="360" y="258" class="lab s" text-anchor="middle">System 2 · LLaMA2-7B 전체 32블록 (블록 1~32)</text>
+          <text x="628" y="258" class="lab f" text-anchor="middle">System 1 = 마지막 2블록</text>
+          <path d="M108 236 L660 236" stroke="var(--slow)" stroke-width="1" fill="none" stroke-dasharray="3 3" opacity=".6"/>
+          <path d="M598 240 L658 240" stroke="var(--fast)" stroke-width="2.5" fill="none"/>
+
+          <!-- System 2 입력 -->
+          <text x="24" y="122" class="lab s">System 2 입력 · 저주파 (4스텝마다)</text>
+          <rect x="24" y="132" width="76" height="24" fill="var(--slow-soft)"/><text x="62" y="149" class="lab" text-anchor="middle">언어 지시</text>
+          <rect x="24" y="162" width="76" height="24" fill="var(--slow-soft)"/><text x="62" y="179" class="lab" text-anchor="middle">2D 이미지</text>
+          <path d="M100 144 C112 144 112 200 118 200" stroke="var(--slow)" stroke-width="1.6" fill="none" marker-end="url(#ars)"/>
+          <path d="M100 174 C110 174 110 200 118 200" stroke="var(--slow)" stroke-width="1.6" fill="none" marker-end="url(#ars)"/>
+
+          <!-- System 1 입력 -->
+          <text x="500" y="38" class="lab f" text-anchor="end">System 1 입력 · 고주파 (매 스텝)</text>
+          <rect x="380" y="50" width="84" height="22" fill="var(--fast-soft)"/><text x="422" y="66" class="lab" text-anchor="middle">2D 이미지</text>
+          <rect x="380" y="78" width="84" height="22" fill="var(--fast-soft)"/><text x="422" y="94" class="lab" text-anchor="middle">3D 포인트클라우드</text>
+          <rect x="380" y="106" width="84" height="22" fill="var(--fast-soft)"/><text x="422" y="122" class="lab" text-anchor="middle">로봇 상태</text>
+          <rect x="474" y="50" width="110" height="22" fill="var(--fast-soft)"/><text x="529" y="66" class="lab" text-anchor="middle">노이즈 행동 a<tspan baseline-shift="sub" font-size="9">t..t+H</tspan></text>
+          <path d="M464 61 C560 61 592 100 598 162" stroke="var(--fast)" stroke-width="1.6" fill="none" marker-end="url(#arf)"/>
+          <path d="M464 89 C560 89 588 120 600 162" stroke="var(--fast)" stroke-width="1.6" fill="none" marker-end="url(#arf)"/>
+          <path d="M464 117 C560 117 584 140 602 162" stroke="var(--fast)" stroke-width="1.6" fill="none" marker-end="url(#arf)"/>
+          <path d="M584 61 C600 61 606 110 608 162" stroke="var(--fast)" stroke-width="1.6" fill="none" marker-end="url(#arf)"/>
+          <text x="596" y="120" class="lab sm" text-anchor="end">블록 30의 출력(중간 특징)에</text>
+          <text x="596" y="134" class="lab sm" text-anchor="end">고주파 토큰을 이어 붙여 입력</text>
+
+          <!-- 출력 -->
+          <path d="M658 182 L760 182" stroke="var(--fast)" stroke-width="1.8" fill="none" marker-end="url(#arf)"/>
+          <rect x="764" y="150" width="176" height="64" fill="var(--fast-soft)"/>
+          <text x="852" y="172" class="lab f" text-anchor="middle">노이즈 예측 → 확산</text>
+          <text x="852" y="190" class="lab" text-anchor="middle">행동 청크 H개 (연속값)</text>
+          <text x="852" y="206" class="lab sm" text-anchor="middle">L_fast · MSE</text>
+          <path d="M658 218 L760 218" stroke="var(--slow)" stroke-width="1.8" fill="none" marker-end="url(#ars)"/>
+          <rect x="764" y="222" width="176" height="56" fill="var(--slow-soft)"/>
+          <text x="852" y="244" class="lab s" text-anchor="middle">다음 토큰 (자기회귀)</text>
+          <text x="852" y="260" class="lab" text-anchor="middle">이산 행동 / 언어 계획</text>
+          <text x="852" y="273" class="lab sm" text-anchor="middle">L_slow · 교차엔트로피</text>
+
+          <!-- 타임라인 -->
+          <text x="24" y="318" class="lab b">시간축 · 주파수 비율 1:4</text>
+          <line x1="24" y1="345" x2="936" y2="345" stroke="var(--rule)" stroke-width="1"/>
+          <line x1="24" y1="380" x2="936" y2="380" stroke="var(--rule)" stroke-width="1"/>
+          <text x="940" y="349" class="lab s" text-anchor="end" dy="-12">System 2 갱신</text>
+          <text x="940" y="384" class="lab f" text-anchor="end" dy="-12">System 1 행동 생성</text>
+          <g fill="var(--slow)">
+            <circle cx="60" cy="345" r="6"/><circle cx="252" cy="345" r="6"/><circle cx="444" cy="345" r="6"/><circle cx="636" cy="345" r="6"/>
+          </g>
+          <g fill="var(--fast)">
+            <circle cx="60" cy="380" r="4.5"/><circle cx="108" cy="380" r="4.5"/><circle cx="156" cy="380" r="4.5"/><circle cx="204" cy="380" r="4.5"/>
+            <circle cx="252" cy="380" r="4.5"/><circle cx="300" cy="380" r="4.5"/><circle cx="348" cy="380" r="4.5"/><circle cx="396" cy="380" r="4.5"/>
+            <circle cx="444" cy="380" r="4.5"/><circle cx="492" cy="380" r="4.5"/><circle cx="540" cy="380" r="4.5"/><circle cx="588" cy="380" r="4.5"/>
+            <circle cx="636" cy="380" r="4.5"/><circle cx="684" cy="380" r="4.5"/><circle cx="732" cy="380" r="4.5"/><circle cx="780" cy="380" r="4.5"/>
+          </g>
+          <path d="M60 352 L60 373" stroke="var(--slow)" stroke-width="1" stroke-dasharray="2 2"/>
+          <path d="M252 352 L252 373" stroke="var(--slow)" stroke-width="1" stroke-dasharray="2 2"/>
+          <path d="M444 352 L444 373" stroke="var(--slow)" stroke-width="1" stroke-dasharray="2 2"/>
+          <path d="M636 352 L636 373" stroke="var(--slow)" stroke-width="1" stroke-dasharray="2 2"/>
+          <text x="156" y="398" class="lab sm" text-anchor="middle">한 번의 중간 특징이 4스텝을 이끈다</text>
+        </svg>
+        <div class="legend"><span class="l-slow">System 2 · 느린 추론 · 언어+2D</span><span class="l-fast">System 1 · 빠른 실행 · 2D+3D+상태+노이즈 행동</span></div>
+        <figcaption>논문 그림 2를 단순화한 도식. System 1은 별도 모듈이 아니라 LLaMA2의 마지막 두 블록이고, System 2 전체 32블록은 자기회귀 출력을 위해 그대로 존재한다. 하단은 GPU 한 장에서 순차 실행하는 1:4 비율.</figcaption>
+      </figure>
+      <div class="tbl"><table>
+        <thead><tr><th>부품</th><th>입력</th><th>출력</th><th>초기화·비고</th></tr></thead>
+        <tbody>
+          <tr><td>토크나이저</td><td>언어 지시</td><td>언어 토큰</td><td>LLaMA2 토크나이저</td></tr>
+          <tr><td>공유 비전 인코더 (SigLIP + DINOv2)</td><td>224×224 이미지</td><td>이미지 토큰 (1024+1152차원)</td><td>Prismatic VLM 사전학습 가중치</td></tr>
+          <tr><td>3D 토크나이저 → 같은 비전 인코더</td><td>포인트클라우드 1024점</td><td>3D 토큰</td><td>3블록 (FPS → kNN → 선형층), Lift3D 방식</td></tr>
+          <tr><td>프로젝터 (MLP)</td><td>2D·3D 토큰</td><td>LLM 차원 토큰</td><td>사전학습 VLM에서 초기화</td></tr>
+          <tr><td>상태 인코더 (MLP)</td><td>로봇 상태 r<sub>t−1</sub></td><td>상태 토큰</td><td>새로 학습</td></tr>
+          <tr><td>행동 인코더 + 타임스텝 MLP</td><td>노이즈 행동 a<sub>t..t+H</sub>, τ</td><td>노이즈 행동 토큰</td><td>새로 학습</td></tr>
+          <tr><td><span class="slow-t">LLM 블록 1~30</span></td><td>언어·이미지 토큰 (저주파)</td><td>중간 잠재 특징</td><td>LLaMA2-7B. System 2의 몸통</td></tr>
+          <tr><td><span class="fast-t">LLM 블록 31~32</span></td><td>중간 특징 + 3D·이미지·상태·노이즈 행동 토큰 (고주파)</td><td>노이즈 예측 → 행동 청크</td><td>같은 LLaMA2 블록. System 1</td></tr>
+          <tr><td><span class="slow-t">자기회귀 출력 (32블록 전체)</span></td><td>위와 같음</td><td>이산 행동 토큰 또는 언어</td><td>L<sub>slow</sub>용</td></tr>
+        </tbody>
+      </table></div>
+      <div class="box warn" data-label="읽을 때 주의">
+        <ul>
+          <li><strong>System 1 블록 수는 2개</strong>다. 그림 2는 블록 30·31·32를 System 1 쪽에 그려 3개처럼 보이지만, 4.2절이 "2블록에서 포화"라 하고 부록 표 6의 "Two blocks (FiS-VLA)"가 본 모델이다.</li>
+          <li><strong>System 2 전체(32블록)도 계속 존재한다.</strong> System 1이 마지막 두 블록을 "쓴다"는 것이지 잘라낸 것이 아니다.</li>
+          <li>이미지 토큰은 <strong>양쪽에 다</strong> 들어간다. System 2는 저주파로(이해용), System 1은 고주파로(현재 장면 확인용).</li>
+        </ul>
+      </div>
+      <div class="box lab" data-label="6 · 코드 지도">
+        <p>이 표의 부품이 저장소 어느 줄인지 앵커로 찾아 출력한다. <code>train.sh</code>의 <code>LLM_MIDDLE_LAYER=30</code>이 "블록 31~32 = System 1"이고, <code>prismatic.py</code>가 LLM을 <code>llm_layer_end=30</code>으로 한 번, <code>llm_layer_start=30</code>으로 한 번 두 번 호출하는 것이 그림 2의 두 구간이다. 핵심 파일 5개(약 150KB)만 내려받으므로 저장소 전체(700MB)를 복제하지 않아도 된다.</p>
+        <span class="cmd">python3 labs/lab6_code_map.py</span>
+      </div>
+
+      <h3 id="s25"><span class="k">2.5</span>두 시스템의 조율 — 비동기 주파수와 이종 입력 (3.3절)</h3>
+      <p><strong>(1) 비동기 주파수 1:n.</strong> System 2가 한 번 내놓은 중간 특징이 앞으로 n스텝 동안 System 1의 조건으로 재사용된다. n=4가 최선(4.2절). 논문의 정직한 각주 하나가 중요하다. <strong>"우리 로봇 하드웨어는 두 시스템을 별도 GPU에 올려 병렬 추론할 수 없어서(Helix와 달리) 순차 실행했다."</strong> 1:4는 "GPU 한 장에서 System 2를 4스텝에 한 번만 돌린다"는 뜻이고, 학습 때도 <strong>비동기 샘플링</strong>으로 System 2 입력을 n스텝 전 것으로 주어 이 상황을 흉내 낸다.</p>
+      <p>왜 1:1이 아니라 1:4가 더 좋은가(1:1은 0.60, 1:4는 0.69, 표 8)? 저자 해석은 둘이다. 속도가 올라 관측을 더 자주 반영하고, System 1이 "오래된 지시를 현재 관측으로 보정하는 법"을 배운다. 1:8은 0.61로 떨어진다. 지시가 너무 오래되면 안 된다.</p>
+      <p><strong>(2) 이종 모달리티 입력.</strong> 역할이 다르니 먹이도 다르게 준다.</p>
+      <div class="tbl"><table>
+        <thead><tr><th></th><th><span class="slow-t">System 2 · 느린 머리</span></th><th><span class="fast-t">System 1 · 빠른 손</span></th></tr></thead>
+        <tbody>
+          <tr><td>입력</td><td><span class="slow-t">언어 지시 + 2D 이미지</span></td><td><span class="fast-t">2D 이미지 + 3D 포인트클라우드 + 로봇 상태</span> + System 2의 중간 특징</td></tr>
+          <tr><td>이유</td><td>VLM은 이미지·텍스트 쌍으로 사전학습됐으니 그 형식이 최선</td><td>지금 장면, 지금 관절 위치, 지금 거리를 알아야 정확히 움직인다</td></tr>
+        </tbody>
+      </table></div>
+      <p>소거 결과(표 7)가 설계를 뒷받침한다. System 1에서 포인트클라우드를 빼면 0.69 → 0.61, 이미지까지 빼면 0.44, 상태까지 빼면 0.22. <strong>System 2 특징만으로 움직이는 System 1은 거의 못 쓴다.</strong> 이 표 한 장이 기존 이중 시스템(System 1이 System 2 특징만 받는 구조)에 대한 저자들의 가장 강한 비판이다.</p>
+      <p>부록 B.2는 입력을 다르게 배분한 세 변형도 시험한다(표 10). 3D를 System 2로 옮기면(변형 1) 0.63, 상태도 옮기면(변형 2) 0.61, 양쪽에 2D·3D를 다 주면(변형 3) 0.68. 결론은 "고주파 정보는 System 1에 있어야 하고, 겹쳐 주는 것은 손해가 아니다."</p>
+      <div class="box lab" data-label="4 · 1:n 비동기의 최적점">
+        <p>GPU 한 장에서 System 2(90 ms)와 System 1(30 ms)을 순차 실행하는 장난감 로봇이 웨이포인트 32개를 돈다. 1:1은 System 2를 매번 돌려 느리고, 1:16은 빠르지만 단계가 바뀐 뒤 옛 목표를 오래 붙든다. 성공률이 가운데에서 최고가 되는 표가 나온다. 저장소 <code>sim.py</code>의 <code>if slow_cnt % slow_fast_ratio == 0</code> 루프가 이 구조다. 상수를 바꿔 최적점이 움직이는 것도 확인하라(5절 한계 "비율이 고정"의 의미).</p>
+        <span class="cmd">python3 labs/lab4_chunk_async.py</span>
+      </div>
+
+      <h3 id="s26"><span class="k">2.6</span>학습 — 식 세 개와 레시피 (3.4절)</h3>
+      <p><strong>L<sub>fast</sub> (식 1)</strong>: 1.8절의 확산 손실. 조건 c = System 2 중간 특징 + System 1 고주파 입력. 학습 대상은 θ<sub>f</sub>(System 1 블록 + 상태·행동 인코더).</p>
+      <p><strong>L<sub>slow</sub> (식 2)</strong>: 교차엔트로피. System 2가 자기회귀로 <strong>이산 행동 토큰</strong> 또는 <strong>언어 계획</strong>을 맞히게 한다. 사전학습 데이터에는 하위 목표 언어가 없어 이산 행동으로, 파인튜닝 때는 사람이 단 하위 과제 계획 문장을 추가한다.</p>
+      <div class="box eq" data-label="논문 식 (2) · L_slow">
+        L<sub>slow</sub> = − Σ<sub>i=1..D<sub>t</sub></sub> log P(â<sub>i</sub> | context, θ)
+        <span class="read">정답 토큰 â<sub>i</sub>에 준 확률의 로그를 다 더해 부호를 바꾼 것. 정답에 확률을 높게 줄수록 작아진다.</span>
+      </div>
+      <p><strong>L = L<sub>fast</sub> + L<sub>slow</sub> (식 3).</strong> 왜 L<sub>slow</sub>를 두는가? System 1이 System 2의 마지막 블록을 공유하므로, 확산 손실만 흘려보내면 그 블록들이 "노이즈 예측기"로 변질되어 <strong>자기회귀 추론 능력을 잊는다</strong>(파국적 망각). 증거: L<sub>slow</sub>를 빼면 0.69 → 0.62(4.2절 (4)). 논문은 이 조합을 <strong>dual-aware co-training</strong>이라 부른다.</p>
+      <div class="box lab" data-label="5 · 공동학습과 망각">
+        <p>공유 몸통 + 분류 머리(이산 행동 토큰, 교차엔트로피) + 노이즈 예측 머리(MSE)를 만들어, 분류로 사전학습한 뒤 노이즈 예측만 학습하면 분류 정확도가 무너지고(95% → 75%), 두 손실을 더해 학습하면 유지되는(96%) 것을 20초 안에 본다. 저장소 <code>base_strategy.py</code>의 <code>loss = loss + output.loss</code> 한 줄이 식 (3)이다. 식 (1)은 실습 3에서 직접 학습했다.</p>
+        <span class="cmd">python3 labs/lab5_cotraining_forgetting.py</span>
+      </div>
+      <div class="tbl"><table>
+        <thead><tr><th>단계</th><th>데이터</th><th>설정</th></tr></thead>
+        <tbody>
+          <tr><td>초기화</td><td>Prismatic VLM 가중치</td><td>—</td></tr>
+          <tr><td>로봇 사전학습</td><td>37개 오픈 데이터셋, <strong>86만 궤적, 3,600만 프레임</strong> (DROID 14.2%, Kuka 10.5%, BridgeData V2 9.3% 등, 표 4)</td><td>5 에폭. 양 시스템 모두 단일 이미지만 관측. System 2 감독은 이산 행동</td></tr>
+          <tr><td>파인튜닝 (시뮬)</td><td>RLBench 10태스크 × 100 궤적</td><td>300 에폭, AdamW, A800 8장, 혼합 정밀도. 전면 카메라 RGB + 포인트클라우드</td></tr>
+          <tr><td>파인튜닝 (실기)</td><td>태스크당 100 데모, 태스크별 단일 학습</td><td>3시점 RGB(외부 1 + 손목 2), 외부 시점만 포인트클라우드</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3 id="s27"><span class="k">2.7</span>결과 읽기 — 표 1·2·3과 소거</h3>
+      <h4>표 1 · RLBench 10태스크 (RTX 4090, 청크 1)</h4>
+      <div class="tbl"><table>
+        <thead><tr><th>모델</th><th>파라미터</th><th class="n">평균 성공률</th><th class="n">추론 속도</th></tr></thead>
+        <tbody>
+          <tr><td>ManipLLM</td><td>7B</td><td class="n">0.38</td><td class="n">2.2 Hz</td></tr>
+          <tr><td>OpenVLA</td><td>7B</td><td class="n">0.40</td><td class="n">6.3 Hz</td></tr>
+          <tr><td>π0</td><td>2.6B</td><td class="n">0.55</td><td class="n">13.8 Hz</td></tr>
+          <tr><td>CogACT</td><td>7B</td><td class="n">0.61</td><td class="n">9.8 Hz</td></tr>
+          <tr class="hi"><td>FiS-VLA</td><td>7B</td><td class="n">0.69</td><td class="n">21.9 Hz</td></tr>
+        </tbody>
+      </table></div>
+      <p>10개 중 8개 태스크에서 최고. Close box·Close laptop lid는 1.00. Water plants(0.20)와 Sweep to dustpan(0.55)은 전 모델이 어려워한다. "+8%p(CogACT), +14%p(π0)"는 <strong>퍼센트포인트</strong>다. 회사 소개의 "π0 대비 30% 우위"는 상대비(14/55 ≈ 25%)를 부풀린 것으로 추정된다.</p>
+      <div class="box warn" data-label="117.7 Hz는 무엇인가">
+        <p>부록 표 9: 청크 1·2·4·8에서 성공률은 0.69·0.68·0.66·0.69로 거의 같고, 제어 주파수는 청크에 비례해 오른다. 청크 8이면 이론값 117.7 Hz. 논문도 "theoretical control frequency"라 명시한다.</p>
+        <ul>
+          <li><strong>행동 출력 빈도</strong>: 1초에 117.7개의 관절 명령. 부드러운 궤적에는 좋다.</li>
+          <li><strong>관측 반영 빈도</strong>: 청크 8이면 한 번 추론에 8스텝을 내니 새 관측을 보는 것은 초당 약 15번(117.7 / 8)이고, System 2는 그중 1/4인 약 3.7번만 갱신된다. "117.7 Hz로 반응한다"고 읽으면 틀린다.</li>
+        </ul>
+      </div>
+      <div class="box lab" data-label="4 · (2)번 실험, 청크 표">
+        <p>비율 1:4 고정, 청크 1→8에서 "명령 Hz"는 8배, "관측 Hz"는 그대로인 열 두 개를 나란히 본다. 실습 2의 자기회귀 vs 한 번에 비교와 함께 보면 속도의 세 축(토큰 수, 자기회귀 횟수, 청크 길이)이 구분된다.</p>
+      </div>
+      <h4>표 2 · 실기 양팔 (π0와 비교, 태스크별 단일 학습, 20 롤아웃)</h4>
+      <div class="tbl"><table>
+        <thead><tr><th>로봇</th><th>태스크</th><th class="n">π0</th><th class="n">FiS-VLA</th></tr></thead>
+        <tbody>
+          <tr><td rowspan="5">AgileX<br><span class="sans" style="font-size:12px;color:var(--muted)">14-DoF · 포즈 제어</span></td><td>물체 집어 바구니에</td><td class="n">0.70</td><td class="n">0.80</td></tr>
+          <tr><td>공 들어 바구니에</td><td class="n">0.75</td><td class="n">0.75</td></tr>
+          <tr><td>병 랙에</td><td class="n">0.55</td><td class="n">0.70</td></tr>
+          <tr><td>칠판 지우기</td><td class="n">0.35</td><td class="n">0.45</td></tr>
+          <tr class="hi"><td>평균</td><td class="n">0.59</td><td class="n">0.68</td></tr>
+          <tr><td rowspan="5">AlphaBot<br><span class="sans" style="font-size:12px;color:var(--muted)">16-DoF · 관절 제어</span></td><td>그릇 집고 물체 넣기</td><td class="n">0.65</td><td class="n">0.80</td></tr>
+          <tr><td>건네주고 놓기</td><td class="n">0.75</td><td class="n">0.80</td></tr>
+          <tr><td>물 따르고 컵 옮기기</td><td class="n">0.65</td><td class="n">0.75</td></tr>
+          <tr><td>수건 접어 통에</td><td class="n">0.40</td><td class="n">0.60</td></tr>
+          <tr class="hi"><td>평균</td><td class="n">0.61</td><td class="n">0.74</td></tr>
+        </tbody>
+      </table></div>
+      <p>가장 큰 차이는 AlphaBot "수건 접기"(0.40 → 0.60, 변형 물체). 논문의 "실기 +11%"는 두 로봇 평균 차이(+9%p, +13%p)의 평균이다.</p>
+      <h4>표 3 · 일반화 (원본 대비 상대 감소율)</h4>
+      <div class="tbl"><table>
+        <thead><tr><th>조건</th><th class="n">AgileX FiS</th><th class="n">AgileX π0</th><th class="n">AlphaBot FiS</th><th class="n">AlphaBot π0</th></tr></thead>
+        <tbody>
+          <tr><td>원본</td><td class="n">0.70</td><td class="n">0.55</td><td class="n">0.80</td><td class="n">0.65</td></tr>
+          <tr><td>미지 물체</td><td class="n">0.55 (−21%)</td><td class="n">0.40 (−27%)</td><td class="n">0.65 (−19%)</td><td class="n">0.40 (−38%)</td></tr>
+          <tr><td>복잡 배경</td><td class="n">0.50 (−29%)</td><td class="n">0.35 (−36%)</td><td class="n">0.60 (−25%)</td><td class="n">0.40 (−38%)</td></tr>
+          <tr><td>조명 변화</td><td class="n">0.50 (−29%)</td><td class="n">0.40 (−27%)</td><td class="n">0.55 (−31%)</td><td class="n">0.35 (−46%)</td></tr>
+        </tbody>
+      </table></div>
+      <p>FiS-VLA의 하락 폭이 대체로 작다. 저자 해석은 "System 1이 VLM 지식을 물려받아 새 물체를 더 잘 다루고, System 2가 지시와 무관한 물체를 걸러 준다."</p>
+      <h4>소거 실험 요약 (부록 표 6~9, 10태스크 평균)</h4>
+      <div class="tbl"><table>
+        <thead><tr><th>무엇을 바꿨나</th><th>결과</th></tr></thead>
+        <tbody>
+          <tr><td>System 1 블록 수 1 / <strong>2</strong> / 4 / 8</td><td>0.49 / <strong>0.69</strong> / 0.66 / 0.64 — 2개에서 포화, 더 늘리면 하락</td></tr>
+          <tr><td>System 1 입력에서 3D 제거 / 3D+2D 제거 / 전부 제거</td><td>0.61 / 0.44 / 0.22</td></tr>
+          <tr><td>주파수 비율 1:1 / 1:2 / <strong>1:4</strong> / 1:8</td><td>0.60 / 0.63 / <strong>0.69</strong> / 0.61</td></tr>
+          <tr><td>행동 청크 1 / 2 / 4 / 8</td><td>0.69 / 0.68 / 0.66 / 0.69 — 성공률 유지, 속도 비례 증가</td></tr>
+          <tr><td>L<sub>slow</sub> 제거</td><td>0.69 → 0.62</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3 id="s28"><span class="k">2.8</span>실패 사례와 한계 (부록 D, 5절)</h3>
+      <p>논문이 스스로 적은 AlphaBot 실패 네 가지: 건네주기 중 <strong>양팔 충돌</strong>, 수건 접기에서 <strong>높이 오차</strong>(얇은 변형 물체), 바나나 <strong>위치 오인</strong>, 건네주기 <strong>회전 오차</strong>. 해결책으로 "더 많은 고품질 데모"와 "System 2가 실패를 인식·수정하는 능력"을 미래 과제로 든다.</p>
+      <p>5절의 한계는 하나다. <strong>System 1 블록 수와 주파수 비율이 고정</strong>이다. 과제 난이도에 따라 동적으로 바꾸는 것이 후속 방향.</p>
+
+      <h3 id="s29"><span class="k">2.9</span>비판적으로 읽기 — 스터디에서 따져 볼 것</h3>
+      <ol>
+        <li><strong>속도 비교의 조건</strong>: 베이스라인 속도는 "공식 사전학습 가중치 + 각자의 파인튜닝 설정"이고 청크 1로 통일했다. π0는 원래 청크 50을 쓰는 모델이라, 청크 1 비교가 π0에 불리할 수 있다. 공정한 비교는 "같은 청크, 같은 GPU"다.</li>
+        <li><strong>순차 실행</strong>: 1:4는 GPU 한 장에서 순차 실행한 결과다. Helix처럼 두 GPU에 병렬 배치하면 비율의 의미가 달라진다. 제품(Alpha Brain)이 어느 쪽인지가 부스 질문 2번이다.</li>
+        <li><strong>베이스라인 규모</strong>: π0는 2.6B, FiS-VLA는 7B. 우위의 일부는 크기에서 올 수 있다. 논문도 각주로 인정한다.</li>
+        <li><strong>시뮬 데이터 수집 방식</strong>: RLBench 데이터는 모션 플래너로 만든 궤적이고 키프레임만 뽑았다. 사람 시연과 성질이 다르다.</li>
+        <li><strong>"System 1이 VLM 지식을 물려받는다"의 직접 증거</strong>: 근거는 (i) 블록 1개보다 2개가 낫다 (ii) L<sub>slow</sub>가 도움 된다 (iii) 일반화 하락 폭이 작다, 세 가지 간접 증거다. "별도 헤드를 같은 크기로 붙였을 때"와의 직접 비교표는 없다.</li>
+        <li><strong>v1 기준</strong>: arXiv v1(2025-06-02)을 읽었다. 후속 판에서 수치가 바뀌었을 수 있다. 미확인.</li>
+      </ol>
+
+      <h3 id="s210"><span class="k">2.10</span>계보 안에서의 자리</h3>
+      <p>AI² Robotics 논문 6편을 관통하는 축 "느린 추론 + 빠른 실행"에서 FiS-VLA는 <strong>두 시스템을 한 모델에 넣는 전환점</strong>이다.</p>
+      <ul>
+        <li><strong>앞</strong>: RoboMamba(2024-06)는 "작은 헤드만 붙여도 조작을 배운다"는 철학을 세웠다. FiS-VLA는 그 "작은 헤드"를 VLM 밖이 아니라 안에 두었다. 백본은 Mamba에서 LLaMA2(트랜스포머)로 돌아왔다.</li>
+        <li><strong>뒤</strong>: Video2Act·PosA-VLA는 System 1이 받는 조건을 정제하고, NeuroVLA는 System 1 아래에 더 빠른 반사층을, SOMA는 System 2에 기억을 붙인다. 모두 FiS-VLA의 "이중 시스템 + 비동기" 틀을 전제로 한다.</li>
+        <li><strong>회사 제품</strong>: Alpha Brain의 "Fast-and-Slow 이중 처리"가 이 논문이다. 회사가 오픈소스로 내세운 것도 이 코드다. 협업 실무에서는 <strong>공개 코드와 제품 모델의 거리</strong>가 핵심 변수다.</li>
+      </ul>
+    </section>
+
+    <!-- ───────── 3부 ───────── -->
+    <section id="p3">
+      <div class="part-head"><span class="num">3부</span><h2>스터디 도구</h2></div>
+
+      <h3 id="s31"><span class="k">3.1</span>대표자용 "그림 한 장" 지시서</h3>
+      <p>손으로 그릴 구조도. 위 도식을 그대로 옮기면 된다.</p>
+      <ol>
+        <li>가로로 긴 상자 32칸, "LLaMA2-7B 블록 1~32". 1~30을 한 색, <strong>31~32를 다른 색</strong>으로 칠하고 "System 1".</li>
+        <li>왼쪽 아래에서 상자 시작점으로 화살표 두 개: "언어 지시", "2D 이미지 (저주파, 4스텝마다)". 묶어 "System 2 입력".</li>
+        <li>블록 30과 31 사이 위에서 화살표 네 개: "2D 이미지", "3D 포인트클라우드", "로봇 상태", "노이즈 행동". 묶어 "System 1 입력 (고주파, 매 스텝)".</li>
+        <li>블록 32 오른쪽에서 나가는 화살표 두 개. 위: "노이즈 예측 → 확산 → 행동 청크 (L<sub>fast</sub>)". 아래: "다음 토큰 (L<sub>slow</sub>)".</li>
+        <li>아래에 시간축. System 2는 4칸마다 점, System 1은 매 칸 점. "1:4".</li>
+      </ol>
+
+      <h3 id="s32"><span class="k">3.2</span>공유회에서 던질 질문 세 개</h3>
+      <ol>
+        <li><strong>System 1을 VLM 마지막 블록으로 만든 것과, 같은 크기의 새 트랜스포머 블록 2개를 붙인 것의 차이는 무엇인가?</strong> 논문의 증거는 무엇이고, 빠진 실험은 무엇인가. (2.9절 5번)</li>
+        <li><strong>1:4가 1:1보다 성공률이 높은 이유가 "속도" 때문인가 "학습 신호" 때문인가?</strong> 학습 때 비동기 샘플링을 했다는 점이 어떤 역할을 하는가. (2.5절)</li>
+        <li><strong>표 7에서 System 1 입력을 다 빼면 0.22로 떨어진다.</strong> 기존 이중 시스템(π0, CogACT)에 대한 비판으로 성립하는가, 아니면 FiS-VLA 특유의 구조(마지막 2블록만 쓰는) 때문인가.</li>
+      </ol>
+
+      <h3 id="s33"><span class="k">3.3</span>자가 점검 퀴즈 10문항</h3>
+      <h4>워밍업 — 1부만 읽고</h4>
+      <ul>
+        <li><strong>W1.</strong> 어텐션 한 번에서 일어나는 계산을 세 단계로 말하라. Q·K·V는 각각 어느 단계에 쓰이는가?</li>
+        <li><strong>W2.</strong> 자기회귀 생성이 병렬화되지 않는 이유는? 학습 때는 왜 병렬이 되는가?</li>
+        <li><strong>W3.</strong> 인코더 전용과 디코더 전용의 차이는 무엇이고, FiS-VLA의 어느 부품이 각각에 해당하는가?</li>
+        <li><strong>W4.</strong> System 1과 System 2를 각각 한 단어로 말하면? 하나로 합치지 않고 나누는 이유는?</li>
+      </ul>
+      <details class="quiz">
+        <summary>워밍업 정답 보기</summary>
+        <ul>
+          <li><strong>W1.</strong> ① Q와 K의 내적으로 닮은 정도를 재고 ② softmax로 합이 1인 비율(어텐션 가중치)로 바꾸고 ③ 그 비율로 V를 가중 평균한다. Q·K는 ①, V는 ③에 쓰인다.</li>
+          <li><strong>W2.</strong> 다음 회차의 입력이 이번 회차의 출력이라 앞 결과 없이는 다음 계산을 시작할 수 없다. 학습 때는 정답 열이 이미 있어 전체를 한 번에 넣고, 인과 마스크가 미래를 가려 컨닝을 막는다.</li>
+          <li><strong>W3.</strong> 인코더 전용은 마스크 없이 앞뒤를 다 보며 입력을 벡터로 요약하고(SigLIP·DINOv2), 디코더 전용은 인과 마스크로 앞만 보며 토큰을 이어서 생성한다(LLaMA2 32블록).</li>
+          <li><strong>W4.</strong> System 2는 머리(판단), System 1은 손(실행). 합치면 똑똑하지만 느리거나(큰 모델 하나) 빠르지만 상식이 없거나(작은 모델 하나) 둘 중 하나를 포기해야 한다. 그래서 머리는 가끔, 손은 자주 돌린다.</li>
+        </ul>
+      </details>
+      <h4>논문 읽고 풀기</h4>
+      <ol>
+        <li>FiS-VLA의 System 1은 어디에 있는가?</li>
+        <li>System 2와 System 1의 동작 주파수 비율은? 그 비율을 정한 실험은?</li>
+        <li>System 1이 받지만 System 2는 받지 않는 입력 두 가지는?</li>
+        <li>L<sub>fast</sub>와 L<sub>slow</sub>는 각각 어떤 종류의 손실이고 무엇을 지키는가?</li>
+        <li>"117.7 Hz"와 "21.9 Hz"의 관계를 한 문장으로 설명하라.</li>
+        <li>RLBench에서 FiS-VLA의 평균 성공률과 CogACT·π0 대비 차이는?</li>
+        <li>실기 로봇 두 종과 각각의 제어 모드는?</li>
+        <li>사전학습 데이터 규모는?</li>
+        <li>System 1 블록 수를 2에서 8로 늘리면 성공률은?</li>
+        <li>논문이 밝힌 한계 하나와, 밝히지 않은 비교의 한계 하나를 들어라.</li>
+      </ol>
+      <details class="quiz">
+        <summary>정답 보기</summary>
+        <ol>
+          <li>LLaMA2-7B의 마지막 트랜스포머 블록 2개. 별도 모듈이 아니라 System 2 VLM의 일부.</li>
+          <li>1:4. 4.2절 (3), 부록 표 8. 1:1 0.60, 1:2 0.63, 1:4 0.69, 1:8 0.61.</li>
+          <li>3D 포인트클라우드, 로봇 상태. (2D 이미지는 양쪽 다.)</li>
+          <li>L<sub>fast</sub>는 확산 노이즈 예측 MSE로 행동 생성을 배우고, L<sub>slow</sub>는 자기회귀 교차엔트로피로 System 2의 추론 능력을 지킨다(망각 방지).</li>
+          <li>21.9 Hz는 청크 1일 때 모델 추론 속도, 117.7 Hz는 청크 8로 한 번에 8스텝을 낼 때의 이론 제어 주파수.</li>
+          <li>0.69. CogACT(0.61) 대비 +8%p, π0(0.55) 대비 +14%p.</li>
+          <li>AgileX 양팔 14-DoF 엔드이펙터 포즈 제어, AlphaBot 양팔 16-DoF 관절 위치 제어.</li>
+          <li>37개 데이터셋, 86만 궤적, 3,600만 프레임.</li>
+          <li>0.69 → 0.64 (4블록 0.66). 2개에서 포화.</li>
+          <li>밝힌 것: 블록 수·주파수 비율 고정(5절). 밝히지 않은 것(예): 청크 1 통일 비교가 π0에 불리, 별도 헤드 대조군 부재, 7B vs 2.6B 규모 차이.</li>
+        </ol>
+      </details>
+
+      <h3 id="s34"><span class="k">3.4</span>코드 훑기 가이드 (1시간)</h3>
+      <p>GitHub <a href="https://github.com/CHEN-H01/Fast-in-Slow"><code>CHEN-H01/Fast-in-Slow</code></a> (확인 2026-09-11). README 기준이며 파일 이름은 바뀔 수 있다.</p>
+      <div class="tbl"><table>
+        <thead><tr><th>경로</th><th>무엇이 있나</th><th>논문 어느 절</th></tr></thead>
+        <tbody>
+          <tr><td><code>conf/</code></td><td>학습 설정</td><td>3.4 레시피</td></tr>
+          <tr><td><code>models/</code></td><td>VLA 모델, 백본, 확산 부품</td><td>3.2 구조</td></tr>
+          <tr><td><code>vla/</code></td><td>OpenVLA에서 물려받은 VLA 구조</td><td>1.4절</td></tr>
+          <tr><td><code>LIFT3D/</code></td><td>3D 토크나이저 (서드파티)</td><td>3.2 포인트클라우드</td></tr>
+          <tr><td><code>training/</code></td><td>학습 전략</td><td>3.4 co-training</td></tr>
+          <tr><td><code>scripts/train.py</code>, <code>train.sh</code></td><td>학습 진입점</td><td>—</td></tr>
+          <tr><td><code>scripts/sim.py</code>, <code>test_rlbench.sh</code></td><td>RLBench 평가</td><td>4.1</td></tr>
+        </tbody>
+      </table></div>
+      <p>요구사항: Python 3.10+, PyTorch 2.2+, CUDA 12+, Flash-Attention 2, CoppeliaSim. 체크포인트 HuggingFace <code>haosad/fisvla</code>.</p>
+      <h4>논문 → 저장소 줄 (2026-09-11 확인, main 브랜치)</h4>
+      <div class="tbl"><table>
+        <thead><tr><th>논문</th><th>저장소 위치</th><th>무엇</th></tr></thead>
+        <tbody>
+          <tr><td>4.2절 (1) 블록 2개</td><td><code>train.sh</code> 10행 <code>LLM_MIDDLE_LAYER=30</code></td><td>32블록 중 30 이후 = System 1</td></tr>
+          <tr><td>3.3절 비율 1:4</td><td><code>train.sh</code> 23행 <code>SLOW_FAST_RATIO=1_4</code>, 9행 <code>TRAINING_MODE='async'</code></td><td>비동기 학습</td></tr>
+          <tr><td>3.3절 이종 입력</td><td><code>train.sh</code> 14행 <code>POINTCLOUD_POS='fast'</code>, 13행 <code>LOAD_STATE=true</code></td><td>3D·상태를 System 1에</td></tr>
+          <tr><td>식 (1) L<sub>fast</sub></td><td><code>models/vlas/fisvla.py</code> 204~236행</td><td>randn_like → q_sample → ((noise_pred − noise)²).mean()</td></tr>
+          <tr><td>식 (3) L = L<sub>fast</sub> + L<sub>slow</sub></td><td><code>training/strategies/base_strategy.py</code> 312~313행</td><td><code>if ar_diff_loss: loss = loss + output.loss</code></td></tr>
+          <tr><td>그림 2 두 구간</td><td><code>models/vlms/prismatic.py</code> 983행 · 1031행</td><td>llm_layer_end=30 → 고주파 토큰 결합 → llm_layer_start=30</td></tr>
+          <tr><td>그림 2 Shared Encoder ×2</td><td><code>models/vlms/prismatic.py</code> 457행~</td><td>이미지 키 head_slow_ / head_fast_ 분리 인코딩</td></tr>
+          <tr><td>1:4 비동기 추론</td><td><code>scripts/sim.py</code> 215~219행</td><td>if slow_cnt % slow_fast_ratio == 0: slow_system_forward()</td></tr>
+          <tr><td>청크 실행</td><td><code>scripts/sim.py</code> 242행</td><td>for action in actions: env.step(action)</td></tr>
+          <tr><td>System 1·2 단독 API</td><td><code>fisvla.py</code> 671행 · 759행</td><td>slow_system_forward / fast_system_forward</td></tr>
+        </tbody>
+      </table></div>
+      <p>비동기 "샘플링"은 데이터 쪽에서 처리된다. 학습 데이터의 이미지 키가 image_head_slow / image_head_fast로 나뉘어 있고, 태스크 이름의 s1f4가 slow 프레임을 1:4로 뽑았음을 암시한다. 변환 스크립트는 저장소에 없다(미확인). 실제 실행은 스터디 범위 밖이다(GPU·CoppeliaSim 필요, LIFT3D 포함 약 700MB).</p>
+      <div class="box lab" data-label="6 · 코드 지도">
+        <p>위 표의 줄을 GitHub에서 핵심 파일 5개(약 150KB)만 내려받아 앵커로 찾아 출력한다. 줄 번호가 바뀌어도 찾는다.</p>
+        <span class="cmd">python3 labs/lab6_code_map.py</span>
+      </div>
+
+      <h3 id="s35"><span class="k">3.5</span>더 읽을 것</h3>
+      <div class="tbl"><table>
+        <thead><tr><th>무엇</th><th>왜</th><th>링크</th></tr></thead>
+        <tbody>
+          <tr><td>Diffusion Policy (Chi et al., 2023)</td><td>확산 모델을 로봇 행동 생성에 쓴 원조</td><td><a href="https://arxiv.org/abs/2303.04137">arXiv 2303.04137</a></td></tr>
+          <tr><td>OpenVLA (Kim et al., 2024)</td><td>FiS-VLA의 코드·구조 뿌리. 행동 토큰화</td><td><a href="https://arxiv.org/abs/2406.09246">arXiv 2406.09246</a></td></tr>
+          <tr><td>Prismatic VLMs (2024)</td><td>SigLIP+DINOv2 조합의 출처</td><td><a href="https://arxiv.org/abs/2402.07865">arXiv 2402.07865</a></td></tr>
+          <tr><td>π0 (Black et al., 2024)</td><td>주요 베이스라인. 플로 매칭 헤드</td><td><a href="https://arxiv.org/abs/2410.24164">arXiv 2410.24164</a></td></tr>
+          <tr><td>CogACT (Li et al., 2024)</td><td>주요 베이스라인. 동기 이중 시스템</td><td><a href="https://arxiv.org/abs/2411.19650">arXiv 2411.19650</a></td></tr>
+          <tr><td>HybridVLA (Liu et al., 2025)</td><td>같은 PKU 팀. 확산+자기회귀를 한 모델에. co-training의 직전 연구</td><td><a href="https://arxiv.org/abs/2503.10631">arXiv 2503.10631</a></td></tr>
+          <tr><td>Lift3D (Jia et al., 2024)</td><td>3D 토크나이저를 2D 인코더에 통과시키는 방식</td><td><a href="https://arxiv.org/abs/2411.18623">arXiv 2411.18623</a></td></tr>
+          <tr><td>Helix (Figure AI, 2025)</td><td>두 GPU 병렬 비동기 이중 시스템. 상용 사례</td><td><a href="https://www.figure.ai/news/helix">figure.ai</a></td></tr>
+          <tr><td>The Illustrated Transformer</td><td>어텐션을 그림으로 (Jay Alammar)</td><td><a href="https://jalammar.github.io/illustrated-transformer/">jalammar.github.io</a></td></tr>
+        </tbody>
+      </table></div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    FiS-VLA 정독 가이드 · 작성 2026-09-11 · 논문 원문 arXiv 2506.01953v1 기준. 수치는 논문 본문·부록 표에서 옮겼으며, 논문 밖 사실에는 확인일을 붙였다. 사내 VLA 논문 스터디(AI² Robotics 6편, 2026-09-14 ~ 10-04) 1주차 자료.
+  </footer>
+</div>
+</body>
+</html>

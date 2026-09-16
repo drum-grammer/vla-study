@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+    html { color-scheme: light; }
+    body { margin: 0; font: 14px system-ui, -apple-system, sans-serif; background: #fafaf9; }
+    img { max-width: 100%; }
+    [hidden] { display: none !important; }
+</style>
+<title>RoboMamba 스터디 페이지</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=Noto+Serif+KR:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+<header class="masthead">
+  <div class="wrap">
+    <p class="crumbs"><a href="index.html">VLA 논문 6편 읽기</a> › 스터디 페이지 ① · 1주차</p>
+    <div class="eyebrow">
+      <span>논문 ① · 2024-06 · NeurIPS 2024</span>
+      <span class="dim">개념 2시간 + 실습 90분 + 공유회 준비 30분</span>
+    </div>
+    <h1>RoboMamba — 이해가 먼저, 조작은 싸게</h1>
+    <p class="standfirst">
+      트랜스포머 대신 <strong>선형 복잡도의 Mamba</strong>를 LLM으로 쓴 VLA. 일반 VQA와 로봇 VQA를 섞어 학습해 추론 능력을 먼저 확보하고,
+      그 뒤에는 백본을 완전히 동결한 채 <strong>MLP 헤드 두 개(모델의 0.1%)</strong>만 파인튜닝해 SE(3) 포즈 예측을 붙인다.
+      FiS-VLA의 출발점이자, "추론 능력이 충분하면 조작은 최소 비용으로 붙는다"는 명제의 원천이다.
+    </p>
+    <p class="cite"><b>RoboMamba: Efficient Vision-Language-Action Model for Robotic Reasoning and Manipulation.</b>
+      Jiaming Liu 외 — 베이징대 · <b>AI² Robotics</b> · BAAI. arXiv 2406.04339 (v1 2024-06-06 / v2 2024-12-14), NeurIPS 2024 채택.
+      제1저자 Jiaming Liu는 FiS-VLA의 프로젝트 리드이기도 하다. 코드는 MIT 라이선스이나 <b>학습 코드는 비공개</b>(저자 메일 요청).</p>
+    <div class="links">
+      <a class="ext" href="https://arxiv.org/abs/2406.04339">arXiv</a>
+      <a class="ext" href="https://arxiv.org/pdf/2406.04339">PDF</a>
+      <a class="ext" href="https://github.com/lmzpai/roboMamba">원 저장소 lmzpai/roboMamba</a>
+      <a class="ext" href="https://sites.google.com/view/robomamba-web">프로젝트 페이지</a>
+      <a class="ext" href="https://github.com/drum-grammer/vla-study/tree/main/labs/robomamba">실습 코드 (공개)</a>
+    </div>
+    <div class="meta">
+      <span><strong>주차</strong> 1주 (2026-09-14 ~ 09-20)</span>
+      <span><strong>대표자</strong> 에디</span>
+      <span><strong>짝 논문</strong> <a href="paper-2-fis-vla.html">② FiS-VLA</a></span>
+      <span><strong>심화</strong> <a href="robomamba-guide.html">정독 가이드</a> · <a href="robomamba-lab.html">실습 상세</a></span>
+      <span class="dim">갱신 2026-09-13</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+<main>
+
+<details class="toc" open>
+  <summary>이 페이지의 차례</summary>
+  <div class="toc-body">
+    <div class="grp">시작</div>
+    <a href="#how"><span class="num">0</span>이 페이지로 공부하는 법 · 진행 체크</a>
+    <a href="#summary"><span class="num">S</span>한 장 요약</a>
+    <div class="grp">1부 · 개념</div>
+    <a href="#c1"><span class="num">1.1</span>먼저 알아야 할 개념 여섯 개</a>
+    <a href="#c2"><span class="num">1.2</span>문제 — 두 개의 약점</a>
+    <a href="#c3"><span class="num">1.3</span>핵심 아이디어 — 그림 1</a>
+    <a href="#c4"><span class="num">1.4</span>구조 — 그림 2, 입력·출력·손실</a>
+    <a href="#c5"><span class="num">1.5</span>Mamba를 쓴 이유 — 식 (1)~(4)</a>
+    <a href="#c6"><span class="num">1.6</span>학습 — 2단계 3스텝, 식 (5)(6)</a>
+    <a href="#c7"><span class="num">1.7</span>결과 읽기 — 표 1·2, 그림 1</a>
+    <a href="#c8"><span class="num">1.8</span>소거 실험</a>
+    <a href="#c9"><span class="num">1.9</span>한계와 비판적으로 읽기</a>
+    <a href="#c10"><span class="num">1.10</span>계보 — FiS-VLA와의 대비</a>
+    <div class="grp">2부 · 실습 (numpy)</div>
+    <a href="#prep"><span class="num">2.0</span>준비 — 세 가지 실행 방법</a>
+    <a href="#lab1"><span class="num">2.1</span>상태공간모델을 손으로 굴려 보기</a>
+    <a href="#lab2"><span class="num">2.2</span>어텐션은 왜 느리고 SSM은 왜 빠른가</a>
+    <a href="#lab3"><span class="num">2.3</span>'선택적' SSM이 무엇을 선택하는가</a>
+    <a href="#lab4"><span class="num">2.4</span>이미지를 Mamba에 넣는 방법과 순서의 대가</a>
+    <a href="#lab5"><span class="num">2.5</span>정책 헤드 하나로 조작을 배우기</a>
+    <a href="#lab6"><span class="num">2.6</span>'0.1%'를 직접 세어 보기</a>
+    <a href="#lab7"><span class="num">2.7</span>논문 문장을 저장소 줄 번호로</a>
+    <a href="#found"><span class="num">2.8</span>실습이 논문에서 찾아낸 것 네 가지</a>
+    <a href="#gpu"><span class="num">2.9</span>실제 모델 · 알려진 한계</a>
+    <div class="grp">3부 · 공유회 준비</div>
+    <a href="#draw"><span class="num">3.1</span>대표자용 그림 한 장 지시서</a>
+    <a href="#q3"><span class="num">3.2</span>공유회에서 던질 질문 세 개</a>
+    <a href="#quiz"><span class="num">3.3</span>자가 점검 퀴즈 10문항</a>
+    <a href="#booth"><span class="num">3.4</span>부스 질문의 근거</a>
+    <div class="grp">4부</div>
+    <a href="#map"><span class="num">4</span>자료 지도</a>
+  </div>
+</details>
+
+<h2 id="how"><span class="num">0</span>이 페이지로 공부하는 법</h2>
+<p class="col">위에서 아래로 읽는다. 논문 PDF는 옆에 펴 둔다 — 각 절에 "논문에서 볼 곳"을 적었다.
+트랜스포머도 Mamba도 몰라도 되게 썼고, 부족하면 1.1절 링크로 정독 가이드 1부에 다녀온다. 실습은 파이썬 3.9와 numpy만 있으면 된다.</p>
+<ol class="path">
+  <li><div class="what"><b>한 장 요약을 읽고 논문 그림 1·2와 초록을 본다</b><div class="where">아래 S절. 시간이 없으면 여기까지만 해도 공유회 참여가 된다</div></div><span class="t">20분</span></li>
+  <li><div class="what"><b>1부 개념 — 문제 → 아이디어 → 구조 → Mamba → 학습 → 결과 → 한계</b><div class="where">각 절 끝의 "논문에서" 표시대로 원문 절·그림·표를 함께 본다</div></div><span class="t">2시간</span></li>
+  <li><div class="what"><b>2부 실습 일곱 개 — 순서대로</b><div class="where">명령 한 줄씩. 코드는 GitHub, 노트북 하나가 코랩에서 통째로 돈다</div></div><span class="t">90분</span></li>
+  <li><div class="what"><b>3부 — 그림 한 장, 질문 세 개, 퀴즈 10문항</b><div class="where">대표자는 3.1·3.2, 참여자는 3.3. 부스 질문 근거는 3.4</div></div><span class="t">30분</span></li>
+</ol>
+<h3>진행 체크</h3>
+<p class="col">이 브라우저에만 저장된다(서버 없음). 다른 기기에서는 다시 비어 있다.</p>
+<ul class="checks">
+  <li><label><input type="checkbox" id="k-summary"><span>한 장 요약 + 논문 그림 1·2·초록</span></label></li>
+  <li><label><input type="checkbox" id="k-concept"><span>1부 개념 1.1 ~ 1.10</span></label></li>
+  <li><label><input type="checkbox" id="k-lab1"><span>실습 1·2·3 (SSM · 복잡도 · 선택)</span></label></li>
+  <li><label><input type="checkbox" id="k-lab4"><span>실습 4·5 (토큰 순서 · 정책 헤드)</span></label></li>
+  <li><label><input type="checkbox" id="k-lab6"><span>실습 6·7 (파라미터 감사 · 코드 지도)</span></label></li>
+  <li><label><input type="checkbox" id="k-quiz"><span>퀴즈 10문항 중 8개 이상</span></label></li>
+  <li><label><input type="checkbox" id="k-share"><span>공유회 준비물 (그림 한 장 또는 질문) 완료</span></label></li>
+</ul>
+
+<h2 id="summary"><span class="num">S</span>한 장 요약</h2>
+<div class="figs">
+  <div class="fig"><span class="v">9.0 Hz</span><span class="k">추론 속도 (A100). OpenVLA 3.4, ManipLLM 1.1 — 개루프 단발 포즈</span></div>
+  <div class="fig"><span class="v">0.63</span><span class="k">SAPIEN 시뮬 seen 평균 성공률. ManipLLM 0.56. unseen 0.53 vs 0.51</span></div>
+  <div class="fig spike"><span class="v">3.7M</span><span class="k">파인튜닝 파라미터 = 전체의 0.1%. ManipLLM 41.3M의 1/10 (⚠️ 코드로 세면 8.20M)</span></div>
+  <div class="fig"><span class="v">42.8</span><span class="k">RoboVQA BLEU-4. TinyLLaVA 29.6, LLaMA-AdapterV2 8.1</span></div>
+  <div class="fig"><span class="v">2.7B</span><span class="k">Mamba LLM 크기. 64블록. 비전 인코더는 CLIP 하나</span></div>
+</div>
+<div class="box key"><span class="h">한 문장</span>
+  LLM 백본을 트랜스포머가 아니라 <strong>Mamba-2.7B</strong>로 바꾸면 선형 복잡도로 빨라진다. 그리고 "추론 능력이 충분하면 조작은 아주 작은 헤드만 붙여도 배운다"는 가설을 세워,
+  일반 VQA + 로봇 VQA 공동학습으로 추론을 갖춘 뒤 <strong>백본을 동결하고 MLP 정책 헤드만</strong> 학습해 접촉점 + 회전(SE(3) 포즈)을 예측한다.
+</div>
+<h3>기여 세 가지 (논문 1절)</h3>
+<ol>
+  <li>비전 인코더 + <strong>선형 복잡도 Mamba LLM</strong>을 결합한 종단간 VLA.</li>
+  <li><strong>단순한 정책 헤드로 효율적 파인튜닝</strong>. 추론 능력이 충분하면 조작은 최소 비용으로 붙는다.</li>
+  <li>일반·로봇 추론 벤치마크와 시뮬·실기 포즈 예측에서 검증.</li>
+</ol>
+<p class="col"><strong>논문에서 볼 곳</strong>: 초록, 그림 1(속도 비교와 추론 예시), 그림 2(전체 구조도). 그림 1의 예시 — "지난 20스텝" 이력을 주고 다음 5스텝을 물으면 LLaMA-AdapterV2는 "1- 끝"이라 답한다 — 가 논문이 말하는 "추론이 약하다"의 뜻이다.</p>
+
+<div class="part">1부 · 개념</div>
+
+<h2 id="c1"><span class="num">1.1</span>먼저 알아야 할 개념 여섯 개</h2>
+<p class="col">각 항목의 링크는 정독 가이드 1부의 해당 절이다. FiS-VLA 페이지를 먼저 읽었다면 앞 둘은 건너뛴다.</p>
+<div class="terms">
+  <div><b>토큰과 임베딩</b>이미지 패치·언어를 같은 크기의 벡터 열로 만들어 세로로 쌓는다. RoboMamba는 <code>[이미지 256, 텍스트 ~15]</code> 순서다 — 이 순서가 실습 4의 주제. → <a href="robomamba-guide.html#s12">가이드 1.2</a></div>
+  <div><b>트랜스포머와 어텐션 — 그리고 왜 느린가</b>모든 토큰이 모든 토큰을 본다 → 계산이 L². 토큰을 하나 더 뽑을 때마다 지금까지의 전부(KV 캐시)를 다시 읽는다. → <a href="robomamba-guide.html#s13">가이드 1.3</a></div>
+  <div><b>순환신경망과 상태 — SSM의 조상</b>고정 크기 상태 h를 들고 토큰을 하나씩 흘린다. 계산 O(L), 생성 시 메모리 고정. 대신 "무엇을 기억할지"를 고를 수 없었다. → <a href="robomamba-guide.html#s14">가이드 1.4</a></div>
+  <div><b>Mamba — 선택적 상태공간모델(S6)</b>B·C·Δ를 입력의 함수로 만들어 토큰마다 "기억할지 넘길지"를 정한다. Δ가 크면 과거를 지우고, 작으면 보존. → <a href="robomamba-guide.html#s15">가이드 1.5</a></div>
+  <div><b>MLLM — 이미지를 LLM에 넣기</b>CLIP → 프로젝터(MLP) → LLM. RoboMamba는 비전 인코더 앙상블을 일부러 거부했다. → <a href="robomamba-guide.html#s16">가이드 1.6</a></div>
+  <div><b>개루프 vs 폐루프, 관절 물체, 파인튜닝 전략</b>RoboMamba는 <em>한 번의 접촉 포즈</em>를 내는 개루프 예측이다(궤적 제어가 아니다). 무엇을 동결하고 무엇을 학습하는가가 논문의 핵심 선택. → <a href="robomamba-guide.html#s18">가이드 1.8</a> · <a href="robomamba-guide.html#s110">1.10</a></div>
+</div>
+
+<h2 id="c2"><span class="num">1.2</span>문제 — 두 개의 약점 (초록 · 1절)</h2>
+<div class="tbl">
+<table>
+<thead><tr><th>약점</th><th>내용</th><th>논문의 답</th></tr></thead>
+<tbody>
+<tr><td><strong>추론이 약하다</strong></td><td>사전학습 MLLM의 로봇 장면 추론 능력이 부족해 복잡한 과제에서 무너진다 (그림 1의 "1- 끝" 예시)</td><td>일반 VQA + 로봇 VQA(RoboVQA 300K) 공동학습으로 추론 능력을 먼저 갖춘다</td></tr>
+<tr><td><strong>비싸다</strong></td><td>어텐션 기반 LLM 때문에 파인튜닝도 추론도 비용이 크다 (OpenVLA 7B 3.4 Hz, ManipLLM 1.1 Hz)</td><td>백본을 Mamba로 바꾸고, 조작은 3.7M 헤드만 학습한다</td></tr>
+</tbody>
+<caption>더 깊이: <a href="robomamba-guide.html#s22">가이드 2.2</a></caption>
+</table>
+</div>
+
+<h2 id="c3"><span class="num">1.3</span>핵심 아이디어 — 그림 1 읽기</h2>
+<p class="col">그림 1은 두 부분이다. 왼쪽은 속도 막대(9.0 vs 3.4 vs 1.1 Hz), 오른쪽은 추론 예시.
+논문의 주장은 두 겹이다: (1) <strong>Mamba라서 빠르다</strong> — 선형 복잡도. (2) <strong>이해가 먼저다</strong> — 추론 능력이 갖춰지면 조작은 작은 헤드로 충분히 붙는다.
+(2)가 이후 FiS-VLA를 포함한 모든 후속 논문의 전제가 되므로, 그 근거가 얼마나 단단한지를 1.8·1.9절에서 따진다.</p>
+<div class="box"><span class="h">비유</span>
+  트랜스포머는 문장을 읽을 때 매 단어마다 앞 단어 전부를 다시 훑는 독자, Mamba는 "요약 메모 한 장"(고정 크기 상태)만 갱신하며 읽는 독자다.
+  Mamba가 다른 점은 메모에 무엇을 적고 무엇을 지울지를 <em>지금 읽는 단어가 정한다</em>는 것. 더 깊이: <a href="robomamba-guide.html#s23">가이드 2.3</a>
+</div>
+
+<h2 id="c4"><span class="num">1.4</span>구조 — 그림 2 읽기, 입력·출력·손실 (3.2절)</h2>
+<pre class="code">이미지 224×224 → CLIP ViT-L/14 (동결, 끝에서 2번째 층) → <b>256 토큰 × 1024</b>
+                  → Project Layer (MLP 3층, 21.2M)     → <b>256 × 2560</b>
+언어 질문        → Tokenizer (vocab 50280)            → <b>~15 × 2560</b>
+   cat([이미지, 텍스트])  →  <b>Mamba 블록 64개 (2.77B)</b>  →  출력 토큰 열
+                                    ├─ 다음 토큰 → 언어 답변 (추론)               <span class="c">Stage 1: 교차엔트로피</span>
+                                    └─ 전역 토큰 → MLP ×2 → 위치 2개 / 방향 6개    <span class="c">Stage 2: 식 (5) L1 + 식 (6) 측지</span></pre>
+<div class="tbl">
+<table>
+<thead><tr><th></th><th>내용</th></tr></thead>
+<tbody>
+<tr><td><strong>입력</strong></td><td>RGB 이미지 한 장 + 언어 질문. <em>그뿐이다</em> — 포인트클라우드도, 로봇 상태도, 과거 프레임도 없다</td></tr>
+<tr><td><strong>출력 (추론)</strong></td><td>다음 토큰 → 언어 답변 (VQA, 로봇 계획)</td></tr>
+<tr><td><strong>출력 (조작)</strong></td><td>SE(3) 포즈 — 접촉점 위치(2개, 이미지 좌표) + 그리퍼 방향(6D 표현 → 3×3 회전)</td></tr>
+<tr><td><strong>손실</strong></td><td>Stage 1 교차엔트로피 · Stage 2 식 (5) 위치 L1 + 식 (6) 회전 측지 거리 (1.6절)</td></tr>
+<tr><td>설계 선택</td><td>비전 인코더 앙상블(DINOv2+ConvNeXt+ViT)을 <strong>일부러 안 썼다</strong> — "실세계 실용성을 심하게 해친다". FiS-VLA는 SigLIP+DINOv2를 쓴다</td></tr>
+</tbody>
+<caption>더 깊이(부품 목록 전체): <a href="robomamba-guide.html#s24">가이드 2.4</a></caption>
+</table>
+</div>
+<div class="lab-link"><span class="n">실습 4</span><span>이미지 → 토큰 256개, 프로젝터의 실제 모양, 그리고 <code>[이미지, 텍스트]</code> 순서가 만드는 비대칭(이미지 토큰 민감도 0.12 vs 텍스트 7.30)을 본다. → <a href="#lab4">2.4</a></span></div>
+
+<h2 id="c5"><span class="num">1.5</span>Mamba를 쓴 이유 — 식 (1)~(4) (3.1절)</h2>
+<div class="eq"><span class="tag">식 (1)(4) · 상태공간모델의 순환</span>
+<pre>h_t = Ā h_{t−1} + B̄ x_t          y_t = C h_t
+Ā = exp(ΔA)         (식 2)       B̄ = (ΔA)⁻¹ (exp(ΔA) − I) ΔB ≈ ΔB   (식 3, 저장소는 근사)</pre>
+<p class="gloss">고정 크기 상태 h를 들고 토큰을 하나씩 흘린다 → 계산 O(L), 생성 시 메모리 고정. <strong>Δ가 크면</strong> Ā ≈ 0이라 과거를 지우고 지금을 받고, <strong>작으면</strong> Ā ≈ 1이라 과거를 보존한다.</p></div>
+<p class="col">Mamba(S6)는 여기에 <strong>B·C·Δ를 입력의 함수로</strong> 만들었다. 그래서 "이 토큰은 기억하고 저 토큰은 넘기기"가 가능하다 — 논문이 말하는 content-aware reasoning.
+블록 하나는 <code>in_proj → conv → x_proj/dt_proj → 선택적 스캔 → out_proj</code>. 더 깊이: <a href="robomamba-guide.html#s15">가이드 1.5</a></p>
+<div class="lab-link"><span class="n">실습 1 · 2 · 3</span><span>실습 1은 식 (1)~(4)를 숫자로 굴리고 Δ가 기억 길이를 정하는 것을 본다. 실습 2는 어텐션 O(L²) vs 스캔 O(L)을 실측한다. 실습 3은 '선택'이 없으면 못 하는 일을 만든다. → <a href="#lab1">2.1</a> · <a href="#lab2">2.2</a> · <a href="#lab3">2.3</a></span></div>
+
+<h2 id="c6"><span class="num">1.6</span>학습 — 2단계 3스텝, 식 (5)(6) (3.3 · 3.4절)</h2>
+<div class="tbl">
+<table>
+<thead><tr><th>단계</th><th>데이터</th><th>학습</th><th>동결</th><th>설정</th></tr></thead>
+<tbody>
+<tr><td>1.1 정렬 사전학습</td><td>LLaVA-LCS 558K</td><td><strong>Project Layer만</strong></td><td>비전, Mamba</td><td>1 에폭, lr 4e-5, fp16</td></tr>
+<tr><td>1.2 명령어 <strong>공동학습</strong></td><td>LLaVA-1.5 655K + <strong>RoboVQA 300K</strong></td><td>Projector + <strong>Mamba</strong></td><td>비전</td><td>2 에폭, 교차엔트로피</td></tr>
+<tr class="hi"><td>2 조작 파인튜닝</td><td>SAPIEN 자체 수집 10K / 20범주</td><td><strong>정책 헤드만</strong></td><td><strong>전부</strong></td><td>8 에폭, lr 1e-5, fp32, "a few dozen minutes"</td></tr>
+</tbody>
+<caption>전부 NVIDIA A100. 더 깊이: <a href="robomamba-guide.html#s25">가이드 2.5</a></caption>
+</table>
+</div>
+<div class="eq"><span class="tag">식 (5) · 접촉점 — L1</span>
+<pre>L_pos = (1/N) Σ | a_pos − a_gt |</pre></div>
+<div class="eq"><span class="tag">식 (6) · 회전 — 측지 거리 (두 회전 사이 각도)</span>
+<pre>L_dir = (1/N) Σ arccos( ( Tr( a_gt_dirᵀ · a_dir ) − 1 ) / 2 )</pre>
+<p class="gloss">방향은 9개 숫자가 아니라 <strong>6개(6D 표현) + Gram-Schmidt</strong>로 내놓아 항상 유효한 회전이 되게 한다(실습 5 (4)). 4.1절의 "random y-axis" 데이터 수집 규칙이 이 손실의 바닥을 막는다는 것이 실습 5의 핵심 발견.</p></div>
+<div class="lab-link"><span class="n">실습 5 · 6</span><span>실습 5는 동결 백본 + 작은 헤드로 조작을 배우는 것과 'random y-axis'의 뜻을 재현한다. 실습 6은 "0.1%"를 손으로 센다. → <a href="#lab5">2.5</a> · <a href="#lab6">2.6</a></span></div>
+
+<h2 id="c7"><span class="num">1.7</span>결과 읽기 — 표 1·2, 그림 1</h2>
+<p class="col"><strong>베이스라인이 누구인가부터.</strong> 추론(표 1)은 LLaVA1.5·TinyLLaVA 같은 일반 MLLM과, 조작(표 2)은 ManipLLM·RoboFlamingo·FlowBot3D와 비교한다. π0·GR00T 같은 폐루프 VLA와의 비교는 없다 — 2024년 6월 논문이다.</p>
+<div class="tbl">
+<table>
+<thead><tr><th>추론 (표 1)</th><th class="n">LLM</th><th class="n">GQA</th><th class="n">POPE</th><th class="n">MME</th><th class="n">MMB</th><th class="n">RoboVQA BLEU-4</th></tr></thead>
+<tbody>
+<tr><td>LLaMA-AdapterV2</td><td class="n">7B</td><td class="n">45.1</td><td class="n">–</td><td class="n">1328.4</td><td class="n">–</td><td class="n">8.1</td></tr>
+<tr><td>LLaVA1.5</td><td class="n">7B</td><td class="n">62.0</td><td class="n">85.9</td><td class="n"><strong>1510.7</strong></td><td class="n">64.3</td><td class="n">–</td></tr>
+<tr><td>TinyLLaVA</td><td class="n">2.7B</td><td class="n">61.0</td><td class="n">86.3</td><td class="n">1437.3</td><td class="n"><strong>68.3</strong></td><td class="n">29.6</td></tr>
+<tr class="hi"><td>RoboMamba</td><td class="n">2.7B</td><td class="n">64.2</td><td class="n">86.3</td><td class="n">1297.2</td><td class="n">60.9</td><td class="n">42.8</td></tr>
+</tbody>
+<caption>RoboVQA에서 가장 큰 격차. OKVQA 63.3 · VQAv2 79.6 · VizWiz 57.1도 7B급을 앞선다. <strong>다만 MME·MMBench·MM-Vet은 뒤진다</strong> — 논문도 인정하며 7B 버전을 예고.</caption>
+</table>
+</div>
+<div class="tbl">
+<table>
+<thead><tr><th>조작 (표 2, 개루프, SAPIEN)</th><th class="n">파인튜닝 파라미터</th><th class="n">seen 평균</th><th class="n">unseen 평균</th></tr></thead>
+<tbody>
+<tr><td>UMPNet</td><td class="n">–</td><td class="n">0.34</td><td class="n">0.26</td></tr>
+<tr><td>FlowBot3D</td><td class="n">–</td><td class="n">0.35</td><td class="n">0.30</td></tr>
+<tr><td>RoboFlamingo</td><td class="n">1.8B (35.5%)</td><td class="n">0.41</td><td class="n">0.43</td></tr>
+<tr><td>ManipLLM</td><td class="n">41.3M (0.5%)</td><td class="n">0.56</td><td class="n">0.51</td></tr>
+<tr class="hi"><td>RoboMamba</td><td class="n">3.7M (0.1%)</td><td class="n">0.63</td><td class="n">0.53</td></tr>
+</tbody>
+<caption>성공 = 관절 상태 변화 &gt; 0.1 m. ManipLLM 대비 seen +7%p, unseen +2%p. 20개 중 14개 범주 SOTA. "10배 적게 학습하고 7배 빠른데 더 잘한다"가 논문의 종합 주장.</caption>
+</table>
+</div>
+<div class="box warn"><span class="h">속도 수치를 읽을 때</span>
+  그림 1의 9.0 Hz(A100, 양자화·가속 없음)는 <strong>개루프 단발 포즈 예측</strong> 속도다. 폐루프 제어 주기가 아니라서 FiS-VLA의 21.9 Hz와 직접 비교할 수 없다.
+  초록의 "3배"는 OpenVLA 대비(×2.6), 4.2절의 "7배"는 ManipLLM 대비(×8.2)다. 더 깊이: <a href="robomamba-guide.html#s26">가이드 2.6</a> · <a href="robomamba-guide.html#s27">2.7</a>
+</div>
+
+<h2 id="c8"><span class="num">1.8</span>소거 실험 — 무엇이 성능을 만들었나 (그림 3, 부록 표 4~6)</h2>
+<div class="tbl">
+<table>
+<thead><tr><th>무엇을 바꿨나</th><th>결과</th><th>읽는 법</th></tr></thead>
+<tbody>
+<tr><td>LLM: Mamba-1.4B / RWKV-3B / <strong>Mamba-2.7B</strong> (그림 3a, RoboVQA BLEU-4)</td><td class="n">34.5 / 9.1 / <strong>42.8</strong></td><td>같은 데이터·같은 전략. RWKV는 무너진다</td></tr>
+<tr class="hi"><td>백본 이해 수준 → 조작 (그림 3b, seen/unseen)</td><td class="n">OpenFlamingo 0.26/0.33 · LLaMA-AdapterV2 0.46/0.20 · Ours-1.4B 0.39/0.41 · Ours-2.7B(co-training 없음) 0.61/0.41 · <strong>Ours-2.7B 0.63/0.53</strong></td><td>"이해가 먼저"의 근거. 단, 통제된 비교는 co-training 유무 한 쌍뿐</td></tr>
+<tr><td>비전 인코더·해상도 (부록 표 4)</td><td>큰 영향 없음</td><td>⚠️ 라벨 상충 — 1.9절</td></tr>
+<tr><td>로봇 데이터 추가 (부록 표 5)</td><td class="n">RoboVQA 26.5 → <strong>42.8</strong> / GQA 65.3 → 64.2</td><td>로봇 추론은 오르고 일반 추론은 살짝 내린다</td></tr>
+<tr><td>정책 헤드 설계 (부록 표 6)</td><td class="n">MLP×2 <strong>63.7%</strong> / MLP×1 62.1% / (SSM+MLP)×2 63.2%</td><td>헤드를 12배 키워도 같다 → 병목은 백본 표현</td></tr>
+</tbody>
+<caption>두 결과가 메시지를 만든다: 헤드 크기는 무관(표 6), 백본 이해 수준이 결정적(그림 3b) → "이해가 먼저, 조작은 싸게". co-training을 빼면 <strong>unseen이 더 크게 떨어진다</strong>(0.53 → 0.41) — 로봇 데이터의 이득은 주로 일반화에 있다. 더 깊이: <a href="robomamba-guide.html#s28">가이드 2.8</a></caption>
+</table>
+</div>
+
+<h2 id="c9"><span class="num">1.9</span>한계와 비판적으로 읽기</h2>
+<h3>논문이 밝힌 것 (5절) — 딱 하나</h3>
+<p class="col">2.7B LLM이라 7B/13B 기반 MLLM보다 복잡한 추론에서 뒤진다. 향후 ① 더 발전된 선형 복잡도 LLM, ② <strong>4D 로봇 VLA</strong>(포인트클라우드 + 시간). ②가 그대로 FiS-VLA의 설계가 된다.</p>
+<h3>논문이 밝히지 않은 것 — 스터디에서 따져 볼 것</h3>
+<ol>
+  <li><strong>개루프 실험인데 "control frequency"라 부른다.</strong> 폐루프 제어 실험은 없다.</li>
+  <li><strong>파라미터 수가 코드와 안 맞는다.</strong> 표 6의 3.7M을 공개 코드로 세면 8.20M, 45.2M은 90.69M (실습 6). 결론(크기 무관)은 유지되지만 재현에 걸린다.</li>
+  <li><strong>부록 표 4의 인코더 라벨이 상충한다.</strong> 인쇄된 2행(XCiT 224)의 값이 표 1의 RoboMamba 224 행과 정확히 같고, 본문은 XCiT가 나쁘다고 적는다 → 1·2행 라벨이 바뀐 것으로 보인다(확인 2026-09-11).</li>
+  <li><strong>식 (6)의 바닥이 막혀 있다.</strong> 4.1절이 데이터 수집 시 y축을 임의로 정하므로 정답 회전의 z축 주위 성분은 장면의 함수가 아니다. 흡착 그리퍼라 성공률에는 영향이 거의 없지만(실습 5: 회전 오차 93.7°에 멈추는데도 성공률 95.5%), 식 (6)을 지표로 쓰면 모델 비교가 안 된다.</li>
+  <li><strong>co-training 주장이 증거보다 강하다.</strong> "일반 추론도 좋아진다"지만 부록 표 5에서 GQA는 세 쌍 모두 내려간다.</li>
+  <li><strong>"이해 → 조작" 인과의 통제.</strong> 그림 3b의 백본 네 개는 크기·구조·데이터가 모두 다르다. 통제된 비교는 co-training 유무 한 쌍뿐.</li>
+  <li><strong>동결의 대가를 재지 않았다.</strong> "헤드만 vs 백본도 조금" 대조 실험이 없다.</li>
+  <li><strong>공개 범위.</strong> 학습 코드·조작 평가·데이터 수집 스크립트 모두 없다. 같은 회사가 공저자인 FiS-VLA는 학습·평가를 모두 공개했다.</li>
+</ol>
+<p class="col">더 깊이: <a href="robomamba-guide.html#s29">가이드 2.9</a> · <a href="robomamba-guide.html#s210">2.10</a></p>
+
+<h2 id="c10"><span class="num">1.10</span>계보 — FiS-VLA와의 대비</h2>
+<div class="tbl">
+<table>
+<thead><tr><th></th><th>① RoboMamba (2024-06)</th><th>② FiS-VLA (2025-06)</th></tr></thead>
+<tbody>
+<tr><td>백본</td><td><strong>Mamba 2.8B</strong> (선형)</td><td>LLaMA2-7B (트랜스포머)</td></tr>
+<tr><td>비전</td><td>CLIP 하나 (앙상블 거부)</td><td>SigLIP + DINOv2</td></tr>
+<tr><td>입력</td><td>RGB 1장 + 언어</td><td>RGB 3장 + 포인트클라우드 + 로봇 상태</td></tr>
+<tr><td>행동</td><td>MLP 헤드 2개 (밖에 붙임)</td><td>확산 헤드 (VLM 마지막 2블록 재활용)</td></tr>
+<tr><td>추론 능력 보존</td><td><strong>백본 동결</strong></td><td><strong>L_slow 공동학습</strong></td></tr>
+<tr><td>제어</td><td>개루프 단발 포즈</td><td>폐루프, 행동 청크, 1:4 비동기</td></tr>
+</tbody>
+<caption>같은 문제(조작을 배우면 추론을 잊는다)를 RoboMamba는 "건드리지 않음"으로, FiS-VLA는 "같이 학습함"으로 풀었다. 그리고 백본은 Mamba에서 트랜스포머로 되돌아갔다 — 왜인지가 부스 질문. 더 깊이: <a href="robomamba-guide.html#s211">가이드 2.11</a> · <a href="paper-2-fis-vla.html">FiS-VLA 스터디 페이지</a></caption>
+</table>
+</div>
+
+<div class="part">2부 · 실습 — numpy 일곱 개로 Mamba와 작은 헤드를 만져 보기</div>
+
+<h2 id="prep"><span class="num">2.0</span>준비 — 세 가지 실행 방법</h2>
+<p class="col"><strong>GPU 없이, PyTorch 없이, numpy만으로</strong> 실습 7개가 각 1~17초에 돈다. 원 저장소는 <code>mamba_ssm</code> + CUDA 전용 torch를 요구하고 학습 코드는 비공개다(2.9절).
+코드는 공개 저장소 <a href="https://github.com/drum-grammer/vla-study/tree/main/labs/robomamba">drum-grammer/vla-study/labs/robomamba</a>에 있다.</p>
+<div class="tbl">
+<table>
+<thead><tr><th>방법</th><th>준비물</th><th>어떻게</th></tr></thead>
+<tbody>
+<tr class="hi"><td><strong>A. 터미널</strong></td><td>파이썬 3.9+, numpy</td><td>아래 명령. 결과 그림은 <code>out/*.svg</code>로 떨어진다</td></tr>
+<tr><td><strong>B. 주피터</strong></td><td>+ jupyterlab</td><td><code>notebooks/robomamba_lab.ipynb</code> 하나에 실습 7개 + 실제 Mamba 백본 부록</td></tr>
+<tr><td><strong>C. 구글 코랩</strong> (가장 쉬움)</td><td>브라우저만</td><td><a href="https://colab.research.google.com/github/drum-grammer/vla-study/blob/main/labs/robomamba/notebooks/robomamba_lab.ipynb">코랩에서 열기</a>. 노트북이 자기완결형이라 두 번째 셀이 <code>tinyssm.py</code>를 직접 써 넣는다. 부록은 무료 T4 GPU로 돈다</td></tr>
+</tbody>
+<caption>설치가 막히면 <a href="lab-environment.html">실습 환경</a> 페이지.</caption>
+</table>
+</div>
+<pre class="code"><span class="c"># A. 터미널</span>
+git clone https://github.com/drum-grammer/vla-study
+cd vla-study/labs/robomamba/labs
+python3 --version            <span class="c"># 3.9 이상</span>
+python3 -c "import numpy"    <span class="c"># 없으면: pip install numpy</span>
+python3 lab1_ssm_recurrence.py
+
+<span class="c"># B. 주피터</span>
+cd ../notebooks && jupyter lab robomamba_lab.ipynb</pre>
+<div class="tbl">
+<table>
+<thead><tr><th>파일</th><th>무엇을 확인하는가</th><th>논문</th><th class="n">시간</th></tr></thead>
+<tbody>
+<tr><td><a href="https://github.com/drum-grammer/vla-study/blob/main/labs/robomamba/labs/tinyssm.py"><code>tinyssm.py</code></a></td><td>공용 도구: 저장소와 같은 식의 선택적 스캔·Mamba 블록, 6D 회전·측지 손실, 수동 역전파 MLP + Adam, SVG 그리기</td><td>—</td><td class="n">import</td></tr>
+<tr><td><a href="https://github.com/drum-grammer/vla-study/blob/main/labs/robomamba/labs/lab1_ssm_recurrence.py"><code>lab1_ssm_recurrence.py</code></a></td><td>식 (1)~(4) 이산화·순환, Δ가 기억 길이를 정하는 것, 상태가 L과 무관하게 고정인 것</td><td>3.1</td><td class="n">2초</td></tr>
+<tr><td><a href="https://github.com/drum-grammer/vla-study/blob/main/labs/robomamba/labs/lab2_linear_vs_quadratic.py"><code>lab2_linear_vs_quadratic.py</code></a></td><td>어텐션 O(L²) vs 스캔 O(L) 실측, 생성 단계 비용, 그림 1의 9.0/3.4/1.1 Hz 읽기</td><td>3.1 · 4.2 · 그림 1</td><td class="n">3초</td></tr>
+<tr><td><a href="https://github.com/drum-grammer/vla-study/blob/main/labs/robomamba/labs/lab3_selective_gating.py"><code>lab3_selective_gating.py</code></a></td><td>'선택'이 없으면 못 하는 일. 최적 선형 readout + Δ 격자탐색으로 구조의 상한 비교</td><td>1 · 3.1</td><td class="n">2초</td></tr>
+<tr><td><a href="https://github.com/drum-grammer/vla-study/blob/main/labs/robomamba/labs/lab4_vlm_token_order.py"><code>lab4_vlm_token_order.py</code></a></td><td>이미지 → 토큰 256개, Projector 실제 모양, <code>[이미지, 텍스트]</code> 순서가 만드는 비대칭</td><td>3.2</td><td class="n">2초</td></tr>
+<tr><td><a href="https://github.com/drum-grammer/vla-study/blob/main/labs/robomamba/labs/lab5_policy_head_6d.py"><code>lab5_policy_head_6d.py</code></a></td><td>정책 헤드 학습(식 5·6), 'random y-axis'가 회전 손실에 만드는 바닥, 그림 3b 구조 재현</td><td>3.4 · 4.1 · 그림 3b</td><td class="n">17초</td></tr>
+<tr><td><a href="https://github.com/drum-grammer/vla-study/blob/main/labs/robomamba/labs/lab6_param_audit.py"><code>lab6_param_audit.py</code></a></td><td>논문의 0.1% 검증. 블록당 41,244,160개까지 손으로 세고 표 6과 대조</td><td>4.3 · 부록 표 6</td><td class="n">1초 미만</td></tr>
+<tr><td><a href="https://github.com/drum-grammer/vla-study/blob/main/labs/robomamba/labs/lab7_code_map.py"><code>lab7_code_map.py</code></a></td><td>논문 문장 16개를 저장소 줄 번호로 (앵커 기반, 네트워크 200KB)</td><td>전체</td><td class="n">5초</td></tr>
+<tr><td><a href="https://github.com/drum-grammer/vla-study/blob/main/labs/robomamba/notebooks/robomamba_lab.ipynb"><code>notebooks/robomamba_lab.ipynb</code></a></td><td>위 7개 + 실제 Mamba 백본 확인. 로컬 주피터·코랩 공용. <code>build_notebook.py</code>가 <code>.py</code>에서 만든 산출물</td><td>—</td><td class="n">40초</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="lab-head" id="lab1"><span class="n">실습 1</span><div><h3>상태공간모델을 손으로 굴려 보기</h3><div class="ref">개념 <a href="#c5">1.5</a> — 가이드 <a href="robomamba-guide.html#s14">1.4</a> · <a href="robomamba-guide.html#s15">1.5</a> · 2초 · <code>out/lab1_state.svg</code></div></div></div>
+<pre class="code">python3 lab1_ssm_recurrence.py</pre>
+<div class="links">
+  <a class="ext" href="https://github.com/drum-grammer/vla-study/blob/main/labs/robomamba/labs/lab1_ssm_recurrence.py">코드 (GitHub)</a>
+  <a class="ext" href="https://colab.research.google.com/github/drum-grammer/vla-study/blob/main/labs/robomamba/notebooks/robomamba_lab.ipynb">코랩 노트북</a>
+  <a href="robomamba-lab.html#l1">상세 해설</a>
+</div>
+<ul>
+  <li><strong>(1) 이산화</strong> — A = −1로 놓고 Δ를 바꾸면: Δ=0.01에서 Ā=0.9900, Δ=1에서 0.3679, Δ=5에서 0.0067. 저장소는 식 (3)을 정확히 계산하지 않고 <strong>B̄ ≈ Δ·B</strong>로 쓴다 — 실제 학습된 Δ 범위(0.001~0.1)에서 오차 5% 미만.</li>
+  <li><strong>(2) 상태는 고정 크기</strong> — L을 8 → 1024로 늘려도 상태는 (64, 16) 그대로인데 트랜스포머 KV 캐시는 512 → 65,536(128배). 실제 값: d_model=2560 → 블록당 81,920개 고정.</li>
+  <li><strong>(3) Δ가 기억의 길이를 정한다</strong> — 5번 토큰에 정보 한 방울을 넣고 10%까지 남는 토큰 수: Δ=0.02 → <strong>55</strong>, 0.1 → 24, 0.5 → 5, 2.0 → <strong>2</strong>. Mamba의 S6는 이 Δ를 <em>입력이 정하게</em> 만든 것.</li>
+</ul>
+
+<div class="lab-head" id="lab2"><span class="n">실습 2</span><div><h3>어텐션은 왜 느리고 SSM은 왜 빠른가</h3><div class="ref">개념 <a href="#c3">1.3</a> · <a href="#c7">1.7</a> — 가이드 <a href="robomamba-guide.html#s13">1.3</a> · 3초 · <code>out/lab2_scaling.svg</code></div></div></div>
+<pre class="code">python3 lab2_linear_vs_quadratic.py</pre>
+<div class="links">
+  <a class="ext" href="https://github.com/drum-grammer/vla-study/blob/main/labs/robomamba/labs/lab2_linear_vs_quadratic.py">코드 (GitHub)</a>
+  <a href="robomamba-lab.html#l2">상세 해설</a>
+</div>
+<div class="tbl">
+<table>
+<thead><tr><th class="n">L</th><th class="n">어텐션 ms</th><th class="n">L=64 대비</th><th class="n">SSM ms</th><th class="n">L=64 대비</th></tr></thead>
+<tbody>
+<tr><td class="n">64</td><td class="n">0.48</td><td class="n">×1.0</td><td class="n">2.90</td><td class="n">×1.0</td></tr>
+<tr><td class="n">256</td><td class="n">1.72</td><td class="n">×3.6</td><td class="n">8.66</td><td class="n">×3.0</td></tr>
+<tr><td class="n">1024</td><td class="n">12.69</td><td class="n">×26.7</td><td class="n">34.85</td><td class="n">×12.0</td></tr>
+<tr class="hi"><td class="n">2048</td><td class="n">36.17</td><td class="n">×76.0</td><td class="n">67.41</td><td class="n">×23.2</td></tr>
+</tbody>
+<caption>(1) 블록 하나 통과 시간. 절대값은 numpy 단일 스레드라 어텐션이 더 빠르게 나오지만, <strong>증가율</strong>이 L² vs L이다. (2) 토큰 하나 더 뽑는 비용: 문맥 2048에서 어텐션은 262,144개 숫자를 읽고 SSM은 4,096개 고정. (3) 논문 Hz를 ms로: 9.0 Hz = 111 ms, 3.4 Hz = 294 ms, 1.1 Hz = 909 ms.</caption>
+</table>
+</div>
+
+<div class="lab-head" id="lab3"><span class="n">실습 3</span><div><h3>'선택적' SSM이 무엇을 선택하는가</h3><div class="ref">개념 <a href="#c5">1.5</a> — 가이드 <a href="robomamba-guide.html#s15">1.5</a> · 2초 · <code>out/lab3_selective.svg</code></div></div></div>
+<pre class="code">python3 lab3_selective_gating.py</pre>
+<div class="links">
+  <a class="ext" href="https://github.com/drum-grammer/vla-study/blob/main/labs/robomamba/labs/lab3_selective_gating.py">코드 (GitHub)</a>
+  <a href="robomamba-lab.html#l3">상세 해설</a>
+</div>
+<div class="tbl">
+<table>
+<thead><tr><th>모델</th><th>Δ 탐색</th><th>최적 Δ</th><th class="n">테스트 MSE</th><th class="n">정답 분산 대비</th></tr></thead>
+<tbody>
+<tr class="dim"><td>A · 비선택적 (Δ 상수)</td><td>40개 후보 중 최적</td><td>Δ=0.0033</td><td class="n">0.3120</td><td class="n"><strong>95.6%</strong></td></tr>
+<tr class="hi"><td>B · 선택적 (Δ=f(표시))</td><td>100개 후보 중 최적</td><td>Δ_lo=0.0010 / Δ_hi=15.85</td><td class="n">0.0000</td><td class="n"><strong>0.0%</strong></td></tr>
+</tbody>
+<caption>"표시가 켜진 토큰만 기억하라"는 과제. Δ가 상수면 아무리 좋은 Δ를 골라도 못 푼다(오차가 정답 분산의 95.6%). Δ를 입력의 함수로 두면 완벽하다. Δ를 학습하지 않고 격자탐색으로 각 구조의 <em>최적값</em>을 찾아 비교했다 — "학습이 덜 됐다"는 변명을 없애기 위해서.</caption>
+</table>
+</div>
+
+<div class="lab-head" id="lab4"><span class="n">실습 4</span><div><h3>이미지를 Mamba에 넣는 방법과 '순서'의 대가</h3><div class="ref">개념 <a href="#c4">1.4</a> — 가이드 <a href="robomamba-guide.html#s16">1.6</a> · <a href="robomamba-guide.html#s24">2.4</a> · 2초 · <code>out/lab4_order.svg</code></div></div></div>
+<pre class="code">python3 lab4_vlm_token_order.py</pre>
+<div class="links">
+  <a class="ext" href="https://github.com/drum-grammer/vla-study/blob/main/labs/robomamba/labs/lab4_vlm_token_order.py">코드 (GitHub)</a>
+  <a href="robomamba-lab.html#l4">상세 해설</a>
+</div>
+<div class="tbl">
+<table>
+<thead><tr><th>토큰 순서</th><th class="n">이미지 토큰 민감도</th><th class="n">텍스트 토큰 민감도</th><th class="n">이미지/텍스트</th></tr></thead>
+<tbody>
+<tr class="hi"><td><code>[이미지16, 텍스트6]</code> ← 저장소</td><td class="n">0.1156</td><td class="n">7.2976</td><td class="n"><strong>0.016</strong></td></tr>
+<tr><td><code>[텍스트6, 이미지16]</code></td><td class="n">2.6248</td><td class="n">0.0779</td><td class="n"><strong>33.680</strong></td></tr>
+</tbody>
+<caption>SSM은 한 방향으로 흘리므로 <strong>먼저 들어온 토큰이 뒤 토큰에 가려진다</strong>. 어텐션에는 없는 비대칭. 무작위 가중치 축소 모형이라 방향성만 읽는다. 논문에 없는 사실 하나: 비전 인코더의 <strong>끝에서 두 번째 층</strong>을 쓴다.</caption>
+</table>
+</div>
+
+<div class="lab-head" id="lab5"><span class="n">실습 5</span><div><h3>정책 헤드 하나로 조작을 배우기</h3><div class="ref">개념 <a href="#c6">1.6</a> · <a href="#c8">1.8</a> — 가이드 <a href="robomamba-guide.html#s25">2.5</a> · <a href="robomamba-guide.html#s28">2.8</a> · 17초 · <code>out/lab5_head.svg</code></div></div></div>
+<pre class="code">python3 lab5_policy_head_6d.py</pre>
+<div class="links">
+  <a class="ext" href="https://github.com/drum-grammer/vla-study/blob/main/labs/robomamba/labs/lab5_policy_head_6d.py">코드 (GitHub)</a>
+  <a href="robomamba-lab.html#l5">상세 해설</a>
+</div>
+<p class="col"><strong>(1) 동결 백본 + 작은 헤드.</strong> 장난감 장면(관절 물체의 손잡이 위치·방향)을 동결된 "백본"이 요약한 벡터에서, 82.8K 파라미터 MLP 헤드만 학습해 접촉점(식 5)과 6D 회전(식 6)을 예측한다.</p>
+<div class="tbl">
+<table>
+<thead><tr><th>데이터 수집 규칙</th><th class="n">접촉점 오차</th><th class="n">회전 전체 오차(식 6)</th><th class="n">z축 오차</th><th class="n">성공률</th></tr></thead>
+<tbody>
+<tr><td>y축을 장면이 결정</td><td class="n">0.0310</td><td class="n"><strong>5.37°</strong></td><td class="n">3.20°</td><td class="n">98.7%</td></tr>
+<tr class="hi"><td>y축을 임의로 (논문 4.1절 문장 그대로)</td><td class="n">0.0310</td><td class="n"><strong>93.67°</strong></td><td class="n">11.51°</td><td class="n"><strong>95.5%</strong></td></tr>
+</tbody>
+<caption><strong>(2) 'random y-axis' 한 줄이 뜻하는 것 — 이 실습의 핵심.</strong> 정답 회전의 z축 주위 성분이 장면의 함수가 아니라서 식 (6)은 93.7°에서 바닥을 친다. 그래도 흡착 그리퍼라 성공률은 거의 안 떨어진다 — 논문이 회전 오차를 표로 내지 않고 성공률만 보고하는 이유로 읽힌다.</caption>
+</table>
+</div>
+<div class="tbl">
+<table>
+<thead><tr><th class="n">백본 이해 수준</th><th class="n">접촉점 오차</th><th class="n">z축 오차</th><th class="n">성공률</th></tr></thead>
+<tbody>
+<tr class="hi"><td class="n">1.0</td><td class="n">0.0310</td><td class="n">3.20°</td><td class="n"><strong>98.7%</strong></td></tr>
+<tr><td class="n">0.6</td><td class="n">0.0337</td><td class="n">60.30°</td><td class="n">11.7%</td></tr>
+<tr><td class="n">0.4</td><td class="n">0.0361</td><td class="n">90.57°</td><td class="n">6.5%</td></tr>
+<tr><td class="n">0.0</td><td class="n">0.2090</td><td class="n">87.39°</td><td class="n">1.2%</td></tr>
+</tbody>
+<caption><strong>(3) 그림 3 b) 구조 재현.</strong> 백본 요약에 잡음을 섞어 "이해 수준"을 낮추면 같은 헤드로도 성공률이 무너진다. <strong>(4) 왜 6개인가</strong>: 9개 숫자를 그대로 내면 유효한 회전 비율 0.0%, 6개 + Gram-Schmidt는 100%(직교성 오차 5e-12).</caption>
+</table>
+</div>
+
+<div class="lab-head" id="lab6"><span class="n">실습 6</span><div><h3>논문의 '0.1%'를 직접 세어 보기</h3><div class="ref">개념 <a href="#c8">1.8</a> · <a href="#c9">1.9</a> — 가이드 <a href="robomamba-guide.html#s28">2.8</a> · 1초 미만</div></div></div>
+<pre class="code">python3 lab6_param_audit.py</pre>
+<div class="links">
+  <a class="ext" href="https://github.com/drum-grammer/vla-study/blob/main/labs/robomamba/labs/lab6_param_audit.py">코드 (GitHub)</a>
+  <a href="robomamba-lab.html#l6">상세 해설</a>
+</div>
+<div class="tbl">
+<table>
+<thead><tr><th>부품</th><th class="n">파라미터</th><th class="n">비중</th></tr></thead>
+<tbody>
+<tr><td>Mamba LLM (블록 64개 + 임베딩, lm_head 공유)</td><td class="n">2,768,345,600</td><td class="n">89.5%</td></tr>
+<tr><td>CLIP ViT-L/14@224 (동결)</td><td class="n">303,179,776</td><td class="n">9.8%</td></tr>
+<tr><td>Projector</td><td class="n">21,242,880</td><td class="n">0.7%</td></tr>
+<tr class="hi"><td>합계</td><td class="n">3,092,768,256 (3.09B)</td><td class="n">100%</td></tr>
+</tbody>
+</table>
+</div>
+<div class="tbl">
+<table>
+<thead><tr><th>정책 헤드 구성</th><th class="n">저장소 코드대로</th><th class="n">모델 대비</th><th class="n">논문 표 6</th><th class="n">논문 %</th></tr></thead>
+<tbody>
+<tr class="hi"><td>MLP×2 (본 모델)</td><td class="n"><strong>8,200,960 (8.20M)</strong></td><td class="n">0.265%</td><td class="n"><strong>3.7M</strong></td><td class="n">0.11%</td></tr>
+<tr><td>MLP×1 (출력 8개)</td><td class="n">4,103,040 (4.10M)</td><td class="n">0.133%</td><td class="n">1.8M</td><td class="n">0.05%</td></tr>
+<tr><td>(SSM+MLP)×2</td><td class="n">90,689,280 (90.69M)</td><td class="n">2.932%</td><td class="n">45.2M</td><td class="n">1.3%</td></tr>
+</tbody>
+<caption><code>SpecialMLP</code>의 축소비가 논문 계산으로는 <code>//4, //8</code>, 코드는 <code>//2, //4</code>. 결론(헤드 크기는 결과에 거의 무관)은 유지되지만 숫자를 그대로 인용해 재현하려 하면 맞지 않는다. 대외 문서에는 두 값을 병기하는 편이 안전하다.</caption>
+</table>
+</div>
+
+<div class="lab-head" id="lab7"><span class="n">실습 7</span><div><h3>논문 문장을 저장소 줄 번호로</h3><div class="ref">가이드 <a href="robomamba-guide.html#s34">3.4</a> · 5초 · 네트워크 200KB</div></div></div>
+<pre class="code">python3 lab7_code_map.py              <span class="c"># lmzpai/roboMamba 핵심 파일을 out/src/ 로 내려받음</span></pre>
+<div class="links">
+  <a class="ext" href="https://github.com/drum-grammer/vla-study/blob/main/labs/robomamba/labs/lab7_code_map.py">코드 (GitHub)</a>
+  <a href="robomamba-lab.html#l7">상세 해설</a>
+  <a class="ext" href="https://github.com/lmzpai/roboMamba">원 저장소</a>
+</div>
+<p class="col">논문 문장 16개를 앵커 문자열로 찾아 앞뒤 줄과 함께 출력한다. 줄 번호가 밀려도 동작하지만 앵커 자체가 바뀌면 "찾지 못함"을 출력한다. 2026-09-11 기준 결과 표는 <a href="robomamba-guide.html#s34">가이드 3.4</a>.</p>
+<div class="box key"><span class="h">읽고 답할 것</span>
+  (1) 그림 2의 "pooling operation"은 코드에서 정확히 무엇인가 (<code>AdaptiveAvgPool1d</code>는 어느 경로에서만 쓰이는가).
+  (2) <code>selective_scan_ref()</code>에서 식 (3)의 B̄를 어떻게 계산하는가 — 정확한 식인가 근사인가 (실습 1).
+  (3) <code>cat([이미지, 텍스트])</code>의 순서를 코드 어디에서 정하는가 (실습 4).
+</div>
+
+<h2 id="found"><span class="num">2.8</span>실습이 논문에서 찾아낸 것 네 가지</h2>
+<p class="col">논문 본문만 읽어서는 안 보이는 것들. 전부 실습에서 계산·검증했다(2026-09-11). 1·3·4는 논문의 결론을 흔들지 않는다 — 오히려 4는 논문이 성공률만 보고하는 이유를 설명한다.</p>
+<div class="tbl">
+<table>
+<thead><tr><th class="n">#</th><th>무엇</th><th>어디서 확인</th></tr></thead>
+<tbody>
+<tr><td class="n">1</td><td>논문 표 6의 <strong>3.7M</strong>을 공개 코드로 세면 <strong>8,200,960(8.20M)</strong>. 45.2M은 90.69M</td><td>실습 6</td></tr>
+<tr><td class="n">2</td><td>부록 표 4의 <strong>비전 인코더 라벨(CLIP↔XCiT)이 서로 바뀐 것으로 보인다</strong></td><td>표 1·표 5·본문 대조</td></tr>
+<tr><td class="n">3</td><td>그림 2의 <strong>"pooling operation"이 코드에서는 토큰 두 개의 평균</strong>. <code>AdaptiveAvgPool1d</code>는 <code>ssm+mlp</code> 경로에서만</td><td>실습 5·7</td></tr>
+<tr><td class="n">4</td><td>4.1절 <strong>'random y-axis' 때문에 식 (6) 측지 손실은 바닥이 막혀 있다</strong>(93.7°)</td><td>실습 5</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2 id="gpu"><span class="num">2.9</span>실제 모델 · 알려진 한계</h2>
+<p class="col"><strong>실제 Mamba 백본 확인(노트북 부록).</strong> <code>state-spaces/mamba-*-hf</code>를 transformers로 불러 토큰을 흘려 본다. Apple Silicon은 MPS로, 코랩은 T4로 돈다. <code>mamba_ssm</code>은 설치하지 않아도 되고(맥에서는 못 한다), 저장소 체크포인트는 <code>test</code> 브랜치에 있다. 조건과 절차는 <a href="lab-environment.html">실습 환경</a> 페이지.</p>
+<h3>실습의 알려진 한계</h3>
+<ul>
+  <li>실습 3은 Δ를 학습하지 않고 격자탐색으로 각 구조의 최적값을 찾아 비교한다. 실제 Mamba가 학습으로 그 최적에 도달한다는 뜻은 아니다.</li>
+  <li>실습 4의 민감도 수치는 무작위 가중치 축소 모형이다. 방향성만 읽어야 한다.</li>
+  <li>실습 5는 장난감 장면이다. 논문 표 2의 성공률을 재현한 것이 아니다.</li>
+  <li>실습 2의 절대 시간은 numpy 단일 스레드 값으로 GPU 속도와 무관하다. 증가율만 본다.</li>
+  <li>저장소 줄 번호는 2026-09-11 main 기준.</li>
+</ul>
+
+<div class="part">3부 · 공유회 준비</div>
+
+<h2 id="draw"><span class="num">3.1</span>대표자용 "그림 한 장" 지시서</h2>
+<p class="col">손으로 그릴 구조도. 1.4절 도식을 그대로 옮기면 된다.</p>
+<ol class="path">
+  <li><div class="what"><b>왼쪽에 이미지 한 장</b><div class="where">화살표 → "CLIP ViT-L/14 (동결)" 상자 → "<strong>256 토큰 × 1024</strong>"</div></div></li>
+  <li><div class="what"><b>그 아래 "Project Layer (MLP 3층, 21.2M)"</b><div class="where">→ "<strong>256 × 2560</strong>"</div></div></li>
+  <li><div class="what"><b>왼쪽 아래에 언어 질문</b><div class="where">→ "Tokenizer" → "<strong>~15 × 2560</strong>"</div></div></li>
+  <li><div class="what"><b>두 화살표를 합쳐 <code>cat([이미지, 텍스트])</code></b><div class="where"><strong>순서를 꼭 적는다</strong> (실습 4)</div></div></li>
+  <li><div class="what"><b>가로로 긴 상자 하나 — "Mamba 블록 64개 · 2.77B"</b><div class="where">상자 안에 작게 <code>in_proj → conv → x_proj/dt_proj → 선택적 스캔 → out_proj</code></div></div></li>
+  <li><div class="what"><b>오른쪽에서 화살표 둘</b><div class="where">위: "다음 토큰 → 언어 답변" 옆에 "Stage 1: 교차엔트로피". 아래: "전역 토큰 → MLP ×2 (3.7M, 0.1%)" → "위치 2개 / 방향 6개→3×3" 옆에 "Stage 2: 식 (5) L1 + 식 (6) 측지, 나머지 전부 동결"</div></div></li>
+  <li><div class="what"><b>아래에 학습 순서 세 칸</b><div class="where">1.1 정렬(projector만) → 1.2 공동학습(+Mamba, LLaVA 655K + RoboVQA 300K) → 2 조작(헤드만). 각 칸에 동결/학습을 색으로 구분</div></div></li>
+  <li><div class="what"><b>오른쪽 아래 여백에 숫자 세 개</b><div class="where"><strong>9.0 Hz · 0.63 seen · 3.7M (0.1%)</strong></div></div></li>
+</ol>
+
+<h2 id="q3"><span class="num">3.2</span>공유회에서 던질 질문 세 개</h2>
+<ol>
+  <li><strong>"이해가 먼저"라는 인과는 얼마나 증명됐는가?</strong> 그림 3 b)의 백본 네 개는 크기·구조·데이터가 모두 다르다. 통제된 비교는 co-training 유무 한 쌍뿐이다. 이 명제가 FiS-VLA 이후 모든 논문의 전제가 되는데, 근거가 충분한가? (1.8 · 1.9절)</li>
+  <li><strong>왜 백본이 Mamba에서 트랜스포머로 되돌아갔는가?</strong> 논문 5절은 "더 발전된 선형 복잡도 LLM으로"라 했는데 후속(FiS-VLA)은 LLaMA2를 쓴다. 표 1의 MME·MMBench 열세, <code>[이미지, 텍스트]</code> 순서 비대칭(실습 4), 아니면 다른 이유인가? (1.10절)</li>
+  <li><strong>"헤드만 3.7M(0.1%)"의 효율과 "백본을 못 고친다"의 대가는 어떻게 저울질되는가?</strong> 표 6은 헤드를 12배 키워도 같다고 한다. 그러면 병목은 백본 표현인데, 논문에 "헤드만 vs 백본도 조금" 대조 실험이 없다. FiS-VLA가 굳이 백본을 함께 학습한 것(L_slow)은 이 대가를 인정한 것인가? (1.8 · 1.9 · 1.10절)</li>
+</ol>
+
+<h2 id="quiz"><span class="num">3.3</span>자가 점검 퀴즈 10문항</h2>
+<p class="col">논문을 읽고 나서 푼다. 8개 이상이면 공유회 준비 완료.</p>
+<ol>
+  <li>Mamba가 S4 같은 이전 SSM과 다른 점을 한 문장으로.</li>
+  <li>Δ(시각 간격)가 크면 상태에 무슨 일이 일어나는가? 작으면?</li>
+  <li>RoboMamba가 받는 입력은 무엇인가? FiS-VLA가 추가로 받는 것 두 가지는?</li>
+  <li>학습 3단계에서 각각 무엇을 학습하고 무엇을 동결하는가?</li>
+  <li>논문 식 (5)와 (6)은 각각 어떤 손실이고 무엇을 예측하는가?</li>
+  <li>표 2에서 RoboMamba의 seen/unseen 평균과 ManipLLM 대비 차이는?</li>
+  <li>"3배 빠르다"와 "7배 빠르다"는 각각 무엇 대비인가?</li>
+  <li>그림 3 b)에서 co-training을 뺐을 때 seen과 unseen 중 어디가 더 떨어지는가? 왜 중요한가?</li>
+  <li>정책 헤드의 파라미터를 12배 키우면 성공률은? 이 결과가 뜻하는 바는?</li>
+  <li>논문이 밝힌 한계 하나와, 밝히지 않은 한계 하나를 들어라.</li>
+</ol>
+<details class="quiz"><summary></summary>
+<ol>
+  <li>B·C·Δ를 학습된 상수가 아니라 <strong>입력의 함수</strong>로 만들어, 토큰마다 "기억할지 넘길지"를 정할 수 있게 했다(선택적 스캔, S6).</li>
+  <li>Δ가 크면 Ā = exp(ΔA) ≈ 0 → 과거를 지우고 지금 입력을 크게 받는다. Δ가 작으면 Ā ≈ 1 → 과거를 보존하고 지금 입력을 거의 무시한다. (실습 1: Δ=0.02는 55토큰, Δ=2.0은 2토큰까지 기억)</li>
+  <li><strong>RGB 이미지 한 장 + 언어 질문</strong>뿐이다. FiS-VLA는 추가로 <strong>3D 포인트클라우드</strong>와 <strong>로봇 상태</strong>를 받는다(이미지도 3장).</li>
+  <li>Stage 1.1: Project Layer만 학습, 비전 인코더·Mamba 동결. Stage 1.2: Project Layer + Mamba 학습, 비전 인코더 동결. Stage 2: 정책 헤드만 학습, 나머지 전부 동결.</li>
+  <li>식 (5) = 접촉점 위치의 <strong>L1 손실</strong>. 식 (6) = 그리퍼 방향의 <strong>측지 거리</strong>(두 회전 사이 각도) = arccos((Tr(R_gtᵀR_pred) − 1)/2).</li>
+  <li>seen 0.63 / unseen 0.53. ManipLLM(0.56 / 0.51) 대비 <strong>+7%p / +2%p</strong>. 20개 중 14개 SOTA.</li>
+  <li>초록의 "3 times"는 <strong>OpenVLA</strong> 대비(3.4 → 9.0 Hz). 4.2절의 "7 times"는 <strong>LLaMA-AdapterV2 / ManipLLM</strong> 대비(1.1 → 9.0 Hz).</li>
+  <li><strong>unseen이 더 크게 떨어진다</strong>(0.53 → 0.41 vs seen 0.63 → 0.61). 로봇 데이터를 섞는 이득이 주로 <strong>일반화</strong>에 있다는 뜻이다.</li>
+  <li>63.7% → 63.2%로 <strong>거의 같다</strong>(부록 표 6, (SSM block+MLP)×2 = 45.2M). 병목이 헤드가 아니라 <strong>백본의 표현</strong>에 있다는 뜻이고, 그래서 "이해가 먼저"라는 주장을 받친다.</li>
+  <li>밝힌 것: 2.7B LLM이라 복잡한 추론에서 7B/13B 기반 MLLM에 뒤진다(5절). 밝히지 않은 것(예): 개루프 단발 예측인데 "control frequency"라 부른 것, 데이터 수집의 임의 y축 때문에 식 (6)의 바닥이 막힌 것, co-training이 GQA를 일관되게 떨어뜨린 것, 논문↔코드 파라미터 불일치, 동결의 대가를 재는 대조 실험 부재.</li>
+</ol>
+</details>
+
+<h2 id="booth"><span class="num">3.4</span>부스 질문의 근거 (2026-09-21~22)</h2>
+<div class="tbl">
+<table>
+<thead><tr><th>부스 질문</th><th>이 논문에서의 근거</th></tr></thead>
+<tbody>
+<tr><td>4. 백본이 여전히 Mamba 계열인가, 트랜스포머로 돌아갔나</td><td>5절의 "더 발전된 선형 복잡도 LLM" 예고 vs FiS-VLA의 LLaMA2. 1.10절 · 3.2절 2번</td></tr>
+<tr><td>1. 오픈소스 공개 범위</td><td>RoboMamba는 모델 코드만(학습 코드 비공개, 메일 요청). FiS-VLA는 학습·평가 공개. 왜 다른가</td></tr>
+<tr><td>3. 현장 배치 시 실제로 학습하는 부분</td><td>"추론 능력이 충분하면 조작은 싸게 붙는다"는 명제를 제품에서도 유지하는가 — 헤드만 학습하는가. 근거가 통제된 실험 한 쌍뿐이라는 점(1.9절 6번)</td></tr>
+<tr><td>추가</td><td>논문 표 6의 3.7M과 공개 코드의 8.20M 중 어느 쪽이 체크포인트와 맞는가 (실습 6)</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="part">4부</div>
+
+<h2 id="map"><span class="num">4</span>자료 지도</h2>
+<div class="tbl">
+<table>
+<thead><tr><th>무엇</th><th>어디</th><th>비고</th></tr></thead>
+<tbody>
+<tr class="hi"><td>이 페이지</td><td><code>paper-1-robomamba.html</code></td><td>개념 + 실습 + 공유회 준비. 1주차</td></tr>
+<tr><td>정독 가이드 (심화, 4시간 30분)</td><td><a href="robomamba-guide.html">robomamba-guide.html</a></td><td>1부 기초 개념 11절 → 2부 절별 해설 11절 → 3부 스터디 도구. "더 깊이" 링크가 전부 여기로 간다</td></tr>
+<tr><td>실습 세션 (상세)</td><td><a href="robomamba-lab.html">robomamba-lab.html</a></td><td>실습 7개의 측정 결과 전부, 결과 그림 5장</td></tr>
+<tr><td>실습 환경</td><td><a href="lab-environment.html">lab-environment.html</a></td><td>로컬 numpy · 코랩 · Apple Silicon MPS · 원 저장소 실행 조건</td></tr>
+<tr><td><strong>실습 코드 (GitHub, 공개)</strong></td><td><a href="https://github.com/drum-grammer/vla-study/tree/main/labs/robomamba">vla-study/labs/robomamba</a></td><td><code>labs/</code> 스크립트 7개 + <code>tinyssm.py</code>, <code>notebooks/robomamba_lab.ipynb</code></td></tr>
+<tr><td>원 저장소</td><td><a href="https://github.com/lmzpai/roboMamba">lmzpai/roboMamba</a></td><td>MIT. 모델 코드만, 체크포인트는 <code>test</code> 브랜치. 실습 7이 줄 번호로 잇는다</td></tr>
+<tr><td>논문</td><td><a href="https://arxiv.org/abs/2406.04339">arXiv 2406.04339</a> · <a href="https://arxiv.org/pdf/2406.04339">PDF</a> · <a href="https://sites.google.com/view/robomamba-web">프로젝트</a></td><td>v2 2024-12-14 기준</td></tr>
+<tr><td>사내 노션 (계정 필요)</td><td><a href="https://app.notion.com/p/3d8f800bd1c1814da4e5fea0f8b09327">RoboMamba 정독 가이드</a> (하위에 요약·독해 노트·실습 세션)</td><td>공유회 논의 기록은 <a href="https://app.notion.com/p/gsholdings/3d6f800bd1c180e58a4ce5ece278485d">운영 페이지</a> 1주차 칸에</td></tr>
+<tr><td>메인 문서</td><td><a href="index.html">VLA 논문 6편 읽기</a></td><td>일정 · 논문 6편 · 계보 · 부스 질문</td></tr>
+</tbody>
+</table>
+</div>
+<div class="nextprev">
+  <a href="paper-2-fis-vla.html"><small>짝 논문 · 1주차</small>← ② FiS-VLA 스터디 페이지</a>
+  <a href="index.html"><small>메인 문서</small>VLA 논문 6편 읽기</a>
+</div>
+
+<footer>
+  논문 수치는 arXiv 2406.04339 v2 본문·부록 표에서 옮겼다. 실습 결과는 스크립트를 실제로 돌려 나온 값이다(M1 Mac, numpy, 2026-09-11).
+  논문 밖 사실(저장소 내용·파라미터 계산·환경)에는 확인일을 붙였다. 갱신 2026-09-13.
+</footer>
+</main>
+</div>
+
+<script>
+(function () {
+  var key = 'vla-study:' + location.pathname;
+  var boxes = document.querySelectorAll('.checks input[type=checkbox]');
+  var saved = {};
+  try { saved = JSON.parse(localStorage.getItem(key) || '{}') || {}; } catch (e) { saved = {}; }
+  Array.prototype.forEach.call(boxes, function (b) {
+    if (saved[b.id]) b.checked = true;
+    b.addEventListener('change', function () {
+      saved[b.id] = b.checked;
+      try { localStorage.setItem(key, JSON.stringify(saved)); } catch (e) {}
+    });
+  });
+})();
+</script>
+</body>
+</html>
