@@ -97,7 +97,7 @@
   <header class="head">
     <p class="eyebrow">사내 VLA 논문 스터디 · FiS-VLA · 실습 세션 · 작성 2026-09-11</p>
     <h1>numpy 여섯 개로 <span class="slow">느린 머리</span>와 <span class="fast">빠른 손</span>을 만져 보기</h1>
-    <p class="sub">GPU 없이, PyTorch 없이. 논문의 핵심 장치 다섯 개를 1분 안에 돌려 보고, 원 저장소의 정확히 그 줄로 건너간다. 각 실습은 <a href="fis-vla-guide.html">정독 가이드</a>의 절과 연결된다.</p>
+    <p class="sub">GPU 없이, PyTorch 없이. 논문의 핵심 장치 다섯 개를 1분 안에 돌려 보고, 원 저장소의 정확히 그 줄로 건너간다. 각 실습은 <a href="../../papers/fis-vla/guide.html">정독 가이드</a>의 절과 연결된다.</p>
     <div class="chips">
       <span class="chip">Python 3.9+ · numpy</span>
       <span class="chip fast">총 90분 · 스크립트 6개</span>
@@ -109,13 +109,13 @@
   <section>
     <h2>0. 준비</h2>
 <pre class="sh"><span class="c"># 터미널로 스크립트를 돌리는 쪽</span>
-cd 50_skills/ai2-vla-paper-study/fis-vla-lab/labs
+cd 50_skills/physical-ai-papers/papers/2506.01953-fis-vla/lab
 python3 -c "import numpy"      <span class="c"># 없으면 pip install numpy</span>
 python3 lab1_tokens_blocks.py  <span class="c"># 1초. 아래 순서대로 여섯 개</span>
 
 <span class="c"># 주피터로 셀을 하나씩 실행하는 쪽 (권장 — 결과 그림이 노트북 안에 뜬다)</span>
-cd labs/notebooks &amp;&amp; jupyter lab</pre>
-    <p><strong>노트북판이 있다.</strong> <code>labs/notebooks/lab*.ipynb</code> 여섯 개는 스크립트와 내용이 같고 셀로 쪼개져 있다. 첫 셀이 작업 폴더를 <code>labs/</code> 로 옮겨 <code>tinynn.py</code> 를 불러오고 결과 그림을 <code>labs/out/</code> 에 저장한다. <code>.py</code> 가 정본이고 노트북은 <code>make_notebooks.py</code> 가 만든 산출물이다.</p>
+cd notebooks &amp;&amp; jupyter lab</pre>
+    <p><strong>노트북판이 있다.</strong> <code>lab/notebooks/lab*.ipynb</code> 여섯 개는 스크립트와 내용이 같고 셀로 쪼개져 있다. 첫 셀이 작업 폴더를 <code>lab/</code> 으로 옮겨 <code>tinynn.py</code> 를 불러오고 결과 그림을 <code>lab/out/</code> 에 저장한다. <code>.py</code> 가 정본이고 노트북은 <code>make_notebooks.py</code> 가 만든 산출물이다.</p>
     <p><strong>왜 numpy인가.</strong> 참여자 PC에 GPU가 없고, 저장소 원본은 LIFT3D 포함 약 700MB에 CoppeliaSim·Flash-Attention까지 필요하다. 논문의 아이디어는 작은 모형으로 충분히 재현된다. 공용 도구 <code>tinynn.py</code>에 수동 역전파 MLP, Adam, 트랜스포머 블록(순전파), 저장소와 같은 squaredcos_cap_v2 확산 스케줄, SVG 그리기가 들어 있다.</p>
     <p><strong>권장 순서.</strong> 가이드 1.2~1.3 → 실습 1 → 1.4·1.7 → 실습 2 → 1.8 → 실습 3 → 2.5·2.7 → 실습 4 → 2.6 → 실습 5 → 2.4·3.4 → 실습 6.</p>
   </section>
@@ -835,24 +835,24 @@ loss = ((noise_pred - noise) ** 2).mean()  <span class="c"># loss = ((noise_pred
 
   <section>
     <h2>5. 파일 위치</h2>
-    <p>이 페이지의 원본과 실습 코드가 저장소 어디에 있는지 적는다. 경로는 <code>50_skills/ai2-vla-paper-study/</code> 기준이다.</p>
+    <p>이 페이지의 원본과 실습 코드가 저장소 어디에 있는지 적는다. 경로는 <code>50_skills/physical-ai-papers/</code> 기준이다.</p>
     <div class="tbl"><table>
       <thead><tr><th>무엇</th><th>저장소 경로</th></tr></thead>
       <tbody>
-        <tr><td><strong>이 페이지의 원본</strong> (고칠 때 이 파일을 고친다)</td><td><code>fis-vla-lab/index.html</code></td></tr>
-        <tr><td>같은 내용의 마크다운 안내</td><td><code>fis-vla-lab/README.md</code></td></tr>
-        <tr><td>실습 스크립트 여섯 개 · 공용 도구</td><td><code>fis-vla-lab/labs/lab*.py</code> · <code>labs/tinynn.py</code></td></tr>
-        <tr><td>주피터 노트북판 (생성물)</td><td><code>fis-vla-lab/labs/notebooks/lab*.ipynb</code></td></tr>
-        <tr><td>노트북 생성기</td><td><code>fis-vla-lab/labs/make_notebooks.py</code></td></tr>
-        <tr><td>결과 그림 (이 페이지에 박힌 것)</td><td><code>fis-vla-lab/labs/out/*.svg</code></td></tr>
-        <tr><td>정독 가이드 · 두 쪽 요약 · 절별 독해 노트</td><td><code>fis-vla-study-guide.md</code> · <code>fis-vla-paper-summary.md</code> · <code>fis-vla-paper-ko.md</code></td></tr>
+        <tr><td><strong>이 페이지의 원본</strong> (고칠 때 이 파일을 고친다)</td><td><code>papers/2506.01953-fis-vla/web/lab.html</code></td></tr>
+        <tr><td>같은 내용의 마크다운 안내</td><td><code>papers/2506.01953-fis-vla/lab.md</code></td></tr>
+        <tr><td>실습 스크립트 여섯 개 · 공용 도구</td><td><code>lab/lab*.py</code> · <code>lab/tinynn.py</code></td></tr>
+        <tr><td>주피터 노트북판 (생성물)</td><td><code>lab/notebooks/lab*.ipynb</code></td></tr>
+        <tr><td>노트북 생성기</td><td><code>lab/make_notebooks.py</code></td></tr>
+        <tr><td>결과 그림 (이 페이지에 박힌 것)</td><td><code>lab/out/*.svg</code></td></tr>
+        <tr><td>정독 가이드 · 두 쪽 요약 · 절별 독해 노트</td><td><code>guide.md</code> · <code>summary.md</code> · <code>notes.md</code></td></tr>
         <tr><td>논문 원본 PDF</td><td><code>papers/2506.01953-fast-in-slow.pdf</code> (7.0MB)</td></tr>
       </tbody>
     </table></div>
-    <p>게시본 주소까지 포함한 전체 목록은 <a href="index.html">자료 위치 지도</a>에 있다.</p>
+    <p>게시본 주소까지 포함한 전체 목록은 <a href="index.html">스터디 페이지</a>에 있다.</p>
   </section>
 
-  <footer>FiS-VLA 실습 세션 · 작성 2026-09-11 · 정독 가이드 · 논문 요약 · 절별 독해 노트와 함께 쓰는 자료. 이 페이지의 원본은 저장소 <code>50_skills/ai2-vla-paper-study/fis-vla-lab/index.html</code>.</footer>
+  <footer>FiS-VLA 실습 세션 · 작성 2026-09-11 · 정독 가이드 · 논문 요약 · 절별 독해 노트와 함께 쓰는 자료. 이 페이지의 원본은 저장소 <code>50_skills/physical-ai-papers/papers/2506.01953-fis-vla/index.html</code>.</footer>
 </div>
 </body>
 </html>

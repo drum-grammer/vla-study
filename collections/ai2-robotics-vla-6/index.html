@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+    html { color-scheme: light; }
+    body { margin: 0; font: 14px system-ui, -apple-system, sans-serif; background: #fafaf9; }
+    img { max-width: 100%; }
+    [hidden] { display: none !important; }
+</style>
+<title>VLA 논문 6편 읽기</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=Noto+Serif+KR:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="../../style.css">
+
+</head>
+<body>
+<header class="masthead">
+  <div class="wrap">
+    <p class="crumbs"><a href="../../index.html">피지컬AI 논문 읽기</a> › 컬렉션</p>
+    <div class="eyebrow">
+      <span>피지컬:52g VLA 논문 스터디</span>
+      <span class="dim">AI² Robotics 논문 6편 · 2026-09-14 ~ 10-04 · 주 2편 3주</span>
+    </div>
+    <h1>VLA 논문 6편 읽기 <span style="white-space:nowrap">(AI² Robotics)</span></h1>
+    <p class="standfirst">
+      한 팀이 2024년부터 낸 논문 여섯 편을 발표순으로 읽으면, 작고 빠른 모델에서 양산 로봇의 두뇌까지
+      VLA(Vision-Language-Action)가 자라는 과정이 한 줄로 이어진다. 이 사이트가 스터디의 메인 문서다.
+      논문마다 <strong>스터디 페이지</strong> 하나에 개념 해설과 numpy 실습을 모아 두었고, 실습 코드는 공개 저장소에서 바로 열린다.
+      AI·트랜스포머 배경이 없어도 읽히도록 썼다.
+    </p>
+    <div class="meta">
+      <span><strong>공개 주소</strong> <a href="https://drum-grammer.github.io/physical-ai-study/collections/ai2-robotics-vla-6/">drum-grammer.github.io/physical-ai-study/collections/ai2-robotics-vla-6</a></span>
+      <span><strong>실습 코드</strong> <a href="https://github.com/drum-grammer/physical-ai-study/tree/main/labs">github.com/drum-grammer/physical-ai-study/labs</a></span>
+      <span><strong>운영 페이지(사내 노션)</strong> <a href="https://app.notion.com/p/gsholdings/3d6f800bd1c180e58a4ce5ece278485d">VLA 논문 6편 읽기</a></span>
+      <span class="dim">갱신 2026-09-17</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+<main>
+
+<details class="toc" open>
+  <summary>이 페이지의 차례</summary>
+  <div class="toc-body">
+    <div class="grp">시작</div>
+    <a href="#how"><span class="num">0</span>이 사이트로 공부하는 법</a>
+    <a href="#schedule"><span class="num">1</span>3주 일정과 스터디 페이지</a>
+    <a href="#papers"><span class="num">2</span>논문 6편, 발표순</a>
+    <a href="#lineage"><span class="num">3</span>관통하는 축과 계보</a>
+    <div class="grp">읽기</div>
+    <a href="#prereq"><span class="num">4</span>읽기 전에 알아둘 것 (30분)</a>
+    <a href="#method"><span class="num">5</span>읽는 법 (논문 공통)</a>
+    <a href="#booth"><span class="num">6</span>부스에서 물어볼 것</a>
+    <div class="grp">자료</div>
+    <a href="#map"><span class="num">7</span>자료 지도 — 페이지·코드·노션</a>
+    <a href="#about"><span class="num">8</span>이 회사, 이 스터디</a>
+  </div>
+</details>
+
+<h2 id="how"><span class="num">0</span>이 사이트로 공부하는 법</h2>
+<p class="col">다른 곳을 먼저 볼 필요가 없다. 순서는 아래 넷이고, 논문 한 편에 <strong>개념 2시간 + 실습 90분 + 공유회 준비 30분</strong>을 잡는다.
+시간이 없으면 각 스터디 페이지의 <em>한 장 요약</em>만 읽어도 공유회 참여가 된다.</p>
+<ol class="path">
+  <li><div class="what"><b>이 페이지에서 지도를 잡는다</b><div class="where">아래 4절의 개념 네 가지, 2·3절의 논문 6편과 계보. 어느 논문이 어느 자리에 있는지 안다</div></div><span class="t">30분</span></li>
+  <li><div class="what"><b>이번 주 논문의 스터디 페이지로 간다</b><div class="where">1절 표의 링크. 페이지 안에 개념(문제 → 아이디어 → 구조 → 학습 → 결과 → 한계)과 실습이 순서대로 있다. 더 깊이 볼 곳은 정독 가이드의 해당 절로 링크된다</div></div><span class="t">2시간</span></li>
+  <li><div class="what"><b>실습을 돌린다 — 파이썬과 numpy만 있으면 된다</b><div class="where">스터디 페이지 2부. 명령 한 줄, 코드는 GitHub, 노트북은 코랩 버튼. 설치가 막히면 <a href="../../lab-environment.html">실습 환경</a> 페이지</div></div><span class="t">90분</span></li>
+  <li><div class="what"><b>공유회 준비</b><div class="where">스터디 페이지 3부 — 대표자용 그림 한 장 지시서, 질문 세 개, 자가 점검 퀴즈 10문항. 논의 기록은 사내 노션 운영 페이지에 쌓는다</div></div><span class="t">30분</span></li>
+</ol>
+
+<h2 id="schedule"><span class="num">1</span>3주 일정과 스터디 페이지</h2>
+<p class="col">모두 다 읽는다. 논문마다 <strong>대표자 1명</strong>이 공유를 주도한다 — 대표자는 그림 한 장과 질문 세 개, 나머지는 읽으면서 생긴 질문을 들고 온다.
+공유회는 주 1회 점심 60분. 못 오면 읽고 채팅에 요약·질문을 올리면 참여다.</p>
+<div class="tbl">
+<table>
+<thead><tr><th>주</th><th>기간</th><th>논문</th><th>스터디 페이지</th><th>대표자</th><th>왜 이 짝인가</th></tr></thead>
+<tbody>
+<tr class="hi"><td class="n">1</td><td class="n">09-14 ~ 09-20</td><td>② FiS-VLA<br>① RoboMamba</td>
+  <td><a href="../../papers/fis-vla/index.html">② FiS-VLA</a> <span class="pill">공개</span><br><a href="../../papers/robomamba/index.html">① RoboMamba</a> <span class="pill">공개</span></td>
+  <td>죠셉<br>에디</td><td>제품의 핵심 구조와 그 출발점. 이 두 편으로 부스 질문을 만든다</td></tr>
+<tr><td class="n">부스</td><td class="n"><strong>09-21 ~ 09-22</strong></td><td colspan="2">GS그룹 해커톤, AI² Robotics 부스</td><td>전원</td><td>1주차 질문을 들고 간다. 깊은 논의를 원하는 사람은 별도 미팅</td></tr>
+<tr><td class="n">2</td><td class="n">09-21 ~ 09-27</td><td>④ PosA-VLA<br>③ Video2Act</td><td><span class="pill todo">준비 중</span></td><td>미정</td><td>실행 쪽과 추론 쪽이 각각 받는 정보를 정제하는 두 방법. 부스에서 들은 답과 대조</td></tr>
+<tr><td class="n">3</td><td class="n">09-28 ~ 10-04</td><td>⑤ NeuroVLA<br>⑥ SOMA</td><td><span class="pill todo">준비 중</span></td><td>미정</td><td>홍콩과기대(광저우) 산학 라인. 반사층과 기억. 후속 협업 논의 질문 정리</td></tr>
+</tbody>
+<caption>2026년 일정. 1주차 두 편의 스터디 페이지는 개념·실습·공유회 준비를 모두 담고 있다. 2·3주차 네 편은 같은 틀로 이어서 만든다.
+번호 ①~⑥은 발표순이고, 읽는 순서는 주차 표를 따른다(제품과 가장 가까운 ②를 먼저).</caption>
+</table>
+</div>
+
+<h2 id="papers"><span class="num">2</span>논문 6편, 발표순</h2>
+<p class="col">전부 arXiv에 공개돼 있고, 회사 CEO가 여섯 편 모두의 공저자다. 링크는 arXiv 최신판 기준(확인 2026-09-10).</p>
+<ol class="papers">
+  <li class="paper">
+    <div class="when"><b>2024-06</b>arXiv 2406.04339</div>
+    <div>
+      <p class="name">RoboMamba <span class="venue">NeurIPS 2024</span></p>
+      <p class="line">Mamba(상태공간모델) 백본으로 작고 빠른 VLA. 추론 능력을 먼저 갖추면 3.7M 파라미터 헤드만 학습해도 조작을 배운다는 가설을 세우고 검증했다.</p>
+      <div class="links"><a class="study" href="../../papers/robomamba/index.html">스터디 페이지 ①</a><a class="ext" href="https://arxiv.org/abs/2406.04339">arXiv</a><a class="ext" href="https://arxiv.org/pdf/2406.04339">PDF</a><a class="ext" href="https://github.com/lmzpai/roboMamba">코드</a><a class="ext" href="https://sites.google.com/view/robomamba-web">프로젝트</a></div>
+    </div>
+  </li>
+  <li class="paper">
+    <div class="when"><b>2025-06</b>arXiv 2506.01953</div>
+    <div>
+      <p class="name">Fast-in-Slow (FiS-VLA) <span class="venue">preprint · 코드·가중치 공개</span></p>
+      <p class="line">느린 추론(System 2)과 빠른 실행(System 1)을 한 VLM 안에 넣는다. VLM의 마지막 트랜스포머 블록 2개를 실행 모듈로 재활용해 청크 8에서 117.7 Hz까지 냈다. 회사 오픈소스 모델의 원형이라 가장 먼저 읽는다.</p>
+      <div class="links"><a class="study" href="../../papers/fis-vla/index.html">스터디 페이지 ②</a><a class="ext" href="https://arxiv.org/abs/2506.01953">arXiv</a><a class="ext" href="https://arxiv.org/pdf/2506.01953">PDF</a><a class="ext" href="https://github.com/CHEN-H01/Fast-in-Slow">코드</a><a class="ext" href="https://fast-in-slow.github.io/">프로젝트</a></div>
+    </div>
+  </li>
+  <li class="paper">
+    <div class="when"><b>2025-12</b>arXiv 2512.03044</div>
+    <div>
+      <p class="name">Video2Act <span class="venue">preprint · 코드 공개</span></p>
+      <p class="line">비디오 확산모델의 특징에 Sobel(공간)과 FFT(운동) 필터를 걸어 "무엇을 만질지, 어떻게 움직일지"를 뽑아 행동 헤드에 공급한다.</p>
+      <div class="links"><span class="study">스터디 페이지 준비 중</span><a class="ext" href="https://arxiv.org/abs/2512.03044">arXiv</a><a class="ext" href="https://arxiv.org/pdf/2512.03044">PDF</a><a class="ext" href="https://github.com/jiayueru/Video2Act">코드</a></div>
+    </div>
+  </li>
+  <li class="paper">
+    <div class="when"><b>2025-12</b>arXiv 2512.03724</div>
+    <div>
+      <p class="name">PosA-VLA <span class="venue">preprint</span></p>
+      <p class="line">로봇 손(엔드이펙터) 위치로 앵커 맵을 만들어 모델의 주의(attention)를 목표물에 고정한다. 궤적의 흔들림이 줄고 잡기 성공률이 오른다. 실기는 AlphaBot 1s.</p>
+      <div class="links"><span class="study">스터디 페이지 준비 중</span><a class="ext" href="https://arxiv.org/abs/2512.03724">arXiv</a><a class="ext" href="https://arxiv.org/pdf/2512.03724">PDF</a></div>
+    </div>
+  </li>
+  <li class="paper">
+    <div class="when"><b>2026-01</b>arXiv 2601.14628</div>
+    <div>
+      <p class="name">NeuroVLA <span class="venue">preprint · 코드 공개</span></p>
+      <p class="line">피질·소뇌·척수 3층 구조. 소뇌 모듈이 팔 떨림을 잡고, 스파이킹 신경망 척수가 20 ms 미만의 안전 반사를 낸다. 홍콩과기대(광저우)와의 산학 논문.</p>
+      <div class="links"><span class="study">스터디 페이지 준비 중</span><a class="ext" href="https://arxiv.org/abs/2601.14628">arXiv</a><a class="ext" href="https://arxiv.org/pdf/2601.14628">PDF</a><a class="ext" href="https://github.com/guoweiyu/NeuroVLA">코드</a></div>
+    </div>
+  </li>
+  <li class="paper">
+    <div class="when"><b>2026-05</b>arXiv 2605.22283</div>
+    <div>
+      <p class="name">SOMA <span class="venue">ICML 2026 서울</span></p>
+      <p class="line">가동형 헤드 카메라로 장면을 스캔해 공간 기억을 만들고, 시야 밖 물체도 찾아 잡는다. 서울에서 열린 ICML 2026 발표 논문.</p>
+      <div class="links"><span class="study">스터디 페이지 준비 중</span><a class="ext" href="https://arxiv.org/abs/2605.22283">arXiv</a><a class="ext" href="https://arxiv.org/pdf/2605.22283">PDF</a></div>
+    </div>
+  </li>
+</ol>
+
+<h2 id="lineage"><span class="num">3</span>관통하는 축과 계보</h2>
+<p class="col">여섯 편은 <strong>"느린 추론(System 2) + 빠른 실행(System 1)"</strong> 한 축 위에 있다.
+①에서 속도를 확보하고, ②에서 두 시스템을 한 모델에 넣고, ③④에서 실행 쪽이 받는 정보를 정제하고, ⑤에서 그 아래 반사층을 깔고, ⑥에서 추론 쪽에 기억을 붙인다.
+회사 제품 Alpha Brain의 "Fast-and-Slow 이중 처리"가 바로 이 축이다.</p>
+<div class="lineage">
+  <svg viewBox="0 0 720 250" role="img" aria-label="논문 6편의 계보: RoboMamba에서 FiS-VLA로, FiS-VLA에서 Video2Act, PosA-VLA, NeuroVLA, SOMA로 갈라진다">
+    <rect class="bx" x="10" y="100" width="150" height="50" rx="4"></rect>
+    <text class="num" x="20" y="120">① RoboMamba</text>
+    <text class="cap" x="20" y="138">효율: 작은 백본, 작은 헤드</text>
+    <rect class="hub" x="205" y="100" width="160" height="50" rx="4"></rect>
+    <text class="num" x="215" y="120">② FiS-VLA</text>
+    <text class="cap" x="215" y="138">이중 시스템을 한 모델에</text>
+    <rect class="bx" x="430" y="10" width="280" height="44" rx="4"></rect>
+    <text class="num" x="440" y="28">③ Video2Act</text>
+    <text class="cap" x="440" y="45">추론 쪽 = 비디오 확산모델 특징</text>
+    <rect class="bx" x="430" y="72" width="280" height="44" rx="4"></rect>
+    <text class="num" x="440" y="90">④ PosA-VLA</text>
+    <text class="cap" x="440" y="107">실행 쪽 입력에 포즈 앵커</text>
+    <rect class="bx" x="430" y="134" width="280" height="44" rx="4"></rect>
+    <text class="num" x="440" y="152">⑤ NeuroVLA</text>
+    <text class="cap" x="440" y="169">실행 쪽 아래에 소뇌·척수 반사층</text>
+    <rect class="bx" x="430" y="196" width="280" height="44" rx="4"></rect>
+    <text class="num" x="440" y="214">⑥ SOMA</text>
+    <text class="cap" x="440" y="231">추론 쪽에 공간 기억</text>
+    <path class="edge main" d="M160 125 H205"></path>
+    <path class="edge" d="M365 125 C397 125, 397 32, 430 32"></path>
+    <path class="edge" d="M365 125 C397 125, 397 94, 430 94"></path>
+    <path class="edge" d="M365 125 C397 125, 397 156, 430 156"></path>
+    <path class="edge" d="M365 125 C397 125, 397 218, 430 218"></path>
+  </svg>
+</div>
+<div class="tbl">
+<table>
+<thead><tr><th></th><th>① RoboMamba</th><th>② FiS-VLA</th><th>③ Video2Act</th><th>④ PosA-VLA</th><th>⑤ NeuroVLA</th><th>⑥ SOMA</th></tr></thead>
+<tbody>
+<tr><td>System 2</td><td>Mamba-2.7B</td><td>LLaMA2-7B VLM</td><td>HunyuanVideo VDM</td><td>CLIP (경량)</td><td>VLM</td><td>Qwen-GR00T 계열</td></tr>
+<tr><td>System 1</td><td>3.7M MLP (단발 포즈)</td><td>VLM 마지막 블록 + 확산</td><td>1B DiT</td><td>플로 매칭 트랜스포머</td><td>소뇌 + SNN 척수</td><td>DiT</td></tr>
+<tr><td>새로 넣은 정보</td><td>—</td><td>3D 포인트클라우드, 로봇 상태</td><td>공간·운동 필터 특징</td><td>포즈 앵커 주의</td><td>고유수용감각, 6축 힘, 촉각</td><td>다시점 공간 기억</td></tr>
+<tr><td>주파수·지연</td><td>9.0 Hz</td><td>21.9 Hz (청크 1) / 117.7 Hz (청크 8)</td><td>실시간 (수치 미기재)</td><td>24.5 ms/행동</td><td>반사 &lt;20 ms</td><td>미기재</td></tr>
+<tr><td>실기 로봇</td><td>Franka</td><td>AgileX, <strong>AlphaBot</strong></td><td>ALOHA</td><td><strong>AlphaBot 1s</strong></td><td>양팔 휴머노이드</td><td>양팔 + 가동 헤드</td></tr>
+<tr><td>코드</td><td>모델 코드만</td><td>학습·평가 공개</td><td>공개</td><td>미공개</td><td>공개</td><td>곧 공개</td></tr>
+</tbody>
+<caption>수치는 각 논문 본문 값. 실기를 회사 로봇 AlphaBot으로 돌린 논문은 ②④뿐이다 — 여섯 편이 모두 제품 기술은 아니고, ②가 제품과 가장 가깝다.</caption>
+</table>
+</div>
+
+<h2 id="prereq"><span class="num">4</span>읽기 전에 알아둘 것 (30분)</h2>
+<p class="col">아래 넷만 알면 어느 논문이든 그림 2(전체 구조도)를 읽을 수 있다. 더 기초부터 필요하면 각 정독 가이드의 1부(신경망 30초 복습부터)가 있다.</p>
+<div class="terms">
+  <div><b>VLA (Vision-Language-Action)</b>사전학습된 시각·언어 모델(VLM)에 행동 출력을 붙인 로봇 정책. 비교 대상으로 OpenVLA, π0, GR00T가 자주 나온다.</div>
+  <div><b>System 1 / System 2</b>카너먼의 빠른 직관·느린 숙고 비유. 로봇에서는 VLM(느림, 수 Hz)과 행동 헤드(빠름, 수십~수백 Hz)의 분업. Helix(Figure AI), GR00T N1이 같은 계열.</div>
+  <div><b>행동 청크 · 확산 · 플로 매칭</b>한 번의 추론으로 앞으로 H 스텝의 연속 행동을 노이즈에서 복원하는 행동 헤드 방식. 제어 주파수를 올리는 기본 기법.</div>
+  <div><b>Mamba · 비디오 확산모델 · 스파이킹 신경망</b>각각 ①③⑤의 핵심 부품. 그 논문 차례에 스터디 페이지가 기초부터 설명한다.</div>
+</div>
+
+<h2 id="method"><span class="num">5</span>읽는 법 (논문 공통)</h2>
+<ol class="path">
+  <li><div class="what"><b>그림 1·2와 초록만 먼저 본다</b><div class="where">논문 번호가 아니라 각 논문에 실린 첫 두 그림. 첫 그림은 아이디어 한 장, 둘째는 전체 구조도. 위 2절의 한 줄 요약과 대조한다</div></div><span class="t">15분</span></li>
+  <li><div class="what"><b>Method에서 입력·출력·손실 함수 세 가지만 표로 옮긴다</b><div class="where">스터디 페이지의 "구조" 절에 그 표가 이미 있다. 논문을 보며 빈칸을 채우는 식으로 확인</div></div><span class="t">40분</span></li>
+  <li><div class="what"><b>결과표에서 베이스라인이 누구인지 먼저 본다</b><div class="where">π0·GR00T와 비교했는지, 자체 소거만 했는지. 스터디 페이지의 "결과" 절이 이것을 먼저 짚는다</div></div><span class="t">30분</span></li>
+  <li><div class="what"><b>실기 로봇이 무엇인지 확인한다</b><div class="where">AlphaBot이면 제품 기술, 아니면 연구 트랙</div></div><span class="t">5분</span></li>
+</ol>
+
+<h2 id="booth"><span class="num">6</span>부스에서 물어볼 것 (09-21~22, 1주차 두 편 기준)</h2>
+<p class="col">1주차 공유회에서 함께 다듬는다. 근거가 되는 절은 각 스터디 페이지 3부에 적어 두었다.</p>
+<ol>
+  <li>오픈소스로 공개한 것의 범위 — FiS-VLA 코드·가중치 외에 제품 모델도 공개하는가.</li>
+  <li>제품에서 System 1과 System 2의 주파수 비율과 배치 하드웨어 — 논문은 1:4, GPU 한 장이었다.</li>
+  <li>현장 배치 시 실제로 학습하는 부분 — 전체 파인튜닝인가, 실행 모듈만인가.</li>
+  <li>현재 백본이 여전히 Mamba 계열인가, 트랜스포머로 돌아갔나 — RoboMamba에서 FiS-VLA 사이에 무엇이 바뀌었나.</li>
+</ol>
+<h3>후속 논의에서 물어볼 것 (나머지 네 편을 읽은 뒤)</h3>
+<ol start="5">
+  <li>안전 반사(NeuroVLA)가 제품에 들어가 있는가.</li>
+  <li>가동형 헤드 카메라와 공간 기억(SOMA)이 AlphaBot 2 기본 사양인가.</li>
+  <li>홍콩과기대(광저우)와의 산학 구조 — 학생·데이터·기체 중 무엇을 회사가 내는가.</li>
+  <li>다음 세대 모델의 방향 — 여섯 편 중 어느 축이 합쳐지는가.</li>
+</ol>
+
+<h2 id="map"><span class="num">7</span>자료 지도 — 페이지·코드·노션</h2>
+<p class="col">이 사이트 안의 페이지는 전부 로그인 없이 열린다. 노션은 사내 워크스페이스라 계정이 있어야 한다. 실습 코드는 공개 저장소에 그대로 있다.</p>
+<div class="tbl">
+<table>
+<thead><tr><th>무엇</th><th>어디</th><th>비고</th></tr></thead>
+<tbody>
+<tr class="hi"><td><strong>스터디 페이지 ② FiS-VLA</strong></td><td><a href="../../papers/fis-vla/index.html">papers/fis-vla/</a></td><td>개념 + 실습 6개 + 공유회 준비. 1주차</td></tr>
+<tr class="hi"><td><strong>스터디 페이지 ① RoboMamba</strong></td><td><a href="../../papers/robomamba/index.html">papers/robomamba/</a></td><td>개념 + 실습 7개 + 공유회 준비. 1주차</td></tr>
+<tr><td>FiS-VLA 정독 가이드 (심화)</td><td><a href="../../papers/fis-vla/guide.html">papers/fis-vla/guide.html</a></td><td>1부 기초 개념 → 2부 절별 해설 → 3부 스터디 도구. 4시간</td></tr>
+<tr><td>FiS-VLA 실습 세션 (상세)</td><td><a href="../../papers/fis-vla/lab.html">papers/fis-vla/lab.html</a></td><td>실습 6개의 결과 그림과 해설</td></tr>
+<tr><td>RoboMamba 정독 가이드 (심화)</td><td><a href="../../papers/robomamba/guide.html">papers/robomamba/guide.html</a></td><td>트랜스포머도 Mamba도 몰라도 읽히는 해설. 4시간 30분</td></tr>
+<tr><td>RoboMamba 실습 세션 (상세)</td><td><a href="../../papers/robomamba/lab.html">papers/robomamba/lab.html</a></td><td>실습 7개의 측정 결과</td></tr>
+<tr><td>실습 환경 (두 논문 공용)</td><td><a href="../../lab-environment.html">lab-environment.html</a></td><td>로컬 numpy · 구글 코랩 · Apple Silicon · 원 저장소</td></tr>
+<tr><td><strong>실습 코드 (GitHub, 공개)</strong></td><td><a href="https://github.com/drum-grammer/physical-ai-study/tree/main/labs">drum-grammer/physical-ai-study/labs</a></td><td><code>fis-vla/</code> 스크립트 6개 + 노트북, <code>robomamba/</code> 스크립트 7개 + 노트북. numpy만</td></tr>
+<tr><td>운영 페이지 (사내 노션)</td><td><a href="https://app.notion.com/p/gsholdings/3d6f800bd1c180e58a4ce5ece278485d">VLA 논문 6편 읽기 (AI² Robotics)</a></td><td>신청·대표자·공유회 일시·논의 기록. 하위에 FiS-VLA·RoboMamba 정독 가이드 페이지</td></tr>
+<tr><td>원 논문 저장소</td><td><a href="https://github.com/CHEN-H01/Fast-in-Slow">CHEN-H01/Fast-in-Slow</a> · <a href="https://github.com/lmzpai/roboMamba">lmzpai/roboMamba</a></td><td>실습 6(FiS)·실습 7(RoboMamba)이 논문 문장을 이 저장소의 줄 번호로 잇는다</td></tr>
+</tbody>
+<caption>이 사이트는 정적 페이지다 — 서버도 데이터베이스도 없다. 스터디 페이지의 진행 체크박스는 보는 사람의 브라우저에만 저장된다.</caption>
+</table>
+</div>
+
+<h2 id="about"><span class="num">8</span>이 회사, 이 스터디</h2>
+<p class="col"><strong>AI² Robotics(智平方)</strong>. 2023년 4월 중국 선전 설립. 창업자·CEO 궈옌둥(郭彦东)은 Microsoft, XPeng, OPPO 수석과학자 출신이다.
+바퀴형 양팔 로봇 <strong>AlphaBot</strong>과 체화지능 모델 <strong>Alpha Brain</strong>을 만들며, 위 논문 6편 전부에 CEO가 공저자로 들어간다.
+(출처 <a href="https://ai2robotics.com/en/about/">ai2robotics.com</a>, 확인 2026-09-10)</p>
+<p class="col">이 회사는 <strong>2026-09-21~22 GS그룹 해커톤</strong>에 부스로 온다. 부스에서 "로봇 잘 봤습니다"로 끝나지 않으려고 논문을 읽는다.
+읽고 가면 질문의 수준이 달라지고, 그 질문이 협업의 출발점이 된다. 전제는 "다 읽고 간다"가 아니다 — 부스까지 한 주뿐이라 1주차 두 편만 읽고 가서 묻고,
+나머지 네 편은 부스 뒤 두 주 동안 마저 읽는다.</p>
+<div class="terms">
+  <div><b>VLA 지도가 생긴다</b>뉴스 속 OpenVLA·π0·GR00T·Helix가 서로 어디에 서 있는지 한 장에 그려진다.</div>
+  <div><b>용어를 내 말로</b>System 1·2, 행동 청크, 확산 헤드, 스파이킹 신경망을 설명할 수 있게 된다.</div>
+  <div><b>논문이 제품이 되는 과정</b>2024년 NeurIPS 논문이 2026년 양산 로봇의 두뇌가 되기까지 같은 팀이 무엇을 바꿨는지.</div>
+  <div><b>논문 6편 완독 실적</b>주 2편, 3주. 대표자 1명, 나머지는 질문을 들고 온다.</div>
+</div>
+
+<footer>
+  논문 요약은 arXiv 최신판 본문 기준(확인 2026-09-10). 회사 소개는 ai2robotics.com. 수치와 주장은 각 논문에서 직접 확인하기를 권한다.<br>
+  원본은 비공개 저장소 <code>physical-ai-papers/collections/ai2-robotics-vla-6/</code>에 있고, 이 페이지는 그 생성물이다. 논문별 자료는 <code>papers/</code> 아래 논문 폴더에 있다. 갱신 2026-09-17.
+</footer>
+</main>
+</div>
+</body>
+</html>

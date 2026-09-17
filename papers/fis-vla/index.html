@@ -12,13 +12,13 @@
 <title>FiS-VLA 스터디 페이지</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=Noto+Serif+KR:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="../../style.css">
 
 </head>
 <body>
 <header class="masthead">
   <div class="wrap">
-    <p class="crumbs"><a href="index.html">VLA 논문 6편 읽기</a> › 스터디 페이지 ② · 1주차</p>
+    <p class="crumbs"><a href="../../index.html">피지컬AI 논문 읽기</a> › <a href="../../collections/ai2-robotics-vla-6/index.html">VLA 논문 6편 읽기</a> › 스터디 페이지 ② · 1주차</p>
     <div class="eyebrow">
       <span>논문 ② · 2025-06 · preprint</span>
       <span class="dim">개념 2시간 + 실습 90분 + 공유회 준비 30분</span>
@@ -38,14 +38,14 @@
       <a class="ext" href="https://github.com/CHEN-H01/Fast-in-Slow">원 저장소 CHEN-H01/Fast-in-Slow</a>
       <a class="ext" href="https://fast-in-slow.github.io/">프로젝트 페이지</a>
       <a class="ext" href="https://huggingface.co/haosad/fisvla">체크포인트 haosad/fisvla</a>
-      <a class="ext" href="https://github.com/drum-grammer/vla-study/tree/main/labs/fis-vla">실습 코드 (공개)</a>
+      <a class="ext" href="https://github.com/drum-grammer/physical-ai-study/tree/main/labs/fis-vla">실습 코드 (공개)</a>
     </div>
     <div class="meta">
       <span><strong>주차</strong> 1주 (2026-09-14 ~ 09-20)</span>
       <span><strong>대표자</strong> 죠셉</span>
-      <span><strong>짝 논문</strong> <a href="paper-1-robomamba.html">① RoboMamba</a></span>
-      <span><strong>심화</strong> <a href="fis-vla-guide.html">정독 가이드</a> · <a href="fis-vla-lab.html">실습 상세</a></span>
-      <span class="dim">갱신 2026-09-13</span>
+      <span><strong>짝 논문</strong> <a href="../robomamba/index.html">① RoboMamba</a></span>
+      <span><strong>심화</strong> <a href="guide.html">정독 가이드</a> · <a href="lab.html">실습 상세</a></span>
+      <span class="dim">갱신 2026-09-17</span>
     </div>
   </div>
 </header>
@@ -136,12 +136,12 @@
 <h2 id="c1"><span class="num">1.1</span>먼저 알아야 할 개념 여섯 개</h2>
 <p class="col">각 항목의 링크는 정독 가이드 1부의 해당 절이다. 이미 아는 것은 건너뛴다.</p>
 <div class="terms">
-  <div><b>토큰과 임베딩</b>언어·이미지 패치·로봇 상태·노이즈 행동을 전부 "같은 크기의 벡터 열"로 만들어 한 행렬에 세로로 쌓는다. 트랜스포머는 그 행렬만 본다. → <a href="fis-vla-guide.html#s12">가이드 1.2</a></div>
-  <div><b>트랜스포머 블록</b>어텐션(닮은 토큰의 정보를 더 많이 섞는 가중평균 — Q·K로 닮음을 재고 V를 평균한다) + MLP. 입력과 출력 모양이 같아서 <em>어느 블록 사이에서든</em> 중간 표현을 꺼낼 수 있다. FiS-VLA의 핵심 전제. → <a href="fis-vla-guide.html#s13">가이드 1.3</a> · <a href="fis-vla-guide.html#s131">숫자 예제 1.3.1</a></div>
-  <div><b>LLM · 자기회귀 · VLM</b>다음 회차의 입력이 이번 회차의 출력이라 순서대로만 뽑을 수 있는 것이 자기회귀. 그래서 느리다. VLM은 인코더 전용 비전 모델(SigLIP·DINOv2)의 출력 토큰을 디코더 전용 LLM 앞에 붙인 것. → <a href="fis-vla-guide.html#s14">가이드 1.4</a> · <a href="fis-vla-guide.html#s141">자기회귀 1.4.1</a> · <a href="fis-vla-guide.html#s142">인코더·디코더 1.4.2</a></div>
-  <div><b>VLA와 "행동을 어떻게 내보내는가"</b>행동을 256 구간 토큰으로 이산화하면(OpenVLA) 끊기고 느리다. 연속값을 한 번에 내는 헤드가 대안. → <a href="fis-vla-guide.html#s17">가이드 1.7</a></div>
-  <div><b>확산 행동 헤드와 행동 청크</b>노이즈에서 행동을 복원한다. 두 갈래 시연(왼쪽/오른쪽)을 회귀는 가운데로 뭉개고 확산은 갈래를 지킨다. 청크는 한 번에 H 스텝을 내는 것. → <a href="fis-vla-guide.html#s18">가이드 1.8</a></div>
-  <div><b>System 1 / System 2 이중 시스템</b>System 2는 "무엇을 할지" 판단하는 느린 머리(VLM), System 1은 "지금 어떻게 움직일지" 정하는 빠른 손. 머리는 가끔, 손은 자주 돌린다. π0, CogACT, GR00T N1, Helix는 그 손을 VLM 밖에 별도 모듈로 붙이지만 FiS-VLA는 VLM 안으로 넣는다. 포인트클라우드는 → <a href="fis-vla-guide.html#s19">가이드 1.9</a> · <a href="fis-vla-guide.html#s110">1.10</a></div>
+  <div><b>토큰과 임베딩</b>언어·이미지 패치·로봇 상태·노이즈 행동을 전부 "같은 크기의 벡터 열"로 만들어 한 행렬에 세로로 쌓는다. 트랜스포머는 그 행렬만 본다. → <a href="guide.html#s12">가이드 1.2</a></div>
+  <div><b>트랜스포머 블록</b>어텐션(닮은 토큰의 정보를 더 많이 섞는 가중평균 — Q·K로 닮음을 재고 V를 평균한다) + MLP. 입력과 출력 모양이 같아서 <em>어느 블록 사이에서든</em> 중간 표현을 꺼낼 수 있다. FiS-VLA의 핵심 전제. → <a href="guide.html#s13">가이드 1.3</a> · <a href="guide.html#s131">숫자 예제 1.3.1</a></div>
+  <div><b>LLM · 자기회귀 · VLM</b>다음 회차의 입력이 이번 회차의 출력이라 순서대로만 뽑을 수 있는 것이 자기회귀. 그래서 느리다. VLM은 인코더 전용 비전 모델(SigLIP·DINOv2)의 출력 토큰을 디코더 전용 LLM 앞에 붙인 것. → <a href="guide.html#s14">가이드 1.4</a> · <a href="guide.html#s141">자기회귀 1.4.1</a> · <a href="guide.html#s142">인코더·디코더 1.4.2</a></div>
+  <div><b>VLA와 "행동을 어떻게 내보내는가"</b>행동을 256 구간 토큰으로 이산화하면(OpenVLA) 끊기고 느리다. 연속값을 한 번에 내는 헤드가 대안. → <a href="guide.html#s17">가이드 1.7</a></div>
+  <div><b>확산 행동 헤드와 행동 청크</b>노이즈에서 행동을 복원한다. 두 갈래 시연(왼쪽/오른쪽)을 회귀는 가운데로 뭉개고 확산은 갈래를 지킨다. 청크는 한 번에 H 스텝을 내는 것. → <a href="guide.html#s18">가이드 1.8</a></div>
+  <div><b>System 1 / System 2 이중 시스템</b>System 2는 "무엇을 할지" 판단하는 느린 머리(VLM), System 1은 "지금 어떻게 움직일지" 정하는 빠른 손. 머리는 가끔, 손은 자주 돌린다. π0, CogACT, GR00T N1, Helix는 그 손을 VLM 밖에 별도 모듈로 붙이지만 FiS-VLA는 VLM 안으로 넣는다. 포인트클라우드는 → <a href="guide.html#s19">가이드 1.9</a> · <a href="guide.html#s110">1.10</a></div>
 </div>
 
 <h2 id="c2"><span class="num">1.2</span>문제 — 두 개의 딜레마</h2>
@@ -152,7 +152,7 @@
 <tr><td><strong>단일 VLA</strong> (OpenVLA 등) — VLM이 행동 토큰을 자기회귀로 뽑는다</td><td>사전학습 지식으로 범용적</td><td>느리다(수 Hz), 행동이 끊긴다(action discontinuities)</td></tr>
 <tr><td><strong>이중 시스템 VLA</strong> (π0, CogACT, GR00T N1, Helix) — VLM(System 2) + <em>별도</em> 행동 헤드(System 1)</td><td>빠르다</td><td>System 1이 새로 만든 모듈이라 <strong>VLM의 사전학습 지식이 없고</strong>, System 2가 준 특징만 본다</td></tr>
 </tbody>
-<caption>저자의 질문: VLM이 로봇의 뇌라면, System 1과 System 2를 한 뇌 안에서 통합할 수 없는가? — 논문 1·2절. 더 깊이: <a href="fis-vla-guide.html#s22">가이드 2.2</a></caption>
+<caption>저자의 질문: VLM이 로봇의 뇌라면, System 1과 System 2를 한 뇌 안에서 통합할 수 없는가? — 논문 1·2절. 더 깊이: <a href="guide.html#s22">가이드 2.2</a></caption>
 </table>
 </div>
 
@@ -161,7 +161,7 @@
 그림에서 확인할 것 두 가지: (1) System 1로 들어가는 화살표가 System 2보다 많다(고주파 입력이 추가된다). (2) 두 시스템의 시계가 다르다(1:4).</p>
 <div class="box"><span class="h">비유</span>
   느린 머리(System 2)가 "지금 어느 단계인지"를 4스텝에 한 번 정리해 주면, 빠른 손(System 1)은 매 스텝 최신 위치와 3D 장면을 보고 움직인다.
-  손은 머리와 같은 뇌 조직(마지막 블록)이라 머리가 배운 것을 그대로 쓴다. 더 깊이: <a href="fis-vla-guide.html#s23">가이드 2.3</a>
+  손은 머리와 같은 뇌 조직(마지막 블록)이라 머리가 배운 것을 그대로 쓴다. 더 깊이: <a href="guide.html#s23">가이드 2.3</a>
 </div>
 
 <h2 id="c4"><span class="num">1.4</span>구조 — 그림 2 읽기, 입력·출력·손실</h2>
@@ -176,7 +176,7 @@
 <tr><td>비동기</td><td>System 2 출력 하나가 System 1의 다음 n=4 스텝을 안내. 단일 GPU 순차 실행(Helix식 병렬 아님). 학습 때도 비동기 샘플링</td></tr>
 <tr><td>행동 공간</td><td>시뮬 7-DoF 엔드이펙터 포즈 · AgileX 14-DoF 포즈 제어 · AlphaBot 16-DoF 관절 제어</td></tr>
 </tbody>
-<caption>논문 3.1~3.3절, 그림 2. "입력·출력·손실 세 가지만 표로" — 손실은 1.6절. 더 깊이(부품 목록 전체): <a href="fis-vla-guide.html#s24">가이드 2.4</a></caption>
+<caption>논문 3.1~3.3절, 그림 2. "입력·출력·손실 세 가지만 표로" — 손실은 1.6절. 더 깊이(부품 목록 전체): <a href="guide.html#s24">가이드 2.4</a></caption>
 </table>
 </div>
 <div class="lab-link"><span class="n">실습 1</span><span>블록 6개짜리 장난감 트랜스포머로 "0~3 통과 → 고주파 토큰 붙이기 → 4~5 통과"를 직접 돌린다. 저장소 <code>prismatic.py</code>가 <code>llm_middle_layer</code>에서 두 번 호출되는 것과 같은 구조. → <a href="#lab1">2.1</a></span></div>
@@ -184,7 +184,7 @@
 <h2 id="c5"><span class="num">1.5</span>두 시스템의 조율 — 1:4 비동기와 이종 입력 (3.3절)</h2>
 <p class="col">System 2는 90 ms급, System 1은 30 ms급이라고 치자. 매 스텝 둘 다 돌리면(1:1) 느리고, System 2를 너무 드물게 돌리면(1:16) 손이 "낡은 이해"로 움직인다.
 사이 어딘가에 최적점이 있고 논문은 <strong>1:4</strong>를 택했다(부록 표 8: 1:1 0.60 · 1:2 0.63 · 1:4 0.69 · 1:8 0.61).</p>
-<p class="col">이종 입력이 중요한 이유: 고주파로 바뀌는 정보(로봇 상태, 3D 장면)를 System 2에 넣으면 4스텝 동안 낡는다. 그래서 System 1에만 넣는다. 부록 표 10의 "입력 배치 변형"이 이것을 검증한다(1.8절). 더 깊이: <a href="fis-vla-guide.html#s25">가이드 2.5</a></p>
+<p class="col">이종 입력이 중요한 이유: 고주파로 바뀌는 정보(로봇 상태, 3D 장면)를 System 2에 넣으면 4스텝 동안 낡는다. 그래서 System 1에만 넣는다. 부록 표 10의 "입력 배치 변형"이 이것을 검증한다(1.8절). 더 깊이: <a href="guide.html#s25">가이드 2.5</a></p>
 <div class="lab-link"><span class="n">실습 4</span><span>점 로봇 모형에서 비율을 1:1 ~ 1:16으로 바꿔 성공률이 1:4 근처에서 최고가 되는 것, 그리고 청크를 늘리면 명령 Hz만 오르고 관측 Hz는 그대로인 것을 본다. → <a href="#lab4">2.4</a></span></div>
 
 <h2 id="c6"><span class="num">1.6</span>학습 — 식 세 개와 레시피 (3.4절)</h2>
@@ -198,7 +198,7 @@
 <p class="gloss">System 2가 원래 하던 일. 이것을 계속 학습시켜야 블록 1~30이 "노이즈 예측기의 부속품"으로 변하지 않는다.</p></div>
 <div class="eq"><span class="tag">식 (3) · 이중 인식 공동학습</span>
 <pre>L = L_fast + L_slow</pre>
-<p class="gloss">L_slow를 빼면 0.69 → 0.62 (4.2절 (4)). 저장소 <code>training/strategies/base_strategy.py</code> 312~313행 <code>if ar_diff_loss: loss = loss + output.loss</code>. 더 깊이: <a href="fis-vla-guide.html#s26">가이드 2.6</a></p></div>
+<p class="gloss">L_slow를 빼면 0.69 → 0.62 (4.2절 (4)). 저장소 <code>training/strategies/base_strategy.py</code> 312~313행 <code>if ar_diff_loss: loss = loss + output.loss</code>. 더 깊이: <a href="guide.html#s26">가이드 2.6</a></p></div>
 <div class="tbl">
 <table>
 <thead><tr><th>단계</th><th>데이터</th><th>설정</th></tr></thead>
@@ -231,7 +231,7 @@
   <li><strong>일반화</strong>: 미지 물체·복잡 배경·조명 변화에서 FiS-VLA의 하락 폭(−19~−31%)이 π0(−27~−46%)보다 작다.</li>
   <li><strong>실기 로봇이 AlphaBot</strong>이므로 이 논문은 제품 기술과 직결된다. 16-DoF 관절 제어라는 점도 기억해 둔다.</li>
 </ul>
-<p class="col">더 깊이(표 1~3 전부, 태스크별 수치): <a href="fis-vla-guide.html#s27">가이드 2.7</a></p>
+<p class="col">더 깊이(표 1~3 전부, 태스크별 수치): <a href="guide.html#s27">가이드 2.7</a></p>
 
 <h2 id="c8"><span class="num">1.8</span>소거 실험 — 무엇이 성능을 만들었나 (부록 표 6~10)</h2>
 <div class="tbl">
@@ -263,7 +263,7 @@
   <li>두 시스템을 같은 GPU에서 순차 실행했다 — Helix처럼 병렬 배치가 아니다. 제품에서는 어떤지가 부스 질문.</li>
   <li>arXiv v1 기준. 학회 채택 여부·후속 판 미확인(2026-09-11).</li>
 </ol>
-<p class="col">더 깊이: <a href="fis-vla-guide.html#s28">가이드 2.8</a> · <a href="fis-vla-guide.html#s29">2.9</a></p>
+<p class="col">더 깊이: <a href="guide.html#s28">가이드 2.8</a> · <a href="guide.html#s29">2.9</a></p>
 
 <h2 id="c10"><span class="num">1.10</span>계보 — RoboMamba와의 대비</h2>
 <div class="tbl">
@@ -279,7 +279,7 @@
 <tr><td>속도</td><td>9.0 Hz (A100, 개루프)</td><td>21.9 Hz (4090, 청크 1)</td></tr>
 <tr><td>공개 범위</td><td>모델 코드만 (학습 코드 비공개)</td><td>학습·평가 모두 공개</td></tr>
 </tbody>
-<caption>같은 문제(조작을 배우면 추론을 잊는다)를 RoboMamba는 "건드리지 않음"으로, FiS-VLA는 "같이 학습함"으로 풀었다. 제1저자 Jiaming Liu가 두 논문 모두의 프로젝트 리드. 백본이 Mamba에서 트랜스포머로 되돌아간 이유는 논문에 없다 — 부스 질문. 더 깊이: <a href="fis-vla-guide.html#s210">가이드 2.10</a> · <a href="paper-1-robomamba.html">RoboMamba 스터디 페이지</a></caption>
+<caption>같은 문제(조작을 배우면 추론을 잊는다)를 RoboMamba는 "건드리지 않음"으로, FiS-VLA는 "같이 학습함"으로 풀었다. 제1저자 Jiaming Liu가 두 논문 모두의 프로젝트 리드. 백본이 Mamba에서 트랜스포머로 되돌아간 이유는 논문에 없다 — 부스 질문. 더 깊이: <a href="guide.html#s210">가이드 2.10</a> · <a href="../robomamba/index.html">RoboMamba 스터디 페이지</a></caption>
 </table>
 </div>
 
@@ -287,7 +287,7 @@
 
 <h2 id="prep"><span class="num">2.0</span>준비 — 세 가지 실행 방법</h2>
 <p class="col"><strong>GPU 없이, PyTorch 없이, numpy만으로</strong> 실습 6개가 각 1~6초에 돈다. 원 저장소는 LIFT3D 포함 약 700MB + CoppeliaSim + Flash-Attention이 필요해서 스터디 범위 밖(2.8절)이다.
-코드는 공개 저장소 <a href="https://github.com/drum-grammer/vla-study/tree/main/labs/fis-vla">drum-grammer/vla-study/labs/fis-vla</a>에 있다.</p>
+코드는 공개 저장소 <a href="https://github.com/drum-grammer/physical-ai-study/tree/main/labs/fis-vla">drum-grammer/physical-ai-study/labs/fis-vla</a>에 있다.</p>
 <div class="tbl">
 <table>
 <thead><tr><th>방법</th><th>준비물</th><th>어떻게</th></tr></thead>
@@ -296,12 +296,12 @@
 <tr><td><strong>B. 주피터</strong> (권장)</td><td>+ jupyterlab</td><td><code>notebooks/lab1_tokens_blocks.ipynb</code>부터. 중간 변수를 들여다볼 수 있고 그림이 노트북 안에 뜬다</td></tr>
 <tr><td><strong>C. 구글 코랩</strong></td><td>브라우저만</td><td>각 실습의 <em>코랩에서 열기</em> 링크. 첫 셀이 공개 저장소에서 <code>tinynn.py</code>를 받아 온다</td></tr>
 </tbody>
-<caption>설치가 막히면 <a href="lab-environment.html">실습 환경</a> 페이지(가상환경, Apple Silicon, 자주 나오는 문제).</caption>
+<caption>설치가 막히면 <a href="../../lab-environment.html">실습 환경</a> 페이지(가상환경, Apple Silicon, 자주 나오는 문제).</caption>
 </table>
 </div>
 <pre class="code"><span class="c"># A. 터미널</span>
-git clone https://github.com/drum-grammer/vla-study
-cd vla-study/labs/fis-vla
+git clone https://github.com/drum-grammer/physical-ai-study
+cd physical-ai-study/labs/fis-vla
 python3 --version            <span class="c"># 3.9 이상</span>
 python3 -c "import numpy"    <span class="c"># 없으면: pip install numpy</span>
 python3 lab1_tokens_blocks.py
@@ -313,24 +313,24 @@ cd notebooks && jupyter lab   <span class="c"># lab1_tokens_blocks.ipynb 부터 
 <table>
 <thead><tr><th>파일</th><th>역할</th><th class="n">실행 시간</th></tr></thead>
 <tbody>
-<tr><td><a href="https://github.com/drum-grammer/vla-study/blob/main/labs/fis-vla/tinynn.py"><code>tinynn.py</code></a></td><td>공용 도구: 수동 역전파 MLP, Adam, 트랜스포머 블록(순전파), 저장소와 같은 squaredcos_cap_v2 확산 스케줄, SVG 그리기</td><td class="n">import 전용</td></tr>
-<tr><td><a href="https://github.com/drum-grammer/vla-study/blob/main/labs/fis-vla/lab1_tokens_blocks.py"><code>lab1_tokens_blocks.py</code></a></td><td>실습 1 토큰 열·어텐션·블록 분기</td><td class="n">1초</td></tr>
-<tr><td><a href="https://github.com/drum-grammer/vla-study/blob/main/labs/fis-vla/lab2_autoregressive_vs_chunk.py"><code>lab2_autoregressive_vs_chunk.py</code></a></td><td>실습 2 자기회귀 비용·이산화 계단</td><td class="n">1초</td></tr>
-<tr><td><a href="https://github.com/drum-grammer/vla-study/blob/main/labs/fis-vla/lab3_diffusion_action.py"><code>lab3_diffusion_action.py</code></a></td><td>실습 3 확산 행동 헤드, L_fast 학습</td><td class="n">6초</td></tr>
-<tr><td><a href="https://github.com/drum-grammer/vla-study/blob/main/labs/fis-vla/lab4_chunk_async.py"><code>lab4_chunk_async.py</code></a></td><td>실습 4 행동 청크·1:n 비동기</td><td class="n">4초</td></tr>
-<tr><td><a href="https://github.com/drum-grammer/vla-study/blob/main/labs/fis-vla/lab5_cotraining_forgetting.py"><code>lab5_cotraining_forgetting.py</code></a></td><td>실습 5 공동학습과 망각</td><td class="n">6초</td></tr>
-<tr><td><a href="https://github.com/drum-grammer/vla-study/blob/main/labs/fis-vla/lab6_code_map.py"><code>lab6_code_map.py</code></a></td><td>실습 6 논문 → 저장소 줄 번호 (네트워크 150KB)</td><td class="n">3초</td></tr>
-<tr><td><a href="https://github.com/drum-grammer/vla-study/tree/main/labs/fis-vla/notebooks"><code>notebooks/lab*.ipynb</code></a></td><td>위 여섯 개의 주피터 노트북판. <code>.py</code>가 정본이고 노트북은 <code>make_notebooks.py</code>가 만든 산출물</td><td class="n">—</td></tr>
+<tr><td><a href="https://github.com/drum-grammer/physical-ai-study/blob/main/labs/fis-vla/tinynn.py"><code>tinynn.py</code></a></td><td>공용 도구: 수동 역전파 MLP, Adam, 트랜스포머 블록(순전파), 저장소와 같은 squaredcos_cap_v2 확산 스케줄, SVG 그리기</td><td class="n">import 전용</td></tr>
+<tr><td><a href="https://github.com/drum-grammer/physical-ai-study/blob/main/labs/fis-vla/lab1_tokens_blocks.py"><code>lab1_tokens_blocks.py</code></a></td><td>실습 1 토큰 열·어텐션·블록 분기</td><td class="n">1초</td></tr>
+<tr><td><a href="https://github.com/drum-grammer/physical-ai-study/blob/main/labs/fis-vla/lab2_autoregressive_vs_chunk.py"><code>lab2_autoregressive_vs_chunk.py</code></a></td><td>실습 2 자기회귀 비용·이산화 계단</td><td class="n">1초</td></tr>
+<tr><td><a href="https://github.com/drum-grammer/physical-ai-study/blob/main/labs/fis-vla/lab3_diffusion_action.py"><code>lab3_diffusion_action.py</code></a></td><td>실습 3 확산 행동 헤드, L_fast 학습</td><td class="n">6초</td></tr>
+<tr><td><a href="https://github.com/drum-grammer/physical-ai-study/blob/main/labs/fis-vla/lab4_chunk_async.py"><code>lab4_chunk_async.py</code></a></td><td>실습 4 행동 청크·1:n 비동기</td><td class="n">4초</td></tr>
+<tr><td><a href="https://github.com/drum-grammer/physical-ai-study/blob/main/labs/fis-vla/lab5_cotraining_forgetting.py"><code>lab5_cotraining_forgetting.py</code></a></td><td>실습 5 공동학습과 망각</td><td class="n">6초</td></tr>
+<tr><td><a href="https://github.com/drum-grammer/physical-ai-study/blob/main/labs/fis-vla/lab6_code_map.py"><code>lab6_code_map.py</code></a></td><td>실습 6 논문 → 저장소 줄 번호 (네트워크 150KB)</td><td class="n">3초</td></tr>
+<tr><td><a href="https://github.com/drum-grammer/physical-ai-study/tree/main/labs/fis-vla/notebooks"><code>notebooks/lab*.ipynb</code></a></td><td>위 여섯 개의 주피터 노트북판. <code>.py</code>가 정본이고 노트북은 <code>make_notebooks.py</code>가 만든 산출물</td><td class="n">—</td></tr>
 </tbody>
 </table>
 </div>
 
-<div class="lab-head" id="lab1"><span class="n">실습 1</span><div><h3>토큰 열, 어텐션, 블록 쌓기</h3><div class="ref">개념 <a href="#c1">1.1</a> · <a href="#c4">1.4</a> — 가이드 <a href="fis-vla-guide.html#s12">1.2</a> · <a href="fis-vla-guide.html#s13">1.3</a> · <a href="fis-vla-guide.html#s24">2.4</a> · 1초</div></div></div>
+<div class="lab-head" id="lab1"><span class="n">실습 1</span><div><h3>토큰 열, 어텐션, 블록 쌓기</h3><div class="ref">개념 <a href="#c1">1.1</a> · <a href="#c4">1.4</a> — 가이드 <a href="guide.html#s12">1.2</a> · <a href="guide.html#s13">1.3</a> · <a href="guide.html#s24">2.4</a> · 1초</div></div></div>
 <pre class="code">python3 lab1_tokens_blocks.py</pre>
 <div class="links">
-  <a class="ext" href="https://github.com/drum-grammer/vla-study/blob/main/labs/fis-vla/lab1_tokens_blocks.py">코드 (GitHub)</a>
-  <a class="ext" href="https://colab.research.google.com/github/drum-grammer/vla-study/blob/main/labs/fis-vla/notebooks/lab1_tokens_blocks.ipynb">코랩에서 열기</a>
-  <a href="fis-vla-lab.html#lab1">상세 해설</a>
+  <a class="ext" href="https://github.com/drum-grammer/physical-ai-study/blob/main/labs/fis-vla/lab1_tokens_blocks.py">코드 (GitHub)</a>
+  <a class="ext" href="https://colab.research.google.com/github/drum-grammer/physical-ai-study/blob/main/labs/fis-vla/notebooks/lab1_tokens_blocks.ipynb">코랩에서 열기</a>
+  <a href="lab.html#lab1">상세 해설</a>
 </div>
 <p class="col"><strong>보는 것</strong></p>
 <ol>
@@ -342,12 +342,12 @@ cd notebooks && jupyter lab   <span class="c"># lab1_tokens_blocks.ipynb 부터 
 <p class="col"><strong>저장소 대응</strong>: <a href="https://github.com/CHEN-H01/Fast-in-Slow/blob/main/models/vlms/prismatic.py"><code>models/vlms/prismatic.py</code></a> — <code>llm_layer_end=self.llm_middle_layer</code>로 한 번, <code>llm_layer_start=self.llm_middle_layer</code>로 한 번. <code>tinynn.run_blocks(blocks, x, start, end)</code>가 그 축소판.</p>
 <div class="box"><span class="h">해 볼 것</span><code>MIDDLE</code>을 1이나 5로 바꿔 System 1 크기를 바꿔 본다(논문 표 6: 1블록 0.49, 2블록 0.69, 8블록 0.64). <code>img[4]</code>를 <code>lang[2]</code>와 무관하게 만들면 어텐션이 어디로 가는지 본다.</div>
 
-<div class="lab-head" id="lab2"><span class="n">실습 2</span><div><h3>자기회귀는 왜 느리고, 이산화는 왜 끊기는가</h3><div class="ref">개념 <a href="#c2">1.2</a> — 가이드 <a href="fis-vla-guide.html#s13">1.3</a> · <a href="fis-vla-guide.html#s14">1.4</a> · <a href="fis-vla-guide.html#s17">1.7</a> · 1초 · <code>out/lab2_quantize.svg</code></div></div></div>
+<div class="lab-head" id="lab2"><span class="n">실습 2</span><div><h3>자기회귀는 왜 느리고, 이산화는 왜 끊기는가</h3><div class="ref">개념 <a href="#c2">1.2</a> — 가이드 <a href="guide.html#s13">1.3</a> · <a href="guide.html#s14">1.4</a> · <a href="guide.html#s17">1.7</a> · 1초 · <code>out/lab2_quantize.svg</code></div></div></div>
 <pre class="code">python3 lab2_autoregressive_vs_chunk.py</pre>
 <div class="links">
-  <a class="ext" href="https://github.com/drum-grammer/vla-study/blob/main/labs/fis-vla/lab2_autoregressive_vs_chunk.py">코드 (GitHub)</a>
-  <a class="ext" href="https://colab.research.google.com/github/drum-grammer/vla-study/blob/main/labs/fis-vla/notebooks/lab2_autoregressive_vs_chunk.ipynb">코랩에서 열기</a>
-  <a href="fis-vla-lab.html#lab2">상세 해설</a>
+  <a class="ext" href="https://github.com/drum-grammer/physical-ai-study/blob/main/labs/fis-vla/lab2_autoregressive_vs_chunk.py">코드 (GitHub)</a>
+  <a class="ext" href="https://colab.research.google.com/github/drum-grammer/physical-ai-study/blob/main/labs/fis-vla/notebooks/lab2_autoregressive_vs_chunk.ipynb">코랩에서 열기</a>
+  <a href="lab.html#lab2">상세 해설</a>
 </div>
 <div class="tbl">
 <table>
@@ -362,12 +362,12 @@ cd notebooks && jupyter lab   <span class="c"># lab1_tokens_blocks.ipynb 부터 
 </div>
 <div class="box warn"><span class="h">주의</span>실제 확산은 디노이징을 여러 번 반복한다(저장소 <code>test_rlbench.sh</code>의 <code>--ddim-steps 4</code>). "한 번에"는 토큰 순차 생성과 대비되는 축이고, 디노이징 반복은 또 다른 축이다.</div>
 
-<div class="lab-head" id="lab3"><span class="n">실습 3</span><div><h3>확산으로 행동 만들기, 식 (1) 직접 학습</h3><div class="ref">개념 <a href="#c6">1.6</a> — 가이드 <a href="fis-vla-guide.html#s18">1.8</a> · <a href="fis-vla-guide.html#s26">2.6</a> · 6초 · <code>out/lab3_diffusion.svg</code></div></div></div>
+<div class="lab-head" id="lab3"><span class="n">실습 3</span><div><h3>확산으로 행동 만들기, 식 (1) 직접 학습</h3><div class="ref">개념 <a href="#c6">1.6</a> — 가이드 <a href="guide.html#s18">1.8</a> · <a href="guide.html#s26">2.6</a> · 6초 · <code>out/lab3_diffusion.svg</code></div></div></div>
 <pre class="code">python3 lab3_diffusion_action.py</pre>
 <div class="links">
-  <a class="ext" href="https://github.com/drum-grammer/vla-study/blob/main/labs/fis-vla/lab3_diffusion_action.py">코드 (GitHub)</a>
-  <a class="ext" href="https://colab.research.google.com/github/drum-grammer/vla-study/blob/main/labs/fis-vla/notebooks/lab3_diffusion_action.ipynb">코랩에서 열기</a>
-  <a href="fis-vla-lab.html#lab3">상세 해설 + 결과 그림</a>
+  <a class="ext" href="https://github.com/drum-grammer/physical-ai-study/blob/main/labs/fis-vla/lab3_diffusion_action.py">코드 (GitHub)</a>
+  <a class="ext" href="https://colab.research.google.com/github/drum-grammer/physical-ai-study/blob/main/labs/fis-vla/notebooks/lab3_diffusion_action.ipynb">코랩에서 열기</a>
+  <a href="lab.html#lab3">상세 해설 + 결과 그림</a>
 </div>
 <ul>
   <li>시연 데이터: 장애물을 왼쪽(x=−0.65) 또는 오른쪽(x=+0.65)으로 돌아가는 <strong>두 갈래</strong>. 조건 c로 위/아래가 바뀐다.</li>
@@ -382,12 +382,12 @@ loss = ((noise_pred - noise) ** 2).mean()  <span class="c"># loss = ((noise_pred
 <p class="col">노이즈 스케줄 <code>squaredcos_cap_v2</code>, T=100도 저장소 <code>create_diffusion(...)</code> 인자와 같다. <a href="https://github.com/CHEN-H01/Fast-in-Slow/blob/main/models/vlas/fisvla.py">fisvla.py (원 저장소)</a></p>
 <div class="box"><span class="h">해 볼 것</span>학습 스텝을 500으로 줄이면 샘플이 어떻게 흐트러지는지. <code>sample()</code>의 100 스텝을 10 스텝으로 줄이면 품질이 어떻게 되는지.</div>
 
-<div class="lab-head" id="lab4"><span class="n">실습 4</span><div><h3>행동 청크와 1:n 비동기, 117.7 Hz의 뜻</h3><div class="ref">개념 <a href="#c5">1.5</a> · <a href="#c8">1.8</a> — 가이드 <a href="fis-vla-guide.html#s18">1.8</a> · <a href="fis-vla-guide.html#s25">2.5</a> · <a href="fis-vla-guide.html#s27">2.7</a> · 4초 · <code>out/lab4_ratio.svg</code></div></div></div>
+<div class="lab-head" id="lab4"><span class="n">실습 4</span><div><h3>행동 청크와 1:n 비동기, 117.7 Hz의 뜻</h3><div class="ref">개념 <a href="#c5">1.5</a> · <a href="#c8">1.8</a> — 가이드 <a href="guide.html#s18">1.8</a> · <a href="guide.html#s25">2.5</a> · <a href="guide.html#s27">2.7</a> · 4초 · <code>out/lab4_ratio.svg</code></div></div></div>
 <pre class="code">python3 lab4_chunk_async.py</pre>
 <div class="links">
-  <a class="ext" href="https://github.com/drum-grammer/vla-study/blob/main/labs/fis-vla/lab4_chunk_async.py">코드 (GitHub)</a>
-  <a class="ext" href="https://colab.research.google.com/github/drum-grammer/vla-study/blob/main/labs/fis-vla/notebooks/lab4_chunk_async.ipynb">코랩에서 열기</a>
-  <a href="fis-vla-lab.html#lab4">상세 해설 + 결과 그림</a>
+  <a class="ext" href="https://github.com/drum-grammer/physical-ai-study/blob/main/labs/fis-vla/lab4_chunk_async.py">코드 (GitHub)</a>
+  <a class="ext" href="https://colab.research.google.com/github/drum-grammer/physical-ai-study/blob/main/labs/fis-vla/notebooks/lab4_chunk_async.ipynb">코랩에서 열기</a>
+  <a href="lab.html#lab4">상세 해설 + 결과 그림</a>
 </div>
 <p class="col"><strong>모형</strong>: 점 로봇이 웨이포인트 수십 개를 순서대로 방문한다. System 2(90 ms)는 "지금 어느 단계인지"를 보고 목표를 낸다. System 1(30 ms)은 매 스텝 최신 위치로 이동량을 낸다.
 둘은 GPU 한 장에서 <strong>순차 실행</strong>(논문 3.3절의 조건). 단계가 끝나도 System 1은 다음 System 2 갱신까지 옛 목표를 붙든다. 시간 예산 안에 다 돌면 성공.</p>
@@ -408,12 +408,12 @@ loss = ((noise_pred - noise) ** 2).mean()  <span class="c"># loss = ((noise_pred
 <p class="col"><strong>저장소 대응</strong>: <a href="https://github.com/CHEN-H01/Fast-in-Slow/blob/main/scripts/sim.py"><code>scripts/sim.py</code></a> 215행 <code>if slow_cnt % int(args.slow_fast_ratio) == 0:</code> → <code>slow_system_forward()</code>, 그 밖에는 <code>slow_latent_embedding</code> 재사용 → 242행 <code>for action in actions: env.step(action)</code>.</p>
 <div class="box"><span class="h">해 볼 것</span><code>C_SLOW</code>를 두 배로(더 큰 VLM) 하면 최적 비율이 어디로 가는가. <code>N_WAYPOINTS</code>를 줄여 단계 전환이 드문 태스크로 만들면? 이것이 논문 5절 한계 "비율이 고정"이 뜻하는 바다.</div>
 
-<div class="lab-head" id="lab5"><span class="n">실습 5</span><div><h3>공동학습과 파국적 망각, 식 (3)</h3><div class="ref">개념 <a href="#c6">1.6</a> — 가이드 <a href="fis-vla-guide.html#s26">2.6</a> · 6초</div></div></div>
+<div class="lab-head" id="lab5"><span class="n">실습 5</span><div><h3>공동학습과 파국적 망각, 식 (3)</h3><div class="ref">개념 <a href="#c6">1.6</a> — 가이드 <a href="guide.html#s26">2.6</a> · 6초</div></div></div>
 <pre class="code">python3 lab5_cotraining_forgetting.py</pre>
 <div class="links">
-  <a class="ext" href="https://github.com/drum-grammer/vla-study/blob/main/labs/fis-vla/lab5_cotraining_forgetting.py">코드 (GitHub)</a>
-  <a class="ext" href="https://colab.research.google.com/github/drum-grammer/vla-study/blob/main/labs/fis-vla/notebooks/lab5_cotraining_forgetting.ipynb">코랩에서 열기</a>
-  <a href="fis-vla-lab.html#lab5">상세 해설</a>
+  <a class="ext" href="https://github.com/drum-grammer/physical-ai-study/blob/main/labs/fis-vla/lab5_cotraining_forgetting.py">코드 (GitHub)</a>
+  <a class="ext" href="https://colab.research.google.com/github/drum-grammer/physical-ai-study/blob/main/labs/fis-vla/notebooks/lab5_cotraining_forgetting.ipynb">코랩에서 열기</a>
+  <a href="lab.html#lab5">상세 해설</a>
 </div>
 <p class="col"><strong>모형</strong>: 공유 몸통(블록 31·32 역할) + 머리 A(4클래스 분류 = 이산 행동 토큰, 교차엔트로피 = L_slow) + 머리 B(노이즈 예측 2차원, MSE = L_fast).
 1단계: A로 사전학습. 2단계: B를 배우되 A 손실을 빼거나(L_fast only) 함께 둔다(co-training).</p>
@@ -429,17 +429,17 @@ loss = ((noise_pred - noise) ** 2).mean()  <span class="c"># loss = ((noise_pred
 </div>
 <div class="box"><span class="h">해 볼 것</span>몸통 폭을 32에서 128로 늘리면 망각이 줄어드는가(자리 다툼이 줄어든다). 2단계 학습률을 낮추면?</div>
 
-<div class="lab-head" id="lab6"><span class="n">실습 6</span><div><h3>코드 지도 — 논문 문장을 저장소 줄 번호로</h3><div class="ref">개념 <a href="#c4">1.4</a> · <a href="#c5">1.5</a> · <a href="#c6">1.6</a> — 가이드 <a href="fis-vla-guide.html#s34">3.4</a> · 3초 · 네트워크 150KB</div></div></div>
+<div class="lab-head" id="lab6"><span class="n">실습 6</span><div><h3>코드 지도 — 논문 문장을 저장소 줄 번호로</h3><div class="ref">개념 <a href="#c4">1.4</a> · <a href="#c5">1.5</a> · <a href="#c6">1.6</a> — 가이드 <a href="guide.html#s34">3.4</a> · 3초 · 네트워크 150KB</div></div></div>
 <pre class="code">python3 lab6_code_map.py              <span class="c"># 핵심 파일 5개만 내려받음 (out/src/)</span>
 python3 lab6_code_map.py --offline    <span class="c"># 두 번째부터</span></pre>
 <div class="links">
-  <a class="ext" href="https://github.com/drum-grammer/vla-study/blob/main/labs/fis-vla/lab6_code_map.py">코드 (GitHub)</a>
-  <a class="ext" href="https://colab.research.google.com/github/drum-grammer/vla-study/blob/main/labs/fis-vla/notebooks/lab6_code_map.ipynb">코랩에서 열기</a>
-  <a href="fis-vla-lab.html#lab6">상세 해설</a>
+  <a class="ext" href="https://github.com/drum-grammer/physical-ai-study/blob/main/labs/fis-vla/lab6_code_map.py">코드 (GitHub)</a>
+  <a class="ext" href="https://colab.research.google.com/github/drum-grammer/physical-ai-study/blob/main/labs/fis-vla/notebooks/lab6_code_map.ipynb">코랩에서 열기</a>
+  <a href="lab.html#lab6">상세 해설</a>
   <a class="ext" href="https://github.com/CHEN-H01/Fast-in-Slow">원 저장소</a>
 </div>
 <p class="col"><code>train.sh</code>(설정) → <code>scripts/sim.py</code>(추론 루프) → <code>models/vlas/fisvla.py</code>(손실) → <code>models/vlms/prismatic.py</code>(블록 분기) → <code>training/strategies/base_strategy.py</code>(손실 합산) 순으로
-20개 앵커를 찾아 앞뒤 줄과 함께 출력한다. 줄 번호가 바뀌어도 앵커 문자열로 찾는다. 2026-09-11 기준 결과 표는 <a href="fis-vla-guide.html#s34">가이드 3.4</a>.</p>
+20개 앵커를 찾아 앞뒤 줄과 함께 출력한다. 줄 번호가 바뀌어도 앵커 문자열로 찾는다. 2026-09-11 기준 결과 표는 <a href="guide.html#s34">가이드 3.4</a>.</p>
 <div class="box key"><span class="h">읽고 답할 것</span>
   (1) <code>LLM_MIDDLE_LAYER=30</code>인데 왜 논문은 "2블록"이라 하는가.
   (2) <code>POINTCLOUD_POS='fast'</code>를 <code>'slow'</code>로 바꾸면 논문의 어느 변형 실험인가(부록 표 10).
@@ -541,7 +541,7 @@ python3 lab6_code_map.py --offline    <span class="c"># 두 번째부터</span><
 <tr><td>1. 오픈소스 공개 범위 — 코드·가중치 외에 제품 모델도?</td><td>코드·체크포인트는 공개(<code>CHEN-H01/Fast-in-Slow</code>, <code>haosad/fisvla</code>). 회사가 "GOVLA 0.5"라 부르는 것과 제품 Alpha Brain의 관계는 2차 출처뿐. 1.10절 공개 범위 대비</td></tr>
 <tr><td>2. 제품의 System 1:2 주파수 비율과 배치 하드웨어</td><td>논문은 1:4, 단일 4090에서 순차 실행(3.3절). 1.5절·1.9절 5번</td></tr>
 <tr><td>3. 현장 배치 시 실제로 학습하는 부분</td><td>논문은 전체 co-training(식 3). 블록 31~32만 열 수 있는 구조인지가 질문. 1.6절</td></tr>
-<tr><td>4. 백본이 Mamba에서 트랜스포머로 돌아간 이유</td><td>이 논문은 LLaMA2-7B. RoboMamba 5절의 "더 발전된 선형 복잡도 LLM" 예고와 어긋난다. 1.10절 · <a href="paper-1-robomamba.html#q3">RoboMamba 3.2</a></td></tr>
+<tr><td>4. 백본이 Mamba에서 트랜스포머로 돌아간 이유</td><td>이 논문은 LLaMA2-7B. RoboMamba 5절의 "더 발전된 선형 복잡도 LLM" 예고와 어긋난다. 1.10절 · <a href="../robomamba/index.html#q3">RoboMamba 3.2</a></td></tr>
 </tbody>
 </table>
 </div>
@@ -553,33 +553,33 @@ python3 lab6_code_map.py --offline    <span class="c"># 두 번째부터</span><
 <table>
 <thead><tr><th>무엇</th><th>어디</th><th>비고</th></tr></thead>
 <tbody>
-<tr class="hi"><td>이 페이지</td><td><code>paper-2-fis-vla.html</code></td><td>개념 + 실습 + 공유회 준비. 1주차</td></tr>
-<tr><td>정독 가이드 (심화, 4시간)</td><td><a href="fis-vla-guide.html">fis-vla-guide.html</a></td><td>1부 기초 개념 11절 → 2부 절별 해설 10절 → 3부 스터디 도구. 이 페이지의 "더 깊이" 링크가 전부 여기로 간다</td></tr>
-<tr><td>실습 세션 (상세)</td><td><a href="fis-vla-lab.html">fis-vla-lab.html</a></td><td>결과 그림 SVG 3장 포함</td></tr>
-<tr><td>실습 환경</td><td><a href="lab-environment.html">lab-environment.html</a></td><td>로컬 numpy · 코랩 · Apple Silicon · 원 저장소 실행 조건</td></tr>
-<tr><td><strong>실습 코드 (GitHub, 공개)</strong></td><td><a href="https://github.com/drum-grammer/vla-study/tree/main/labs/fis-vla">vla-study/labs/fis-vla</a></td><td>스크립트 6개 + <code>tinynn.py</code> + <code>notebooks/</code></td></tr>
+<tr class="hi"><td>이 페이지</td><td><code>papers/fis-vla/index.html</code></td><td>개념 + 실습 + 공유회 준비. 1주차</td></tr>
+<tr><td>정독 가이드 (심화, 4시간)</td><td><a href="guide.html">fis-vla-guide.html</a></td><td>1부 기초 개념 11절 → 2부 절별 해설 10절 → 3부 스터디 도구. 이 페이지의 "더 깊이" 링크가 전부 여기로 간다</td></tr>
+<tr><td>실습 세션 (상세)</td><td><a href="lab.html">lab.html</a></td><td>결과 그림 SVG 3장 포함</td></tr>
+<tr><td>실습 환경</td><td><a href="../../lab-environment.html">lab-environment.html</a></td><td>로컬 numpy · 코랩 · Apple Silicon · 원 저장소 실행 조건</td></tr>
+<tr><td><strong>실습 코드 (GitHub, 공개)</strong></td><td><a href="https://github.com/drum-grammer/physical-ai-study/tree/main/labs/fis-vla">physical-ai-study/labs/fis-vla</a></td><td>스크립트 6개 + <code>tinynn.py</code> + <code>notebooks/</code></td></tr>
 <tr><td>원 저장소 · 체크포인트</td><td><a href="https://github.com/CHEN-H01/Fast-in-Slow">CHEN-H01/Fast-in-Slow</a> · <a href="https://huggingface.co/haosad/fisvla">haosad/fisvla</a></td><td>학습·평가 코드 공개. 실습 6이 줄 번호로 잇는다</td></tr>
 <tr><td>논문</td><td><a href="https://arxiv.org/abs/2506.01953">arXiv 2506.01953</a> · <a href="https://arxiv.org/pdf/2506.01953">PDF</a> · <a href="https://fast-in-slow.github.io/">프로젝트</a></td><td>arXiv v1 기준(확인 2026-09-11)</td></tr>
 <tr><td>사내 노션 (계정 필요)</td><td><a href="https://app.notion.com/p/gsholdings/3d8f800bd1c181f694bff673f3b84b8d">FiS-VLA 정독 가이드</a> · <a href="https://app.notion.com/p/gsholdings/3d8f800bd1c181849993e5b23d2bbfab">두 쪽 요약</a> · <a href="https://app.notion.com/p/gsholdings/3d8f800bd1c18147a215c99f42704010">절별 독해 노트</a> · <a href="https://app.notion.com/p/gsholdings/3d8f800bd1c181929f93ea845766ce2f">실습 세션</a></td><td>공유회 논의 기록은 <a href="https://app.notion.com/p/gsholdings/3d6f800bd1c180e58a4ce5ece278485d">운영 페이지</a> 1주차 칸에</td></tr>
-<tr><td>메인 문서</td><td><a href="index.html">VLA 논문 6편 읽기</a></td><td>일정 · 논문 6편 · 계보 · 부스 질문</td></tr>
+<tr><td>메인 문서</td><td><a href="../../collections/ai2-robotics-vla-6/index.html">VLA 논문 6편 읽기</a></td><td>일정 · 논문 6편 · 계보 · 부스 질문</td></tr>
 </tbody>
 </table>
 </div>
 <div class="nextprev">
-  <a href="index.html"><small>메인 문서</small>VLA 논문 6편 읽기</a>
-  <a href="paper-1-robomamba.html"><small>짝 논문 · 1주차</small>① RoboMamba 스터디 페이지 →</a>
+  <a href="../../collections/ai2-robotics-vla-6/index.html"><small>메인 문서</small>VLA 논문 6편 읽기</a>
+  <a href="../robomamba/index.html"><small>짝 논문 · 1주차</small>① RoboMamba 스터디 페이지 →</a>
 </div>
 
 <footer>
   논문 수치는 arXiv 2506.01953 v1 본문·부록 표에서 옮겼다(확인 2026-09-11). 실습 결과는 스크립트를 실제로 돌려 나온 값이다(M1 Mac, numpy).
-  논문 밖 사실(저장소 내용·줄 번호·환경)에는 확인일을 붙였다. 갱신 2026-09-13.
+  논문 밖 사실(저장소 내용·줄 번호·환경)에는 확인일을 붙였다. 갱신 2026-09-17.
 </footer>
 </main>
 </div>
 
 <script>
 (function () {
-  var key = 'vla-study:' + location.pathname;
+  var key = 'physical-ai-study:' + location.pathname;
   var boxes = document.querySelectorAll('.checks input[type=checkbox]');
   var saved = {};
   try { saved = JSON.parse(localStorage.getItem(key) || '{}') || {}; } catch (e) { saved = {}; }

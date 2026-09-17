@@ -248,17 +248,17 @@
     <section id="intro">
       <p class="lede">이 문서는 논문 원문(arXiv v1)을 처음부터 부록까지 읽고 정리했다. 수치는 모두 논문 본문·부록 표에서 옮겼고, 논문 밖 사실에는 출처와 확인일을 따로 달았다.</p>
       <p><strong>읽는 법.</strong> 1부는 위에서 아래로 한 번 읽는다(2시간). 2부는 논문 PDF를 옆에 펴 놓고 그림·표 번호를 대조하며 읽는다(2시간). 3부는 공유회 준비용이다(30분). 이 페이지 전체에서 <span class="sans" style="color:var(--slow);font-weight:800">파랑은 System 2(느린 추론)</span>, <span class="sans" style="color:var(--fast);font-weight:800">주황은 System 1(빠른 실행)</span>이다.</p>
-      <p><strong>함께 쓰는 자료.</strong> 네 문서가 한 벌이다. 저장소 경로는 모두 <code>50_skills/ai2-vla-paper-study/</code> 기준.</p>
+      <p><strong>함께 쓰는 자료.</strong> 네 문서가 한 벌이다. 저장소 경로는 모두 <code>50_skills/physical-ai-papers/</code> 기준.</p>
       <div class="tbl"><table>
         <thead><tr><th>무엇</th><th>저장소 파일</th><th>언제 보나</th></tr></thead>
         <tbody>
-          <tr><td><a href="https://github.com/drum-grammer/ai2-vla-paper-study/blob/main/fis-vla-paper-summary.md">두 쪽 요약</a></td><td><code>fis-vla-paper-summary.md</code></td><td>시간 없을 때 먼저</td></tr>
-          <tr><td><strong>이 문서</strong> (정독 가이드)</td><td><code>fis-vla-study-guide.md</code> · 이 웹판의 원본 <code>fis-vla-study-guide.html</code></td><td>본체</td></tr>
-          <tr><td><a href="https://github.com/drum-grammer/ai2-vla-paper-study/blob/main/fis-vla-paper-ko.md">절별 독해 노트</a></td><td><code>fis-vla-paper-ko.md</code></td><td>원문 PDF를 옆에 펴 놓고</td></tr>
-          <tr><td><a href="fis-vla-lab.html">실습 세션</a></td><td><code>fis-vla-lab/README.md</code> · 코드 <code>fis-vla-lab/labs/</code></td><td>손으로 만져 볼 때</td></tr>
+          <tr><td><a href="https://github.com/drum-grammer/physical-ai-papers/blob/main/papers/2506.01953-fis-vla/summary.md">두 쪽 요약</a></td><td><code>summary.md</code></td><td>시간 없을 때 먼저</td></tr>
+          <tr><td><strong>이 문서</strong> (정독 가이드)</td><td><code>guide.md</code> · 이 웹판의 원본 <code>web/guide.html</code></td><td>본체</td></tr>
+          <tr><td><a href="https://github.com/drum-grammer/physical-ai-papers/blob/main/papers/2506.01953-fis-vla/notes.md">절별 독해 노트</a></td><td><code>notes.md</code></td><td>원문 PDF를 옆에 펴 놓고</td></tr>
+          <tr><td><a href="lab.html">실습 세션</a></td><td><code>lab.md</code> · 코드 <code>lab/</code></td><td>손으로 만져 볼 때</td></tr>
         </tbody>
       </table></div>
-      <p>각 절 끝의 <span class="sans" style="color:var(--fast);font-weight:800">▶ 실습</span> 상자가 해당 스크립트를 가리킨다. 이론 한 절, 실습 하나의 순서를 권한다. 게시본 주소까지 포함한 전체 목록은 <a href="index.html">자료 위치 지도</a>에 있다.</p>
+      <p>각 절 끝의 <span class="sans" style="color:var(--fast);font-weight:800">▶ 실습</span> 상자가 해당 스크립트를 가리킨다. 이론 한 절, 실습 하나의 순서를 권한다. 게시본 주소까지 포함한 전체 목록은 <a href="index.html">스터디 페이지</a>에 있다.</p>
       <p>논문 제목을 한 단어씩 풀면 배워야 할 개념이 다 나온다.</p>
       <div class="tbl"><table>
         <thead><tr><th>제목의 단어</th><th>알아야 할 개념</th><th>1부 절</th></tr></thead>
@@ -347,7 +347,7 @@
       <p>계산량은 토큰 수의 제곱에 비례한다(모든 토큰이 모든 토큰을 본다). 토큰이 많으면 느리고, 이것이 "VLA는 느리다"의 첫 원인이다.</p>
       <div class="box lab" data-label="1 · 토큰 열과 블록 쌓기">
         <p>언어·이미지 패치·상태·노이즈 행동 토큰이 한 행렬에 놓이는 것, "wine" 토큰이 병 패치에 어텐션을 주는 것, 블록 6개를 0~3(System 2)과 4~5(System 1)로 나눠(<a href="#s19">1.9절</a>) 중간 표현을 꺼내 4번 재사용하는 것을 1초 안에 본다. 저장소 <code>prismatic.py</code>의 <code>llm_layer_end</code> / <code>llm_layer_start</code> 두 번 호출의 축소판.</p>
-        <span class="cmd">python3 labs/lab1_tokens_blocks.py</span>
+        <span class="cmd">python3 lab/lab1_tokens_blocks.py</span>
       </div>
 
       <h3 id="s14"><span class="k">1.4</span>LLM, 자기회귀, 그리고 VLM</h3>
@@ -420,7 +420,7 @@
       <p>그래서 둘째 세대는 <strong>연속 행동을 한 번에 내는 별도 헤드</strong>를 붙인다. 대표가 확산 모델이다.</p>
       <div class="box lab" data-label="2 · 자기회귀는 왜 느리고 이산화는 왜 끊기는가">
         <p>토큰 수를 두 배로 늘리면 시간이 네 배 가까이 늘고(1.3절), 토큰 7개를 순차로 뽑는 것과 연속값 7개를 한 번에 내는 것의 Hz 차이를 직접 잰다(1.4절). 부드러운 궤적을 256·16 구간으로 자른 계단 그림도 만든다(1.7절).</p>
-        <span class="cmd">python3 labs/lab2_autoregressive_vs_chunk.py</span>
+        <span class="cmd">python3 lab/lab2_autoregressive_vs_chunk.py</span>
       </div>
 
       <h3 id="s18"><span class="k">1.8</span>확산 모델 행동 헤드와 행동 청크</h3>
@@ -441,11 +441,11 @@
       </div>
       <div class="box lab" data-label="3 · 확산으로 행동 만들기">
         <p>장애물을 왼쪽·오른쪽 어느 쪽으로 돌아도 되는 "두 갈래" 시연 데이터를 만들고, 행동을 직접 맞히는 회귀는 가운데(장애물 위)로 붕괴하는 반면 노이즈를 맞히는 확산은 두 갈래를 모두 만드는 것을 본다. 학습 코드 네 줄이 저장소 <code>fisvla.py</code>의 네 줄과 같고, 노이즈 스케줄도 같은 squaredcos_cap_v2, T=100.</p>
-        <span class="cmd">python3 labs/lab3_diffusion_action.py</span>
+        <span class="cmd">python3 lab/lab3_diffusion_action.py</span>
       </div>
       <div class="box lab" data-label="4 · 행동 청크">
         <p>청크 H를 1→8로 늘리면 명령 Hz는 8배가 되지만 관측 Hz는 그대로인 것을 표로 본다. 117.7 Hz의 뜻이 여기서 몸에 붙는다. 같은 스크립트의 (1)번 실험은 2.5절에서.</p>
-        <span class="cmd">python3 labs/lab4_chunk_async.py</span>
+        <span class="cmd">python3 lab/lab4_chunk_async.py</span>
       </div>
 
       <h3 id="s19"><span class="k">1.9</span>System 1 / System 2 — 이 논문의 중심 한 쌍</h3>
@@ -689,7 +689,7 @@
       </div>
       <div class="box lab" data-label="6 · 코드 지도">
         <p>이 표의 부품이 저장소 어느 줄인지 앵커로 찾아 출력한다. <code>train.sh</code>의 <code>LLM_MIDDLE_LAYER=30</code>이 "블록 31~32 = System 1"이고, <code>prismatic.py</code>가 LLM을 <code>llm_layer_end=30</code>으로 한 번, <code>llm_layer_start=30</code>으로 한 번 두 번 호출하는 것이 그림 2의 두 구간이다. 핵심 파일 5개(약 150KB)만 내려받으므로 저장소 전체(700MB)를 복제하지 않아도 된다.</p>
-        <span class="cmd">python3 labs/lab6_code_map.py</span>
+        <span class="cmd">python3 lab/lab6_code_map.py</span>
       </div>
 
       <h3 id="s25"><span class="k">2.5</span>두 시스템의 조율 — 비동기 주파수와 이종 입력 (3.3절)</h3>
@@ -707,7 +707,7 @@
       <p>부록 B.2는 입력을 다르게 배분한 세 변형도 시험한다(표 10). 3D를 System 2로 옮기면(변형 1) 0.63, 상태도 옮기면(변형 2) 0.61, 양쪽에 2D·3D를 다 주면(변형 3) 0.68. 결론은 "고주파 정보는 System 1에 있어야 하고, 겹쳐 주는 것은 손해가 아니다."</p>
       <div class="box lab" data-label="4 · 1:n 비동기의 최적점">
         <p>GPU 한 장에서 System 2(90 ms)와 System 1(30 ms)을 순차 실행하는 장난감 로봇이 웨이포인트 32개를 돈다. 1:1은 System 2를 매번 돌려 느리고, 1:16은 빠르지만 단계가 바뀐 뒤 옛 목표를 오래 붙든다. 성공률이 가운데에서 최고가 되는 표가 나온다. 저장소 <code>sim.py</code>의 <code>if slow_cnt % slow_fast_ratio == 0</code> 루프가 이 구조다. 상수를 바꿔 최적점이 움직이는 것도 확인하라(5절 한계 "비율이 고정"의 의미).</p>
-        <span class="cmd">python3 labs/lab4_chunk_async.py</span>
+        <span class="cmd">python3 lab/lab4_chunk_async.py</span>
       </div>
 
       <h3 id="s26"><span class="k">2.6</span>학습 — 식 세 개와 레시피 (3.4절)</h3>
@@ -720,7 +720,7 @@
       <p><strong>L = L<sub>fast</sub> + L<sub>slow</sub> (식 3).</strong> 왜 L<sub>slow</sub>를 두는가? System 1이 System 2의 마지막 블록을 공유하므로, 확산 손실만 흘려보내면 그 블록들이 "노이즈 예측기"로 변질되어 <strong>자기회귀 추론 능력을 잊는다</strong>(파국적 망각). 증거: L<sub>slow</sub>를 빼면 0.69 → 0.62(4.2절 (4)). 논문은 이 조합을 <strong>dual-aware co-training</strong>이라 부른다.</p>
       <div class="box lab" data-label="5 · 공동학습과 망각">
         <p>공유 몸통 + 분류 머리(이산 행동 토큰, 교차엔트로피) + 노이즈 예측 머리(MSE)를 만들어, 분류로 사전학습한 뒤 노이즈 예측만 학습하면 분류 정확도가 무너지고(95% → 75%), 두 손실을 더해 학습하면 유지되는(96%) 것을 20초 안에 본다. 저장소 <code>base_strategy.py</code>의 <code>loss = loss + output.loss</code> 한 줄이 식 (3)이다. 식 (1)은 실습 3에서 직접 학습했다.</p>
-        <span class="cmd">python3 labs/lab5_cotraining_forgetting.py</span>
+        <span class="cmd">python3 lab/lab5_cotraining_forgetting.py</span>
       </div>
       <div class="tbl"><table>
         <thead><tr><th>단계</th><th>데이터</th><th>설정</th></tr></thead>
@@ -919,7 +919,7 @@
       <p>비동기 "샘플링"은 데이터 쪽에서 처리된다. 학습 데이터의 이미지 키가 image_head_slow / image_head_fast로 나뉘어 있고, 태스크 이름의 s1f4가 slow 프레임을 1:4로 뽑았음을 암시한다. 변환 스크립트는 저장소에 없다(미확인). 실제 실행은 스터디 범위 밖이다(GPU·CoppeliaSim 필요, LIFT3D 포함 약 700MB).</p>
       <div class="box lab" data-label="6 · 코드 지도">
         <p>위 표의 줄을 GitHub에서 핵심 파일 5개(약 150KB)만 내려받아 앵커로 찾아 출력한다. 줄 번호가 바뀌어도 찾는다.</p>
-        <span class="cmd">python3 labs/lab6_code_map.py</span>
+        <span class="cmd">python3 lab/lab6_code_map.py</span>
       </div>
 
       <h3 id="s35"><span class="k">3.5</span>더 읽을 것</h3>

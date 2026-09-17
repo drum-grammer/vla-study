@@ -73,7 +73,7 @@ notebook 6.4.5 / matplotlib 3.4.3 / scipy 1.7.1</strong> (anaconda3).
 <code>python3 -m pip install numpy</code>.</p>
 
 <h2>실행 — 스크립트</h2>
-<pre class="code">cd 50_skills/ai2-vla-paper-study/robomamba-lab/labs
+<pre class="code">cd 50_skills/physical-ai-papers/papers/2406.04339-robomamba/lab
 python3 lab1_ssm_recurrence.py
 python3 lab2_linear_vs_quadratic.py
 python3 lab3_selective_gating.py
@@ -85,7 +85,7 @@ python3 lab7_code_map.py        <span class="c"># 이것만 네트워크 필요 
 떨어지고 브라우저로 열면 된다 (<code>open labs/out/lab1_state.svg</code>).</p>
 
 <h2>실행 — 주피터 노트북</h2>
-<pre class="code">cd 50_skills/ai2-vla-paper-study/robomamba-lab/notebooks
+<pre class="code">cd 50_skills/physical-ai-papers/papers/2406.04339-robomamba/lab/notebooks
 jupyter notebook robomamba_lab.ipynb</pre>
 <p>노트북은 실습 7개 전부 + 실제 Mamba 백본 확인(부록)이 한 파일에 들어 있다.
 위에서 아래로 실행하면 된다.</p>
@@ -110,7 +110,7 @@ jupyter notebook robomamba_lab.ipynb</pre>
 <ol>
 <li><a href="https://colab.research.google.com">colab.research.google.com</a> 접속</li>
 <li><strong>파일 &gt; 노트북 업로드</strong></li>
-<li><code>robomamba-lab/notebooks/robomamba_lab.ipynb</code>를 끌어다 놓기</li>
+<li><code>papers/2406.04339-robomamba/lab/notebooks/robomamba_lab.ipynb</code>를 끌어다 놓기</li>
 <li>위에서 아래로 실행</li>
 </ol>
 <div class="box key">
@@ -137,10 +137,10 @@ jupyter notebook robomamba_lab.ipynb</pre>
 <div class="box warn">
   <span class="h">⚠️ 두 가지 주의</span>
   원본 저장소는 <strong>비공개</strong>이지만, 실습 코드는 <strong>공개 저장소
-  <a href="https://github.com/drum-grammer/vla-study/tree/main/labs">drum-grammer/vla-study/labs</a></strong>에 복사돼 있다(2026-09-13부터).
+  <a href="https://github.com/drum-grammer/physical-ai-study/tree/main/labs">drum-grammer/physical-ai-study/labs</a></strong>에 복사돼 있다(2026-09-13부터).
   그 경로의 GitHub URL 방식이 그대로 된다 —
-  <a href="https://colab.research.google.com/github/drum-grammer/vla-study/blob/main/labs/robomamba/notebooks/robomamba_lab.ipynb">RoboMamba 노트북 코랩에서 열기</a> ·
-  <a href="https://colab.research.google.com/github/drum-grammer/vla-study/blob/main/labs/fis-vla/notebooks/lab1_tokens_blocks.ipynb">FiS-VLA 실습 1 코랩에서 열기</a>
+  <a href="https://colab.research.google.com/github/drum-grammer/physical-ai-study/blob/main/labs/robomamba/notebooks/robomamba_lab.ipynb">RoboMamba 노트북 코랩에서 열기</a> ·
+  <a href="https://colab.research.google.com/github/drum-grammer/physical-ai-study/blob/main/labs/fis-vla/notebooks/lab1_tokens_blocks.ipynb">FiS-VLA 실습 1 코랩에서 열기</a>
   (FiS-VLA 노트북은 첫 셀이 <code>tinynn.py</code>를 받아 온다). 비공개 원본에 코랩 GitHub 권한을 연결하는 것은 권장하지 않는다.
   <br><br>
   코랩에 올린 노트북과 그 출력은 <strong>구글 계정에 저장된다.</strong> 이 노트북은 공개
@@ -149,7 +149,7 @@ jupyter notebook robomamba_lab.ipynb</pre>
 
 <h2>노트북을 고쳤을 때 — 다시 빌드</h2>
 <p>실습 스크립트(<code>labs/*.py</code>)가 <strong>정본</strong>이고 노트북은 그 사본이다.</p>
-<pre class="code">cd 50_skills/ai2-vla-paper-study/robomamba-lab/notebooks
+<pre class="code">cd 50_skills/physical-ai-papers/papers/2406.04339-robomamba/lab/notebooks
 python3 build_notebook.py</pre>
 <p>손으로 두 벌을 관리하면 반드시 어긋나므로, <strong>노트북을 직접 고치지 말고 스크립트를
 고친 뒤 다시 빌드</strong>하는 것을 원칙으로 한다.</p>
@@ -329,14 +329,14 @@ pip install --force-reinstall opencv-python-headless &amp;&amp; pip install nump
 <table>
 <thead><tr><th>문서</th><th>배포 링크 (인터넷 필요, 설치 없음)</th></tr></thead>
 <tbody>
-<tr><td>RoboMamba 정독 가이드</td><td><a href="robomamba-guide.html">claude.ai/code/artifact/4631e67f…320f</a></td></tr>
-<tr><td>RoboMamba 실습 세션</td><td><a href="robomamba-lab.html">claude.ai/code/artifact/1579615f…c214</a></td></tr>
-<tr><td>이 문서 (실습 환경)</td><td><a href="lab-environment.html">claude.ai/code/artifact/c60f3bc8…8cab</a></td></tr>
+<tr><td>RoboMamba 정독 가이드</td><td><a href="papers/robomamba/guide.html">papers/robomamba/guide.html</a></td></tr>
+<tr><td>RoboMamba 실습 세션</td><td><a href="papers/robomamba/lab.html">papers/robomamba/lab.html</a></td></tr>
+<tr><td>이 문서 (실습 환경)</td><td><a href="lab-environment.html">lab-environment.html</a></td></tr>
 </tbody>
 </table>
 </div>
 <p><strong>로컬에서 띄우기</strong> — 저장소만 있으면 된다.</p>
-<pre class="code">cd 50_skills/ai2-vla-paper-study/web
+<pre class="code">cd 50_skills/physical-ai-papers/web
 python3 serve.py
 <span class="c"># → http://localhost:8765/ (브라우저 자동 실행)</span></pre>
 <div class="box warn">
@@ -357,20 +357,20 @@ python3 serve.py
 python3 --version &amp;&amp; python3 -c "import numpy; print(numpy.__version__)"
 
 <span class="c"># 2) 실습 하나 돌려 보기</span>
-cd 50_skills/ai2-vla-paper-study/robomamba-lab/labs &amp;&amp; python3 lab6_param_audit.py | head -20</pre>
+cd 50_skills/physical-ai-papers/papers/2406.04339-robomamba/lab &amp;&amp; python3 lab6_param_audit.py | head -20</pre>
 <p>2번이 표를 출력하면 준비 완료다. 안 되면 <strong>경로 B(코랩)</strong>로 가면 된다.</p>
 
 <h2>FiS-VLA 실습 스크립트에 대한 메모</h2>
 <div class="box key">
   <span class="h">FiS-VLA 실습도 같은 절차로 돌아간다</span>
   노션의 FiS-VLA 실습 페이지가 안내하는
-  <code>50_skills/ai2-vla-paper-study/fis-vla-lab/labs/</code>는
+  <code>50_skills/physical-ai-papers/papers/2506.01953-fis-vla/lab/</code>는
   <strong>2026-09-11 main에 커밋돼 있다</strong>(PR #23). 스크립트 6개 + 공용 도구
   <code>tinynn.py</code> + <code>.ipynb</code> 생성기와 노트북 6개가 함께 들어 있다.
   <br><br>
   <ul style="margin-top:8px">
   <li>FiS-VLA 실습의 요건도 같다(파이썬 3.9+ / numpy만). 위의 경로 A·B·C가 그대로 적용되고,
-  <code>cd</code> 대상만 <code>robomamba-lab/labs</code> → <code>fis-vla-lab/labs</code>로 바꾸면 된다.</li>
+  <code>cd</code> 대상만 <code>papers/2406.04339-robomamba/lab</code> → <code>papers/2506.01953-fis-vla/lab</code>로 바꾸면 된다.</li>
   <li>두 실습 디렉터리는 서로 독립이다. 한쪽만 돌려도 문제 없다.</li>
   </ul>
 </div>

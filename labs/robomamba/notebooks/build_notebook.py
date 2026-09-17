@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""labs/*.py 에서 자기완결형 주피터 노트북을 생성한다.
+"""상위 폴더(lab/)의 lab*.py 에서 자기완결형 주피터 노트북을 생성한다.
 
 왜 생성하는가: 실습 스크립트가 정본이고 노트북은 그 사본이다. 손으로 두 벌을
 관리하면 반드시 어긋난다. 이 스크립트를 다시 돌리면 노트북이 항상 최신이 된다.
@@ -16,7 +16,7 @@ import os
 import re
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-LABS = os.path.join(os.path.dirname(HERE), "labs")
+LABS = os.path.dirname(HERE)          # 실습 스크립트는 상위 폴더(lab/)에 있다
 OUT = os.path.join(HERE, "robomamba_lab.ipynb")
 
 LAB_FILES = [
@@ -105,7 +105,7 @@ cells.append(code(boot))
 tiny = open(os.path.join(LABS, "tinyssm.py"), encoding="utf-8").read()
 cells.append(md("### 0-1. 공용 도구 `tinyssm.py` 준비\n",
                 "\n",
-                "저장소 `labs/tinyssm.py`와 **같은 내용**이다. 이미 같은 폴더에 "
+                "저장소 `tinyssm.py`와 **같은 내용**이다. 이미 같은 폴더에 "
                 "있으면 이 셀은 건너뛴다(로컬에서 저장소를 클론한 경우).\n"))
 cells.append(code(
     'import os\n'
@@ -119,7 +119,7 @@ cells.append(code(
     'print("import OK ·", T.PAPER)\n'))
 # 원본 문자열을 별도 셀로 (가독성: 접어 두고 볼 수 있게)
 cells.insert(len(cells) - 1, code(
-    "# tinyssm.py 원본 (labs/tinyssm.py와 동일) — 내용을 읽고 싶으면 펼쳐 보라\n"
+    "# tinyssm.py 원본 (저장소 lab/tinyssm.py와 동일) — 내용을 읽고 싶으면 펼쳐 보라\n"
     "_TINYSSM_SOURCE = r'''" + tiny.replace("'''", "\\'\\'\\'") + "'''\n"
     "print(f'tinyssm 원본 {len(_TINYSSM_SOURCE):,} 바이트 준비')\n"))
 
@@ -130,7 +130,7 @@ for i, (fn, title, svg) in enumerate(LAB_FILES, start=1):
     body = "\n".join(doc.splitlines()[1:]).strip()
     cells.append(md(f"---\n", f"\n## 실습 {i} · {title}\n", "\n",
                     f"```\n{body}\n```\n" if body else "\n",
-                    f"\n원본 스크립트: `labs/{fn}`\n"))
+                    f"\n원본 스크립트: `{fn}`\n"))
     cells.append(code(notebook_safe(src)))
     if svg:
         cells.append(code(
